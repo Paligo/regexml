@@ -17,3 +17,9 @@ and XQuery standard function library:
 https://www.w3.org/TR/xpath-functions-31/#regex-syntax
 
 This crate also implements this extension.
+
+The Rust source code is based on the Java implementation in Saxon HE
+`net.sf.saxon.regex`, which in turn is based on an engine implemented by Apache
+Jakarta:
+
+https://blog.saxonica.com/mike/2012/01/a-new-regex-engine.html
