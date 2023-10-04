@@ -20,7 +20,7 @@ pub(crate) trait Operation {
     fn matches_empty_string(&self) -> u32;
 
     fn matches_iter<'a>(
-        &'a self,
+        &self,
         matcher: &'a ReMatcher<'a>,
         position: usize,
     ) -> Box<dyn Iterator<Item = usize> + 'a>;
@@ -45,7 +45,7 @@ impl<T: Operation> Operation for &T {
     }
 
     fn matches_iter<'a>(
-        &'a self,
+        &self,
         matcher: &'a ReMatcher<'a>,
         position: usize,
     ) -> Box<dyn Iterator<Item = usize> + 'a> {

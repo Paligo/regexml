@@ -62,6 +62,8 @@ impl<'a> ReMatcher<'a> {
     pub(crate) fn set_paren_end(&self, which: usize, i: usize) {
         todo!()
     }
+
+    pub(crate) fn clear_capture_groups_beyond(&self, position: usize) {}
 }
 
 #[derive(Debug, Clone)]

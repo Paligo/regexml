@@ -33,7 +33,7 @@ impl Operation for OpCapture {
     // }
 
     fn matches_iter<'a>(
-        &'a self,
+        &self,
         matcher: &'a ReMatcher<'a>,
         position: usize,
     ) -> Box<dyn Iterator<Item = usize> + 'a> {

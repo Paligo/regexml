@@ -1,11 +1,13 @@
+use std::rc::Rc;
+
 use crate::{operation::Operation, re_matcher::ReMatcher};
 
 struct OpChoice {
-    branches: Vec<Box<dyn Operation>>,
+    branches: Vec<Rc<dyn Operation>>,
 }
 
 impl OpChoice {
-    pub(crate) fn new(branches: Vec<Box<dyn Operation>>) -> Self {
+    pub(crate) fn new(branches: Vec<Rc<dyn Operation>>) -> Self {
         Self { branches }
     }
 }
@@ -44,11 +46,15 @@ impl Operation for OpChoice {
     // fn contains_capturing_expressions() -> bool {}
 
     fn matches_iter<'a>(
-        &'a self,
+        &self,
         matcher: &'a ReMatcher<'a>,
         position: usize,
     ) -> Box<dyn Iterator<Item = usize> + 'a> {
-        Box::new(ChoiceIterator::new(matcher, position, &self.branches))
+        Box::new(ChoiceIterator::new(
+            matcher,
+            position,
+            self.branches.clone(),
+        ))
     }
 
     fn display(&self) -> String {
@@ -64,24 +70,22 @@ impl Operation for OpChoice {
 struct ChoiceIterator<'a> {
     matcher: &'a ReMatcher<'a>,
     position: usize,
-    branches_iter: Box<dyn Iterator<Item = &'a Box<dyn Operation + 'a>> + 'a>,
-    current_iter: Box<dyn Iterator<Item = usize> + 'a>,
+    branches_iter: Box<dyn Iterator<Item = Rc<dyn Operation + 'a>> + 'a>,
+    current_iter: Option<Box<dyn Iterator<Item = usize> + 'a>>,
 }
 
 impl<'a> ChoiceIterator<'a> {
     fn new(
         matcher: &'a ReMatcher<'a>,
         position: usize,
-        branches: &'a [Box<dyn Operation + 'a>],
+        branches: Vec<Rc<dyn Operation + 'a>>,
     ) -> Self {
-        let mut branches_iter = branches.iter();
-        let first_op = branches_iter.next().unwrap();
-        let current_iter = first_op.matches_iter(matcher, position);
         Self {
             matcher,
             position,
-            branches_iter: Box::new(branches_iter),
-            current_iter,
+            branches_iter: Box::new(branches.into_iter()),
+            current_iter: None,
+            // current_iter,
         }
     }
 }
@@ -91,13 +95,25 @@ impl<'a> Iterator for ChoiceIterator<'a> {
 
     fn next(&mut self) -> Option<Self::Item> {
         loop {
-            let next = self.current_iter.next();
-            if let Some(next) = next {
-                return Some(next);
+            if let Some(current_iter) = &mut self.current_iter {
+                let next = current_iter.next();
+                if let Some(next) = next {
+                    return Some(next);
+                } else {
+                    // TODO: ugly duplication
+                    let next_op = self.branches_iter.next();
+                    if let Some(next_op) = next_op {
+                        self.matcher.clear_capture_groups_beyond(self.position);
+                        self.current_iter = Some(next_op.matches_iter(self.matcher, self.position));
+                    } else {
+                        return None;
+                    }
+                }
             } else {
                 let next_op = self.branches_iter.next();
                 if let Some(next_op) = next_op {
-                    self.current_iter = next_op.matches_iter(self.matcher, self.position);
+                    self.matcher.clear_capture_groups_beyond(self.position);
+                    self.current_iter = Some(next_op.matches_iter(self.matcher, self.position));
                 } else {
                     return None;
                 }

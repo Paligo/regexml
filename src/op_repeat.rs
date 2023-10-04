@@ -1,4 +1,4 @@
-use std::{cell::RefCell, rc::Rc};
+use std::rc::Rc;
 
 use crate::{
     operation::{Operation, MATCHES_ZLS_ANYWHERE},
@@ -50,11 +50,11 @@ impl Operation for OpRepeat {
     // fn contains_capturing_expressions() -> bool {}
 
     fn matches_iter<'a>(
-        &'a self,
+        &self,
         matcher: &'a crate::re_matcher::ReMatcher,
         position: usize,
     ) -> Box<dyn Iterator<Item = usize> + 'a> {
-        let mut iterators: Vec<RefCell<Box<dyn Iterator<Item = usize>>>> = Vec::new();
+        let mut iterators: Vec<Box<dyn Iterator<Item = usize>>> = Vec::new();
         let mut positions = Vec::new();
         let bound = self.max.min(matcher.search.len() - position + 1);
         let mut p = position;
@@ -66,7 +66,7 @@ impl Operation for OpRepeat {
                     .is_duplicate_zero_length_match(Box::new(self), position)
             {
                 // add a match at the current position if zero occurrences are allowed
-                iterators.push(RefCell::new(Box::new(std::iter::once(position))));
+                iterators.push(Box::new(std::iter::once(position)));
                 positions.push(p);
             }
             for _i in 0..bound {
@@ -103,7 +103,7 @@ struct RepeatIterator<'a> {
     matcher: &'a crate::re_matcher::ReMatcher<'a>,
     operation: Rc<dyn Operation + 'a>,
     min: usize,
-    iterators: Vec<RefCell<Box<dyn Iterator<Item = usize> + 'a>>>,
+    iterators: Vec<Box<dyn Iterator<Item = usize> + 'a>>,
     positions: Vec<usize>,
     bound: usize,
 }
@@ -111,8 +111,8 @@ struct RepeatIterator<'a> {
 impl<'a> RepeatIterator<'a> {
     fn new(
         matcher: &'a ReMatcher<'a>,
-        operation: Rc<dyn Operation>,
-        iterators: Vec<RefCell<Box<dyn Iterator<Item = usize> + 'a>>>,
+        operation: Rc<dyn Operation + 'a>,
+        iterators: Vec<Box<dyn Iterator<Item = usize> + 'a>>,
         positions: Vec<usize>,
         bound: usize,
     ) -> Self {
@@ -139,18 +139,19 @@ impl<'a> Iterator for RepeatIterator<'a> {
         } else {
             loop {
                 let top = self.iterators.last_mut().unwrap();
-                let p = top.borrow_mut().next();
+                let p = top.next();
                 if let Some(p) = p {
                     self.positions.pop();
                     self.positions.push(p);
                     while self.iterators.len() < self.bound {
-                        // let mut it = self.operation.matches_iter(self.matcher, p);
-                        // if let Some(p) = it.next() {
-                        //     self.iterators.push(it.into());
-                        //     self.positions.push(p)
-                        // } else {
-                        //     break;
-                        // }
+                        let operation = &self.operation;
+                        let mut it = operation.matches_iter(self.matcher, p);
+                        if let Some(p) = it.next() {
+                            self.iterators.push(it.into());
+                            self.positions.push(p)
+                        } else {
+                            break;
+                        }
                     }
                 } else {
                     self.iterators.pop();
