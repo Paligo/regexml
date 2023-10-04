@@ -5,7 +5,7 @@ use crate::re_matcher::ReMatcher;
 struct Action {}
 
 impl Action {
-    fn characters(&mut self, current: &str) {
+    fn characters(&mut self, current: &[char]) {
         todo!()
     }
 
@@ -20,15 +20,15 @@ impl Action {
 
 struct RegexIterator<'a> {
     // the input string being matched
-    the_string: &'a str,
-    regex: &'a str,
+    the_string: &'a [char],
+    regex: &'a [char],
     // the Matcher object that does the matching, and holds the state
     matcher: ReMatcher<'a>,
     // the string most recently returned by the iterator
-    current: Option<&'a str>,
+    current: Option<&'a [char]>,
     // if the last string was a matching string, None, null; otherwise the next
     // substring matched by the regex
-    next_substring: Option<&'a str>,
+    next_substring: Option<&'a [char]>,
     // the position in the input string of the end of the last match or
     // non-match
     prev_end: Option<usize>,
@@ -40,12 +40,12 @@ struct RegexIterator<'a> {
 }
 
 impl<'a> RegexIterator<'a> {
-    pub(crate) fn new(str: &'a str, regex: &'a str, matcher: ReMatcher<'a>) -> Self {
+    pub(crate) fn new(str: &'a [char], regex: &'a [char], matcher: ReMatcher<'a>) -> Self {
         Self {
             the_string: str,
             regex,
             matcher,
-            current: Some(""),
+            current: None,
             next_substring: None,
             prev_end: Some(0),
             nesting_table: Some(HashMap::new()),
@@ -137,7 +137,7 @@ impl<'a> RegexIterator<'a> {
                     }
                 }
             }
-            let mut buff = String::new();
+            let mut buff = Vec::new();
 
             if let Some(current) = self.current {
                 for i in 0..=current.len() {
@@ -157,7 +157,7 @@ impl<'a> RegexIterator<'a> {
                     }
 
                     if i < current.len() {
-                        buff.push(current.chars().nth(i).unwrap());
+                        buff.push(current[i]);
                     }
                 }
             }
@@ -167,7 +167,7 @@ impl<'a> RegexIterator<'a> {
         }
     }
 
-    fn compute_nesting_table(&self, regex: &str) -> HashMap<usize, usize> {
+    fn compute_nesting_table(&self, regex: &[char]) -> HashMap<usize, usize> {
         let mut nesting_table = HashMap::with_capacity(16);
         // TODO: determine capacity based on regex length in unicode chars?
         let mut stack = Vec::new();
@@ -175,23 +175,23 @@ impl<'a> RegexIterator<'a> {
         let group = 1;
         let mut in_brackets = 0;
         stack.push(0);
-        let mut chars = regex.chars().peekable();
+        let mut chars = regex.iter().peekable();
         while let Some(ch) = chars.next() {
-            if ch == '\\' {
+            if *ch == '\\' {
                 continue;
-            } else if ch == '[' {
+            } else if *ch == '[' {
                 in_brackets += 1;
-            } else if ch == ']' {
+            } else if *ch == ']' {
                 in_brackets -= 1;
-            } else if ch == '(' && in_brackets == 0 {
+            } else if *ch == '(' && in_brackets == 0 {
                 // peek ahead one
-                let capture = chars.peek() != Some(&'?');
+                let capture = chars.peek() != Some(&&'?');
                 capture_stack.push(capture);
                 if capture {
                     nesting_table.insert(group, stack[stack.len() - 1]);
                     stack.push(group);
                 }
-            } else if ch == ')' && in_brackets == 0 {
+            } else if *ch == ')' && in_brackets == 0 {
                 let capture = capture_stack.pop().unwrap();
                 if capture {
                     stack.pop();
@@ -203,7 +203,7 @@ impl<'a> RegexIterator<'a> {
 }
 
 impl<'a> Iterator for RegexIterator<'a> {
-    type Item = &'a str;
+    type Item = &'a [char];
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.next_substring.is_none() && self.prev_end.is_some() {
@@ -214,7 +214,8 @@ impl<'a> Iterator for RegexIterator<'a> {
                 search_start += 1;
                 if search_start >= self.the_string.len() {
                     if self.prev_end.unwrap() < self.the_string.len() {
-                        return Some(&self.the_string[self.prev_end.unwrap()..]);
+                        self.current = Some(&self.the_string[self.prev_end.unwrap()..]);
+                        return self.current;
                     } else {
                         self.prev_end = None;
                         self.current = None;

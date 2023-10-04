@@ -1,4 +1,5 @@
 mod op_atom;
+mod op_back_reference;
 mod op_bol;
 mod operation;
 mod re_matcher;

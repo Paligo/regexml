@@ -1,12 +1,14 @@
 use crate::re_program::ReProgram;
 
 pub(crate) struct ReMatcher<'a> {
-    pub(crate) search: &'a str,
+    pub(crate) search: &'a [char],
     pub(crate) program: ReProgram,
+    pub(crate) start_back_ref: Vec<Option<usize>>,
+    pub(crate) end_back_ref: Vec<Option<usize>>,
 }
 
 impl<'a> ReMatcher<'a> {
-    pub(crate) fn matches(&self, str: &str, start: usize) -> bool {
+    pub(crate) fn matches(&self, str: &[char], start: usize) -> bool {
         todo!()
     }
 
@@ -27,5 +29,9 @@ impl<'a> ReMatcher<'a> {
 
     pub(crate) fn is_new_line(&self, i: usize) -> bool {
         todo!();
+    }
+
+    pub(crate) fn equal_case_blind(&self, a: char, b: char) -> bool {
+        todo!()
     }
 }
