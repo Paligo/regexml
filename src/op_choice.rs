@@ -48,7 +48,7 @@ impl Operation for OpChoice {
         matcher: &'a ReMatcher<'a>,
         position: usize,
     ) -> Box<dyn Iterator<Item = usize> + 'a> {
-        Box::new(ChoiceIterator::new(matcher, position, self.branches.iter()))
+        Box::new(ChoiceIterator::new(matcher, position, &self.branches))
     }
 
     fn display(&self) -> String {
@@ -64,7 +64,7 @@ impl Operation for OpChoice {
 struct ChoiceIterator<'a> {
     matcher: &'a ReMatcher<'a>,
     position: usize,
-    branches: std::slice::Iter<'a, Box<dyn Operation>>,
+    branches_iter: Box<dyn Iterator<Item = &'a Box<dyn Operation + 'a>> + 'a>,
     current_iter: Box<dyn Iterator<Item = usize> + 'a>,
 }
 
@@ -72,14 +72,15 @@ impl<'a> ChoiceIterator<'a> {
     fn new(
         matcher: &'a ReMatcher<'a>,
         position: usize,
-        mut branches: std::slice::Iter<'a, Box<dyn Operation>>,
+        branches: &'a [Box<dyn Operation + 'a>],
     ) -> Self {
-        let first_op = branches.next().unwrap();
+        let mut branches_iter = branches.iter();
+        let first_op = branches_iter.next().unwrap();
         let current_iter = first_op.matches_iter(matcher, position);
         Self {
             matcher,
             position,
-            branches,
+            branches_iter: Box::new(branches_iter),
             current_iter,
         }
     }
@@ -94,7 +95,7 @@ impl<'a> Iterator for ChoiceIterator<'a> {
             if let Some(next) = next {
                 return Some(next);
             } else {
-                let next_op = self.branches.next();
+                let next_op = self.branches_iter.next();
                 if let Some(next_op) = next_op {
                     self.current_iter = next_op.matches_iter(self.matcher, self.position);
                 } else {

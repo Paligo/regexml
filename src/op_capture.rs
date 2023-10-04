@@ -48,10 +48,6 @@ impl Operation for OpCapture {
             self.group_nr,
             position,
         ))
-        //     // basis,
-        //     group_nr: self.group_nr,
-        //     position,
-        // })
     }
 
     fn display(&self) -> String {
