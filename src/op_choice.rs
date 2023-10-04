@@ -52,7 +52,12 @@ impl Operation for OpChoice {
     }
 
     fn display(&self) -> String {
-        todo!();
+        format!(
+            "(?:{})",
+            self.branches.iter().fold("".to_string(), |acc, branch| {
+                format!("{}{}|", acc, &branch.display())
+            })
+        )
     }
 }
 
