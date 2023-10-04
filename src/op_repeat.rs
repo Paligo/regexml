@@ -72,7 +72,7 @@ impl Operation for OpRepeat {
             for _i in 0..bound {
                 let mut it = self.operation.matches_iter(matcher, p);
                 if let Some(next) = it.next() {
-                    iterators.push(it.into());
+                    iterators.push(it);
                     positions.push(next);
                 } else if iterators.is_empty() {
                     return Box::new(std::iter::empty());
@@ -89,6 +89,7 @@ impl Operation for OpRepeat {
                 bound,
             ))
         } else {
+            // reluctant (non-greedy) repeat.
             todo!()
         }
     }
@@ -147,7 +148,7 @@ impl<'a> Iterator for RepeatIterator<'a> {
                         let operation = &self.operation;
                         let mut it = operation.matches_iter(self.matcher, p);
                         if let Some(p) = it.next() {
-                            self.iterators.push(it.into());
+                            self.iterators.push(it);
                             self.positions.push(p)
                         } else {
                             break;
