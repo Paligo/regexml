@@ -1,17 +1,15 @@
-use crate::operation::{MatchesZls, Operation};
+use crate::operation::{Operation, MATCHES_ZLS_AT_START};
 use crate::re_matcher::ReMatcher;
 
 struct OpBol {}
-
-const MATCHES_ZLS_AT_START: usize = 1;
 
 impl Operation for OpBol {
     fn get_match_length(&self) -> Option<usize> {
         Some(0)
     }
 
-    fn matches_empty_string(&self) -> Option<MatchesZls> {
-        Some(MatchesZls::AtStart)
+    fn matches_empty_string(&self) -> u32 {
+        MATCHES_ZLS_AT_START
     }
 
     fn matches_iter<'a>(

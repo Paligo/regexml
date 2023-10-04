@@ -1,5 +1,5 @@
 use crate::{
-    operation::{MatchesZls, Operation},
+    operation::Operation,
     re_matcher::ReMatcher,
     re_program::{ReFlags, ReProgram, OPT_HASBACKREFS},
 };
@@ -24,7 +24,7 @@ impl Operation for OpCapture {
         self.child_op.get_minimum_match_length()
     }
 
-    fn matches_empty_string(&self) -> Option<MatchesZls> {
+    fn matches_empty_string(&self) -> u32 {
         self.child_op.matches_empty_string()
     }
 
@@ -33,7 +33,7 @@ impl Operation for OpCapture {
     // }
 
     fn matches_iter<'a>(
-        &self,
+        &'a self,
         matcher: &'a ReMatcher<'a>,
         position: usize,
     ) -> Box<dyn Iterator<Item = usize> + 'a> {

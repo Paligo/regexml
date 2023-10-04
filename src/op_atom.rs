@@ -1,5 +1,5 @@
 use crate::{
-    operation::{MatchesZls, Operation},
+    operation::{Operation, MATCHES_ZLS_ANYWHERE, MATCHES_ZLS_NEVER},
     re_matcher::ReMatcher,
 };
 
@@ -22,11 +22,11 @@ impl Operation for OpAtom {
         Some(self.len)
     }
 
-    fn matches_empty_string(&self) -> Option<MatchesZls> {
+    fn matches_empty_string(&self) -> u32 {
         if self.len == 0 {
-            Some(MatchesZls::Anywhere)
+            MATCHES_ZLS_ANYWHERE
         } else {
-            Some(MatchesZls::Never)
+            MATCHES_ZLS_NEVER
         }
     }
 

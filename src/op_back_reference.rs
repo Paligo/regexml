@@ -1,7 +1,4 @@
-use crate::{
-    operation::{MatchesZls, Operation},
-    re_matcher::ReMatcher,
-};
+use crate::{operation::Operation, re_matcher::ReMatcher};
 
 struct OpBackReference {
     group_nr: usize,
@@ -14,9 +11,9 @@ impl OpBackReference {
 }
 
 impl Operation for OpBackReference {
-    fn matches_empty_string(&self) -> Option<MatchesZls> {
+    fn matches_empty_string(&self) -> u32 {
         // no information available
-        None
+        0
     }
 
     fn matches_iter<'a>(
