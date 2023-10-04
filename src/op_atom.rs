@@ -35,11 +35,11 @@ impl Operation for OpAtom {
 
     // }
 
-    fn matches_iter(
+    fn matches_iter<'a>(
         &self,
-        matcher: &ReMatcher,
+        matcher: &'a ReMatcher,
         position: usize,
-    ) -> Box<dyn Iterator<Item = usize> + '_> {
+    ) -> Box<dyn Iterator<Item = usize> + 'a> {
         let in_ = matcher.search;
         if (position + self.len) > in_.len() {
             return Box::new(std::iter::empty());

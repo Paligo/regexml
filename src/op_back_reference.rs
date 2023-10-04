@@ -19,18 +19,18 @@ impl Operation for OpBackReference {
         None
     }
 
-    fn matches_iter(
+    fn matches_iter<'a>(
         &self,
-        matcher: &ReMatcher,
+        matcher: &'a ReMatcher,
         position: usize,
-    ) -> Box<dyn Iterator<Item = usize> + '_> {
+    ) -> Box<dyn Iterator<Item = usize> + 'a> {
         // Get the start and end of the backref
-        let s = matcher.start_back_ref[self.group_nr];
-        let e = matcher.end_back_ref[self.group_nr];
+        let s = matcher.state.borrow().start_back_ref[self.group_nr];
+        let e = matcher.state.borrow().end_back_ref[self.group_nr];
 
         // We don't know the backref yet
         if s.is_none() || e.is_none() {
-            return Box::new(vec![].into_iter());
+            return Box::new(std::iter::empty());
         }
         let s = s.unwrap();
         let e = e.unwrap();

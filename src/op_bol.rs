@@ -14,11 +14,11 @@ impl Operation for OpBol {
         Some(MatchesZls::AtStart)
     }
 
-    fn matches_iter(
+    fn matches_iter<'a>(
         &self,
-        matcher: &ReMatcher,
+        matcher: &'a ReMatcher,
         position: usize,
-    ) -> Box<dyn Iterator<Item = usize> + '_> {
+    ) -> Box<dyn Iterator<Item = usize> + 'a> {
         // Fail if we're not at the start of the string
         if position != 0 {
             // If we're multiline matching, we could still be at the start of a line

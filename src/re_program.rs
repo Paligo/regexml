@@ -1,3 +1,6 @@
+pub(crate) const OPT_HASBACKREFS: u32 = 1;
+pub(crate) const OPT_HASBOL: u32 = 2;
+
 pub(crate) struct ReFlags {}
 
 impl ReFlags {
@@ -12,4 +15,5 @@ impl ReFlags {
 
 pub(crate) struct ReProgram {
     pub(crate) flags: ReFlags,
+    pub(crate) optimization_flags: u32,
 }
