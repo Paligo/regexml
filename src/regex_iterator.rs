@@ -1,29 +1,6 @@
 use ahash::{HashMap, HashMapExt};
 
-struct Matcher<'a> {
-    phantom: std::marker::PhantomData<&'a str>,
-}
-
-impl<'a> Matcher<'a> {
-    fn matches(&self, str: &str, start: usize) -> bool {
-        todo!()
-    }
-
-    fn get_paren_start(&self, i: usize) -> usize {
-        todo!()
-    }
-
-    fn get_paren_end(&self, i: usize) -> usize {
-        todo!()
-    }
-    fn get_paren_count(&self) -> usize {
-        todo!()
-    }
-
-    fn get_paren(&self, i: usize) -> Option<&'a str> {
-        todo!()
-    }
-}
+use crate::re_matcher::ReMatcher;
 
 struct Action {}
 
@@ -46,7 +23,7 @@ struct RegexIterator<'a> {
     the_string: &'a str,
     regex: &'a str,
     // the Matcher object that does the matching, and holds the state
-    matcher: Matcher<'a>,
+    matcher: ReMatcher<'a>,
     // the string most recently returned by the iterator
     current: Option<&'a str>,
     // if the last string was a matching string, None, null; otherwise the next
@@ -63,7 +40,7 @@ struct RegexIterator<'a> {
 }
 
 impl<'a> RegexIterator<'a> {
-    pub(crate) fn new(str: &'a str, regex: &'a str, matcher: Matcher<'a>) -> Self {
+    pub(crate) fn new(str: &'a str, regex: &'a str, matcher: ReMatcher<'a>) -> Self {
         Self {
             the_string: str,
             regex,
