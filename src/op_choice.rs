@@ -61,7 +61,6 @@ struct ChoiceIterator<'a> {
     position: usize,
     branches: std::slice::Iter<'a, Box<dyn Operation>>,
     current_iter: Box<dyn Iterator<Item = usize> + 'a>,
-    // current_op: Option<Box<dyn Operation>>,
 }
 
 impl<'a> ChoiceIterator<'a> {
