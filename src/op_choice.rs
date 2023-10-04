@@ -88,6 +88,17 @@ impl<'a> ChoiceIterator<'a> {
             // current_iter,
         }
     }
+
+    fn next_branch(&mut self) -> bool {
+        let next_op = self.branches_iter.next();
+        if let Some(next_op) = next_op {
+            self.matcher.clear_capture_groups_beyond(self.position);
+            self.current_iter = Some(next_op.matches_iter(self.matcher, self.position));
+            true
+        } else {
+            false
+        }
+    }
 }
 
 impl<'a> Iterator for ChoiceIterator<'a> {
@@ -99,24 +110,11 @@ impl<'a> Iterator for ChoiceIterator<'a> {
                 let next = current_iter.next();
                 if let Some(next) = next {
                     return Some(next);
-                } else {
-                    // TODO: ugly duplication
-                    let next_op = self.branches_iter.next();
-                    if let Some(next_op) = next_op {
-                        self.matcher.clear_capture_groups_beyond(self.position);
-                        self.current_iter = Some(next_op.matches_iter(self.matcher, self.position));
-                    } else {
-                        return None;
-                    }
-                }
-            } else {
-                let next_op = self.branches_iter.next();
-                if let Some(next_op) = next_op {
-                    self.matcher.clear_capture_groups_beyond(self.position);
-                    self.current_iter = Some(next_op.matches_iter(self.matcher, self.position));
-                } else {
+                } else if !self.next_branch() {
                     return None;
                 }
+            } else if !self.next_branch() {
+                return None;
             }
         }
     }
