@@ -17,6 +17,28 @@ impl CharacterClass {
         }
     }
 
+    pub(crate) fn union(self, other: CharacterClass) -> Self {
+        match (self, other) {
+            (CharacterClass::Empty, other) => other,
+            (s, CharacterClass::Empty) => s,
+            (a, b) => {
+                let is_a = a.charset();
+                let is_b = b.charset();
+                if let (Some(is_a), Some(is_b)) = (is_a, is_b) {
+                    match is_a.union(is_b) {
+                        InvertibleCharSet::Normal(a) => CharacterClass::CharSet(a),
+                        InvertibleCharSet::Inverse(a) => {
+                            CharacterClass::Inverse(Box::new(CharacterClass::CharSet(a)))
+                        }
+                    }
+                } else {
+                    // TODO: this won't work
+                    todo!()
+                    // CharacterClass::Predicate(move |c| self.test(c) || other.test(c))
+                }
+            }
+        }
+    }
     pub(crate) fn escape_s_lower() -> Self {
         CharacterClass::from_chars(&['\t', '\n', '\r', ' '])
     }
@@ -30,16 +52,33 @@ impl CharacterClass {
     // }
 }
 
-pub(crate) enum InvertableCharSet {
+pub(crate) enum InvertibleCharSet {
     Inverse(HashSet<char>),
     Normal(HashSet<char>),
 }
 
-impl InvertableCharSet {
+impl InvertibleCharSet {
     fn inverted(&self) -> Self {
         match self {
-            InvertableCharSet::Inverse(set) => InvertableCharSet::Normal(set.clone()),
-            InvertableCharSet::Normal(set) => InvertableCharSet::Inverse(set.clone()),
+            InvertibleCharSet::Inverse(set) => InvertibleCharSet::Normal(set.clone()),
+            InvertibleCharSet::Normal(set) => InvertibleCharSet::Inverse(set.clone()),
+        }
+    }
+
+    fn union(self, other: InvertibleCharSet) -> Self {
+        match (self, other) {
+            (InvertibleCharSet::Normal(a), InvertibleCharSet::Normal(b)) => {
+                InvertibleCharSet::Normal(a.union(&b).copied().collect::<HashSet<_>>())
+            }
+            (InvertibleCharSet::Inverse(a), InvertibleCharSet::Inverse(b)) => {
+                InvertibleCharSet::Inverse(a.union(&b).copied().collect::<HashSet<_>>())
+            }
+            (InvertibleCharSet::Inverse(a), InvertibleCharSet::Normal(b)) => {
+                InvertibleCharSet::Inverse(a.difference(&b).copied().collect::<HashSet<_>>())
+            }
+            (InvertibleCharSet::Normal(a), InvertibleCharSet::Inverse(b)) => {
+                InvertibleCharSet::Inverse(b.difference(&a).copied().collect::<HashSet<_>>())
+            }
         }
     }
 }
@@ -82,9 +121,9 @@ impl CharacterClass {
         }
     }
 
-    pub(crate) fn charset(&self) -> Option<InvertableCharSet> {
+    pub(crate) fn charset(&self) -> Option<InvertibleCharSet> {
         match self {
-            CharacterClass::Empty => Some(InvertableCharSet::Normal(HashSet::new())),
+            CharacterClass::Empty => Some(InvertibleCharSet::Normal(HashSet::new())),
             CharacterClass::Inverse(complement) => {
                 let charset = complement.charset()?;
                 Some(charset.inverted())
@@ -93,9 +132,9 @@ impl CharacterClass {
             CharacterClass::Char(c) => {
                 let mut set = HashSet::new();
                 set.insert(*c);
-                Some(InvertableCharSet::Normal(set))
+                Some(InvertibleCharSet::Normal(set))
             }
-            CharacterClass::CharSet(set) => Some(InvertableCharSet::Normal(set.clone())),
+            CharacterClass::CharSet(set) => Some(InvertibleCharSet::Normal(set.clone())),
         }
     }
 

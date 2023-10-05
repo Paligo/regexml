@@ -238,4 +238,88 @@ impl<'a> ReCompiler<'a> {
             ))),
         }
     }
+
+    fn parse_character_class(&mut self) -> Result<CharacterClass, Error> {
+        // check for bac calling or empty class
+        if self.pattern[self.idx] != '[' {
+            return Err(Error::Internal);
+        }
+
+        // check for unterminated or empty class
+        let index = self.idx;
+        self.idx += 1;
+        if self.idx + 1 >= self.len || self.pattern[self.idx] == ']' {
+            return Err(Error::syntax("Missing ']"));
+        }
+
+        // parse class declaration
+        let mut simple_char = None;
+        let mut positive = true;
+        let mut defining_range = false;
+        // let mut range_start = None;
+        // let mut range_end = None;
+
+        // let range = HashSet::new();
+        let mut addend: Option<CharacterClass> = None;
+        // let mut subtrahend = None;
+
+        if self.there_follows(&['^']) {
+            if self.there_follows(&['&', '-', '[']) {
+                return Err(Error::syntax("Nothing before subtraction operator"));
+            } else if self.there_follows(&['^', ']']) {
+                return Err(Error::syntax("Empty negative character group"));
+            } else {
+                positive = false;
+                self.idx += 1;
+            }
+        } else if self.there_follows(&['-', '[']) {
+            return Err(Error::syntax("Nothing before subtraction operator"));
+        }
+
+        'outer: while self.idx < self.len && self.pattern[self.idx] != ']' {
+            let ch = self.pattern[self.idx];
+            simple_char = None;
+            match ch {
+                '[' => {
+                    return Err(Error::syntax("Unescaped '[' within square brackets"));
+                }
+                '\\' => {
+                    // escape always advances the stream
+                    let cc = self.escape(true)?;
+                    match cc {
+                        CharacterClass::Char(c) => {
+                            simple_char = Some(c);
+                            break 'outer;
+                        }
+                        _ => {
+                            if defining_range {
+                                return Err(Error::syntax(
+                                    "Multi-character escape cannot follow '-'",
+                                ));
+                            } else if let Some(a) = addend {
+                                addend = Some(a.union(cc));
+                            } else {
+                                addend = Some(cc);
+                            }
+                            continue 'outer;
+                        }
+                    }
+                }
+                _ => todo!(),
+            }
+        }
+        todo!()
+    }
+
+    fn there_follows(&self, chars: &[char]) -> bool {
+        if (self.idx + chars.len()) > self.len {
+            return false;
+        }
+        for i in 0..chars.len() {
+            if self.pattern[self.idx + 1] != chars[i] {
+                return false;
+            }
+        }
+        true
+    }
 }
