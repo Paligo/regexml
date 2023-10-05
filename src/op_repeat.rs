@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::{
-    operation::{Operation, MATCHES_ZLS_ANYWHERE},
+    operation::{ForceProgressIterator, Operation, MATCHES_ZLS_ANYWHERE},
     re_matcher::ReMatcher,
 };
 
@@ -82,13 +82,13 @@ impl Operation for OpRepeat {
                 }
             }
             // Now return an iterator which returns all the matching positions in order
-            Box::new(RepeatIterator::new(
+            Box::new(ForceProgressIterator::new(Box::new(RepeatIterator::new(
                 matcher,
                 self.operation.clone(),
                 iterators,
                 positions,
                 bound,
-            ))
+            ))))
         } else {
             // reluctant (non-greedy) repeat.
             todo!()

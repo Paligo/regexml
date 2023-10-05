@@ -60,3 +60,42 @@ impl<T: Operation> Operation for &T {
         (*self).display()
     }
 }
+
+// The ForceProgressIterator is used to protect against non-termination;
+// specifically, iterators that return an infinite number of zero-length
+// matches. After getting a certain number of zero-length matches at the same
+// position, hasNext() returns false. (Potentially this gives problems with an
+// expression such as (a?|b?|c?|d) that can legitimately return more than one
+// zero-length match).
+pub(crate) struct ForceProgressIterator<'a> {
+    base: Box<dyn Iterator<Item = usize> + 'a>,
+    count_zero_length: usize,
+    current_pos: Option<usize>,
+}
+
+impl<'a> ForceProgressIterator<'a> {
+    pub(crate) fn new(base: Box<dyn Iterator<Item = usize> + 'a>) -> Self {
+        Self {
+            base,
+            count_zero_length: 0,
+            current_pos: None,
+        }
+    }
+}
+impl<'a> Iterator for ForceProgressIterator<'a> {
+    type Item = usize;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.count_zero_length > 3 {
+            return None;
+        }
+        let p = self.base.next()?;
+        if Some(p) == self.current_pos {
+            self.count_zero_length += 1;
+        } else {
+            self.count_zero_length = 0;
+            self.current_pos = Some(p);
+        }
+        Some(p)
+    }
+}
