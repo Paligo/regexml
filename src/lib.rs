@@ -1,3 +1,4 @@
+mod charclass;
 mod op_atom;
 mod op_back_reference;
 mod op_bol;
