@@ -39,12 +39,13 @@ struct ReCompiler<'a> {
 
 enum Error {
     Internal,
-    ExpectedDigit,
-    ExpectedValidNumber,
-    ExpectedCommaOrRightBracket,
-    ExpectedComma,
-    BadRange,
-    MissingCloseBrace,
+    Syntax(String),
+}
+
+impl Error {
+    fn syntax(s: &str) -> Error {
+        Error::Syntax(s.to_string())
+    }
 }
 
 impl<'a> ReCompiler<'a> {
@@ -59,7 +60,7 @@ impl<'a> ReCompiler<'a> {
 
         // next char must be a digit
         if self.idx >= self.len || !self.pattern[self.idx].is_ascii_digit() {
-            return Err(Error::ExpectedDigit);
+            return Err(Error::syntax("Expected digit"));
         }
 
         // get min ('m' of {m,n}) number
@@ -71,11 +72,11 @@ impl<'a> ReCompiler<'a> {
 
         self.bracket_min = number
             .parse::<usize>()
-            .map_err(|_| Error::ExpectedValidNumber)?;
+            .map_err(|_| Error::syntax("Expected valid number"))?;
 
         // if out of input, fail
         if self.idx >= self.len {
-            return Err(Error::ExpectedCommaOrRightBracket);
+            return Err(Error::syntax("Expected comma or right bracket"));
         }
 
         // if end of expr, optional limit is 0
@@ -87,13 +88,13 @@ impl<'a> ReCompiler<'a> {
 
         // must have at least {m,} and maybe {m,n}
         if self.idx >= self.len || self.pattern[self.idx] != ',' {
-            return Err(Error::ExpectedComma);
+            return Err(Error::syntax("Expected comma"));
         }
         self.idx += 1;
 
         // if out of input, fail
         if self.idx >= self.len {
-            return Err(Error::ExpectedCommaOrRightBracket);
+            return Err(Error::syntax("Expected comma or right bracket"));
         }
 
         // if {m,} max is unlimited
@@ -105,7 +106,7 @@ impl<'a> ReCompiler<'a> {
 
         // next char must be a digit
         if self.idx >= self.len || !self.pattern[self.idx].is_ascii_digit() {
-            return Err(Error::ExpectedDigit);
+            return Err(Error::syntax("Unexpected digit"));
         }
 
         // get max number
@@ -117,16 +118,16 @@ impl<'a> ReCompiler<'a> {
 
         self.bracket_max = number
             .parse::<usize>()
-            .map_err(|_| Error::ExpectedValidNumber)?;
+            .map_err(|_| Error::syntax("Expected valid number"))?;
 
         // optional repetitions must be >= 0
         if self.bracket_max < self.bracket_min {
-            return Err(Error::BadRange);
+            return Err(Error::syntax("Bad range"));
         }
 
         // must have close brace
         if self.idx >= self.len || self.pattern[self.idx] != '}' {
-            return Err(Error::MissingCloseBrace);
+            return Err(Error::syntax("Missing closing brace"));
         }
         Ok(())
     }
