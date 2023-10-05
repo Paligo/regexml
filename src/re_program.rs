@@ -17,3 +17,9 @@ pub(crate) struct ReProgram {
     pub(crate) flags: ReFlags,
     pub(crate) optimization_flags: u32,
 }
+
+impl ReProgram {
+    pub(crate) fn get_backtracking_limit(&self) -> Option<usize> {
+        todo!()
+    }
+}
