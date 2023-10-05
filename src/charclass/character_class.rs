@@ -8,6 +8,28 @@ pub(crate) enum CharacterClass {
     CharSet(HashSet<char>),
 }
 
+impl CharacterClass {
+    pub(crate) fn from_chars(chars: &[char]) -> Self {
+        match chars.len() {
+            0 => CharacterClass::Empty,
+            1 => CharacterClass::Char(chars[0]),
+            _ => CharacterClass::CharSet(HashSet::from_iter(chars.iter().cloned())),
+        }
+    }
+
+    pub(crate) fn escape_s_lower() -> Self {
+        CharacterClass::from_chars(&['\t', '\n', '\r', ' '])
+    }
+
+    pub(crate) fn escape_s_upper() -> Self {
+        CharacterClass::escape_s_lower().inverted()
+    }
+
+    // fn escape_i_lower() -> Self {
+    //     CharacterClass::esc
+    // }
+}
+
 pub(crate) enum InvertableCharSet {
     Inverse(HashSet<char>),
     Normal(HashSet<char>),
@@ -74,6 +96,13 @@ impl CharacterClass {
                 Some(InvertableCharSet::Normal(set))
             }
             CharacterClass::CharSet(set) => Some(InvertableCharSet::Normal(set.clone())),
+        }
+    }
+
+    pub(crate) fn inverted(self) -> CharacterClass {
+        match self {
+            CharacterClass::Inverse(complement) => *complement,
+            complement => CharacterClass::Inverse(Box::new(complement)),
         }
     }
 }
