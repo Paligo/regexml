@@ -72,6 +72,7 @@ impl Operation for OpRepeat {
             for _i in 0..bound {
                 let mut it = self.operation.matches_iter(matcher, p);
                 if let Some(next) = it.next() {
+                    p = next;
                     iterators.push(it);
                     positions.push(next);
                 } else if iterators.is_empty() {
