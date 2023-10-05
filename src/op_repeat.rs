@@ -82,16 +82,27 @@ impl Operation for OpRepeat {
                 }
             }
             // Now return an iterator which returns all the matching positions in order
-            Box::new(ForceProgressIterator::new(Box::new(RepeatIterator::new(
-                matcher,
-                self.operation.clone(),
-                iterators,
-                positions,
-                bound,
-            ))))
+            Box::new(ForceProgressIterator::new(Box::new(
+                GreedyRepeatIterator::new(
+                    matcher,
+                    self.operation.clone(),
+                    iterators,
+                    positions,
+                    bound,
+                    self.min,
+                ),
+            )))
         } else {
             // reluctant (non-greedy) repeat.
-            todo!()
+            Box::new(ForceProgressIterator::new(Box::new(
+                ReluctantRepeatIterator::new(
+                    matcher,
+                    self.operation.clone(),
+                    self.min,
+                    self.max,
+                    position,
+                ),
+            )))
         }
     }
 
@@ -100,7 +111,7 @@ impl Operation for OpRepeat {
     }
 }
 
-struct RepeatIterator<'a> {
+struct GreedyRepeatIterator<'a> {
     primed: bool,
     matcher: &'a crate::re_matcher::ReMatcher<'a>,
     operation: Rc<dyn Operation + 'a>,
@@ -110,19 +121,20 @@ struct RepeatIterator<'a> {
     bound: usize,
 }
 
-impl<'a> RepeatIterator<'a> {
+impl<'a> GreedyRepeatIterator<'a> {
     fn new(
         matcher: &'a ReMatcher<'a>,
         operation: Rc<dyn Operation + 'a>,
         iterators: Vec<Box<dyn Iterator<Item = usize> + 'a>>,
         positions: Vec<usize>,
         bound: usize,
+        min: usize,
     ) -> Self {
         Self {
             primed: true,
             matcher,
             operation,
-            min: 0,
+            min,
             iterators,
             positions,
             bound,
@@ -130,7 +142,7 @@ impl<'a> RepeatIterator<'a> {
     }
 }
 
-impl<'a> Iterator for RepeatIterator<'a> {
+impl<'a> Iterator for GreedyRepeatIterator<'a> {
     type Item = usize;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -171,5 +183,62 @@ impl<'a> Iterator for RepeatIterator<'a> {
         } else {
             None
         }
+    }
+}
+
+struct ReluctantRepeatIterator<'a> {
+    matcher: &'a crate::re_matcher::ReMatcher<'a>,
+    operation: Rc<dyn Operation + 'a>,
+    min: usize,
+    max: usize,
+    counter: usize,
+    position: Option<usize>,
+}
+
+impl<'a> ReluctantRepeatIterator<'a> {
+    fn new(
+        matcher: &'a ReMatcher<'a>,
+        operation: Rc<dyn Operation + 'a>,
+        position: usize,
+        min: usize,
+        max: usize,
+    ) -> Self {
+        Self {
+            matcher,
+            operation,
+            min,
+            max,
+            counter: 0,
+            position: Some(position),
+        }
+    }
+}
+
+impl<'a> Iterator for ReluctantRepeatIterator<'a> {
+    type Item = usize;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(position) = self.position {
+            loop {
+                let mut it = self.operation.matches_iter(self.matcher, position);
+                if let Some(position) = it.next() {
+                    self.position = Some(position);
+                    self.counter += 1;
+                    if self.counter > self.max {
+                        self.position = None;
+                        break;
+                    }
+                } else if self.min == 0 && self.counter == 0 {
+                    self.counter += 1;
+                } else {
+                    self.position = None;
+                    break;
+                }
+                if self.counter >= self.min {
+                    break;
+                }
+            }
+        }
+        self.position
     }
 }
