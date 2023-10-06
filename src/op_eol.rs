@@ -3,9 +3,9 @@ use crate::{
     re_matcher::ReMatcher,
 };
 
-pub(crate) struct OpEol;
+pub(crate) struct Eol;
 
-impl OperationControl for OpEol {
+impl OperationControl for Eol {
     fn get_match_length(&self) -> Option<usize> {
         Some(0)
     }

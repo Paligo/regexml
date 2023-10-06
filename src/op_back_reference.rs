@@ -1,16 +1,16 @@
 use crate::{operation::OperationControl, re_matcher::ReMatcher};
 
-pub(crate) struct OpBackReference {
+pub(crate) struct BackReference {
     group_nr: usize,
 }
 
-impl OpBackReference {
+impl BackReference {
     pub(crate) fn new(group_nr: usize) -> Self {
         Self { group_nr }
     }
 }
 
-impl OperationControl for OpBackReference {
+impl OperationControl for BackReference {
     fn matches_empty_string(&self) -> u32 {
         // no information available
         0

@@ -4,18 +4,18 @@ use crate::{
     re_program::{ReFlags, ReProgram, OPT_HASBACKREFS},
 };
 
-pub(crate) struct OpCapture {
+pub(crate) struct Capture {
     group_nr: usize,
     child_op: Box<Operation>,
 }
 
-impl OpCapture {
+impl Capture {
     pub(crate) fn new(group_nr: usize, child_op: Box<Operation>) -> Self {
         Self { group_nr, child_op }
     }
 }
 
-impl OperationControl for OpCapture {
+impl OperationControl for Capture {
     fn get_match_length(&self) -> Option<usize> {
         self.child_op.get_match_length()
     }

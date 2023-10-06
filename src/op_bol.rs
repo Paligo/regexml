@@ -1,9 +1,9 @@
 use crate::operation::{OperationControl, MATCHES_ZLS_AT_START};
 use crate::re_matcher::ReMatcher;
 
-pub(crate) struct OpBol;
+pub(crate) struct Bol;
 
-impl OperationControl for OpBol {
+impl OperationControl for Bol {
     fn get_match_length(&self) -> Option<usize> {
         Some(0)
     }

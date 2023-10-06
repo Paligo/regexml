@@ -3,12 +3,12 @@ use crate::{
     re_matcher::ReMatcher,
 };
 
-pub(crate) struct OpAtom {
+pub(crate) struct Atom {
     atom: Vec<char>,
     len: usize,
 }
 
-impl OpAtom {
+impl Atom {
     pub(crate) fn new(atom: Vec<char>) -> Self {
         Self {
             len: atom.len(),
@@ -17,7 +17,7 @@ impl OpAtom {
     }
 }
 
-impl OperationControl for OpAtom {
+impl OperationControl for Atom {
     fn get_match_length(&self) -> Option<usize> {
         Some(self.len)
     }

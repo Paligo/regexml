@@ -3,9 +3,9 @@ use crate::{
     re_matcher::ReMatcher,
 };
 
-pub(crate) struct OpNothing;
+pub(crate) struct Nothing;
 
-impl OperationControl for OpNothing {
+impl OperationControl for Nothing {
     fn get_match_length(&self) -> Option<usize> {
         Some(0)
     }

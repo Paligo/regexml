@@ -1,9 +1,8 @@
 use ahash::{HashSet, HashSetExt};
 
 use crate::{
-    character_class::CharacterClass, op_atom::OpAtom, op_back_reference::OpBackReference,
-    op_bol::OpBol, op_character_class::OpCharacterClass, op_eol::OpEol, operation::Operation,
-    re_program::ReFlags,
+    character_class::CharacterClass, op_atom::Atom, op_back_reference::BackReference, op_bol::Bol,
+    op_character_class::CharClass, op_eol::Eol, operation::Operation, re_program::ReFlags,
 };
 
 // No flags (nothing special)
@@ -532,7 +531,7 @@ impl<'a> ReCompiler<'a> {
         }
 
         // return the instruction
-        Ok(Operation::from(OpAtom::new(ub)))
+        Ok(Operation::from(Atom::new(ub)))
     }
 
     fn parse_terminal(&mut self, flags: Vec<u32>) -> Result<Operation, Error> {
@@ -540,13 +539,13 @@ impl<'a> ReCompiler<'a> {
             '$' => {
                 if self.is_xpath {
                     self.idx += 1;
-                    return Ok(Operation::from(OpEol));
+                    return Ok(Operation::from(Eol));
                 }
             }
             '^' => {
                 if self.is_xpath {
                     self.idx += 1;
-                    return Ok(Operation::from(OpBol));
+                    return Ok(Operation::from(Bol));
                 }
             }
             '.' => {
@@ -560,13 +559,13 @@ impl<'a> ReCompiler<'a> {
                     // in XSD, "." matches everything except \n and \r
                     |c| c != '\n' && c != '\r'
                 };
-                return Ok(Operation::from(OpCharacterClass::new(
-                    CharacterClass::Predicate(Box::new(predicate)),
-                )));
+                return Ok(Operation::from(CharClass::new(CharacterClass::Predicate(
+                    Box::new(predicate),
+                ))));
             }
             '[' => {
                 let range = self.parse_character_class()?;
-                return Ok(Operation::from(OpCharacterClass::new(range)));
+                return Ok(Operation::from(CharClass::new(range)));
             }
             '(' => return self.parse_expr(flags),
             ')' => return Err(Error::syntax("Unescaped closing ')'")),
@@ -586,7 +585,7 @@ impl<'a> ReCompiler<'a> {
                         if self.capturing_open_paren_count <= back_ref {
                             return Err(Error::syntax("Bad backreference"));
                         }
-                        return Ok(Operation::from(OpBackReference::new(back_ref)));
+                        return Ok(Operation::from(BackReference::new(back_ref)));
                     }
                     CharacterClassOrBackReference::CharacterClass(CharacterClass::Char(c)) => {
                         // we had a simple escape and we want to have it end up in an atom,
@@ -594,7 +593,7 @@ impl<'a> ReCompiler<'a> {
                         self.idx = idx_before_escape;
                     }
                     CharacterClassOrBackReference::CharacterClass(character_class) => {
-                        return Ok(Operation::from(OpCharacterClass::new(character_class)))
+                        return Ok(Operation::from(CharClass::new(character_class)))
                     }
                 }
             }

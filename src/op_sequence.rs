@@ -8,17 +8,17 @@ use crate::{
     re_matcher::{CaptureState, ReMatcher},
 };
 
-pub(crate) struct OpSequence {
+pub(crate) struct Sequence {
     operations: Vec<Rc<Operation>>,
 }
 
-impl OpSequence {
+impl Sequence {
     fn new(operations: Vec<Rc<Operation>>) -> Self {
         Self { operations }
     }
 }
 
-impl OperationControl for OpSequence {
+impl OperationControl for Sequence {
     fn get_match_length(&self) -> Option<usize> {
         self.operations
             .iter()

@@ -3,17 +3,17 @@ use crate::{
     operation::{OperationControl, MATCHES_ZLS_NEVER},
 };
 
-pub(crate) struct OpCharacterClass {
+pub(crate) struct CharClass {
     character_class: CharacterClass,
 }
 
-impl OpCharacterClass {
+impl CharClass {
     pub(crate) fn new(character_class: CharacterClass) -> Self {
         Self { character_class }
     }
 }
 
-impl OperationControl for OpCharacterClass {
+impl OperationControl for CharClass {
     fn get_match_length(&self) -> Option<usize> {
         Some(1)
     }

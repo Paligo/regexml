@@ -3,9 +3,9 @@ use crate::{
     re_matcher::ReMatcher,
 };
 
-pub(crate) struct OpEndProgram;
+pub(crate) struct EndProgram;
 
-impl OperationControl for OpEndProgram {
+impl OperationControl for EndProgram {
     fn get_match_length(&self) -> Option<usize> {
         Some(0)
     }

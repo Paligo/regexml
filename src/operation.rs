@@ -1,16 +1,16 @@
 use enum_dispatch::enum_dispatch;
 
-use crate::op_atom::OpAtom;
-use crate::op_back_reference::OpBackReference;
-use crate::op_bol::OpBol;
-use crate::op_capture::OpCapture;
-use crate::op_character_class::OpCharacterClass;
-use crate::op_choice::OpChoice;
-use crate::op_end_program::OpEndProgram;
-use crate::op_eol::OpEol;
-use crate::op_nothing::OpNothing;
-use crate::op_repeat::OpRepeat;
-use crate::op_sequence::OpSequence;
+use crate::op_atom::Atom;
+use crate::op_back_reference::BackReference;
+use crate::op_bol::Bol;
+use crate::op_capture::Capture;
+use crate::op_character_class::CharClass;
+use crate::op_choice::Choice;
+use crate::op_end_program::EndProgram;
+use crate::op_eol::Eol;
+use crate::op_nothing::Nothing;
+use crate::op_repeat::Repeat;
+use crate::op_sequence::Sequence;
 
 use crate::{
     re_matcher::ReMatcher,
@@ -47,17 +47,17 @@ pub(crate) trait OperationControl {
 
 #[enum_dispatch(OperationControl)]
 pub(crate) enum Operation {
-    OpBol,
-    OpAtom,
-    OpBackReference,
-    OpCapture,
-    OpChoice,
-    OpEndProgram,
-    OpEol,
-    OpNothing,
-    OpRepeat,
-    OpSequence,
-    OpCharacterClass,
+    Bol,
+    Atom,
+    BackReference,
+    Capture,
+    Choice,
+    EndProgram,
+    Eol,
+    Nothing,
+    Repeat,
+    Sequence,
+    CharClass,
 }
 
 // blanket implementation for references

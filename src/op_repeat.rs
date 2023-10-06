@@ -6,14 +6,14 @@ use crate::{
 };
 
 #[derive(Clone)]
-pub(crate) struct OpRepeat {
+pub(crate) struct Repeat {
     operation: Rc<Operation>,
     min: usize,
     max: usize,
     greedy: bool,
 }
 
-impl OpRepeat {
+impl Repeat {
     fn new(operation: Rc<Operation>, min: usize, max: usize, greedy: bool) -> Self {
         Self {
             operation,
@@ -24,7 +24,7 @@ impl OpRepeat {
     }
 }
 
-impl OperationControl for OpRepeat {
+impl OperationControl for Repeat {
     fn get_match_length(&self) -> Option<usize> {
         self.operation.get_match_length().and_then(|match_length| {
             if self.min == self.max {

@@ -5,17 +5,17 @@ use crate::{
     re_matcher::ReMatcher,
 };
 
-pub(crate) struct OpChoice {
+pub(crate) struct Choice {
     branches: Vec<Rc<Operation>>,
 }
 
-impl OpChoice {
+impl Choice {
     pub(crate) fn new(branches: Vec<Rc<Operation>>) -> Self {
         Self { branches }
     }
 }
 
-impl OperationControl for OpChoice {
+impl OperationControl for Choice {
     fn get_match_length(&self) -> Option<usize> {
         let mut iter = self.branches.iter();
         let fixed = iter.next().unwrap().get_match_length();
