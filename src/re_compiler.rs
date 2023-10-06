@@ -1,7 +1,8 @@
 use ahash::{HashSet, HashSetExt};
 
 use crate::{
-    charclass::CharacterClass, op_atom::OpAtom, operation::Operation, re_program::ReFlags,
+    character_class::CharacterClass, op_atom::OpAtom, op_bol::OpBol, op_eol::OpEol,
+    operation::Operation, re_program::ReFlags,
 };
 
 // No flags (nothing special)
@@ -516,6 +517,38 @@ impl<'a> ReCompiler<'a> {
 
         // return the instruction
         Ok(Operation::from(OpAtom::new(ub)))
+    }
+
+    fn parse_terminal(&mut self, flags: Vec<u32>) -> Result<Operation, Error> {
+        match self.pattern[self.idx] {
+            '$' => {
+                if self.is_xpath {
+                    self.idx += 1;
+                    return Ok(Operation::from(OpEol));
+                }
+            }
+            '^' => {
+                if self.is_xpath {
+                    self.idx += 1;
+                    return Ok(Operation::from(OpBol));
+                }
+            }
+            '.' => {
+                self.idx += 1;
+                // let predicate = if self.re_flags.is_single_line() {
+                //     // in XPath with the 's' flag, '.' matches everything
+                //     |_| true
+                // } else {
+                //     // in XSD, "." matches everything except \n and \r
+                //     |c| c != '\n' && c != '\r'
+                // };
+                todo!();
+                // Operation::from(OpCharacterClass::new(c))
+            }
+            _ => todo!(),
+        }
+        // if it wasn't one of the above, it must be the start of an atom.
+        self.parse_atom()
     }
 
     fn there_follows(&self, s: &str) -> bool {

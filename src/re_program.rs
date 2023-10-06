@@ -11,6 +11,10 @@ impl ReFlags {
     pub(crate) fn is_case_independent(&self) -> bool {
         todo!()
     }
+
+    pub(crate) fn is_single_line(&self) -> bool {
+        todo!()
+    }
 }
 
 pub(crate) struct ReProgram {

@@ -1,8 +1,9 @@
-mod charclass;
+mod character_class;
 mod op_atom;
 mod op_back_reference;
 mod op_bol;
 mod op_capture;
+mod op_character_class;
 mod op_choice;
 mod op_end_program;
 mod op_eol;
