@@ -3,7 +3,7 @@ use ahash::{HashSet, HashSetExt};
 pub(crate) enum CharacterClass {
     Empty,
     Inverse(Box<CharacterClass>),
-    Predicate(fn(char) -> bool),
+    Predicate(Box<dyn Fn(char) -> bool>),
     Char(char),
     CharSet(HashSet<char>),
 }
@@ -32,71 +32,48 @@ impl CharacterClass {
                         }
                     }
                 } else {
-                    // TODO: this won't work
-                    todo!()
-                    // CharacterClass::Predicate(move |c| self.test(c) || other.test(c))
+                    CharacterClass::Predicate(Box::new(move |c| a.test(c) || b.test(c)))
                 }
             }
         }
     }
+
+    pub(crate) fn complement(self) -> Self {
+        match self {
+            CharacterClass::Inverse(complement) => *complement,
+            complement => CharacterClass::Inverse(Box::new(complement)),
+        }
+    }
+
+    pub(crate) fn difference(self, other: CharacterClass) -> Self {
+        match (self, other) {
+            (CharacterClass::Empty, _) => CharacterClass::Empty,
+            (a, CharacterClass::Empty) => a,
+            (a, b) => {
+                let is_a = a.charset();
+                let is_b = b.charset();
+                if let (Some(is_a), Some(is_b)) = (is_a, is_b) {
+                    match is_a.difference(is_b) {
+                        InvertibleCharSet::Normal(a) => CharacterClass::CharSet(a),
+                        InvertibleCharSet::Inverse(a) => {
+                            CharacterClass::Inverse(Box::new(CharacterClass::CharSet(a)))
+                        }
+                    }
+                } else {
+                    CharacterClass::Predicate(Box::new(move |c| a.test(c) && !b.test(c)))
+                }
+            }
+        }
+    }
+
     pub(crate) fn escape_s_lower() -> Self {
         CharacterClass::from_chars(&['\t', '\n', '\r', ' '])
     }
 
     pub(crate) fn escape_s_upper() -> Self {
-        CharacterClass::escape_s_lower().inverted()
+        CharacterClass::escape_s_lower().complement()
     }
 
-    // fn escape_i_lower() -> Self {
-    //     CharacterClass::esc
-    // }
-}
-
-pub(crate) enum InvertibleCharSet {
-    Inverse(HashSet<char>),
-    Normal(HashSet<char>),
-}
-
-impl InvertibleCharSet {
-    fn inverted(&self) -> Self {
-        match self {
-            InvertibleCharSet::Inverse(set) => InvertibleCharSet::Normal(set.clone()),
-            InvertibleCharSet::Normal(set) => InvertibleCharSet::Inverse(set.clone()),
-        }
-    }
-
-    fn union(self, other: InvertibleCharSet) -> Self {
-        match (self, other) {
-            (InvertibleCharSet::Normal(a), InvertibleCharSet::Normal(b)) => {
-                InvertibleCharSet::Normal(a.union(&b).copied().collect::<HashSet<_>>())
-            }
-            (InvertibleCharSet::Inverse(a), InvertibleCharSet::Inverse(b)) => {
-                InvertibleCharSet::Inverse(a.union(&b).copied().collect::<HashSet<_>>())
-            }
-            (InvertibleCharSet::Inverse(a), InvertibleCharSet::Normal(b)) => {
-                InvertibleCharSet::Inverse(a.difference(&b).copied().collect::<HashSet<_>>())
-            }
-            (InvertibleCharSet::Normal(a), InvertibleCharSet::Inverse(b)) => {
-                InvertibleCharSet::Inverse(b.difference(&a).copied().collect::<HashSet<_>>())
-            }
-        }
-    }
-}
-
-impl PartialEq for CharacterClass {
-    fn eq(&self, other: &CharacterClass) -> bool {
-        match (self, other) {
-            (CharacterClass::Empty, CharacterClass::Empty) => true,
-            (CharacterClass::Inverse(a), CharacterClass::Inverse(b)) => a == b,
-            (CharacterClass::Predicate(a), CharacterClass::Predicate(b)) => a == b,
-            (CharacterClass::Char(a), CharacterClass::Char(b)) => a == b,
-            (CharacterClass::CharSet(a), CharacterClass::CharSet(b)) => a == b,
-            _ => false,
-        }
-    }
-}
-
-impl CharacterClass {
     pub(crate) fn test(&self, value: char) -> bool {
         match self {
             CharacterClass::Empty => false,
@@ -126,7 +103,7 @@ impl CharacterClass {
             CharacterClass::Empty => Some(InvertibleCharSet::Normal(HashSet::new())),
             CharacterClass::Inverse(complement) => {
                 let charset = complement.charset()?;
-                Some(charset.inverted())
+                Some(charset.complement())
             }
             CharacterClass::Predicate(_) => None,
             CharacterClass::Char(c) => {
@@ -138,10 +115,75 @@ impl CharacterClass {
         }
     }
 
-    pub(crate) fn inverted(self) -> CharacterClass {
+    // fn escape_i_lower() -> Self {
+    //     CharacterClass::esc
+    // }
+}
+
+pub(crate) enum InvertibleCharSet {
+    Inverse(HashSet<char>),
+    Normal(HashSet<char>),
+}
+
+impl InvertibleCharSet {
+    fn complement(&self) -> Self {
         match self {
-            CharacterClass::Inverse(complement) => *complement,
-            complement => CharacterClass::Inverse(Box::new(complement)),
+            InvertibleCharSet::Inverse(set) => InvertibleCharSet::Normal(set.clone()),
+            InvertibleCharSet::Normal(set) => InvertibleCharSet::Inverse(set.clone()),
+        }
+    }
+
+    fn union(self, other: InvertibleCharSet) -> Self {
+        match (self, other) {
+            (InvertibleCharSet::Normal(a), InvertibleCharSet::Normal(b)) => {
+                // all the characters in a, and all the characters in b
+                InvertibleCharSet::Normal(a.union(&b).copied().collect::<HashSet<_>>())
+            }
+            (InvertibleCharSet::Inverse(a), InvertibleCharSet::Inverse(b)) => {
+                // all the characters not in a, and all the characers not in b,
+                // so a character has to be not in a, and not in b
+                InvertibleCharSet::Inverse(a.union(&b).copied().collect::<HashSet<_>>())
+            }
+            (InvertibleCharSet::Inverse(a), InvertibleCharSet::Normal(b)) => {
+                // all the characters not in a, without the characters also in b,
+                // as we do want them
+                InvertibleCharSet::Inverse(a.difference(&b).copied().collect::<HashSet<_>>())
+            }
+            (InvertibleCharSet::Normal(a), InvertibleCharSet::Inverse(b)) => {
+                // all the characters not in b, without the character also in a,
+                // as we do want them
+                InvertibleCharSet::Inverse(b.difference(&a).copied().collect::<HashSet<_>>())
+            }
+        }
+    }
+
+    fn difference(self, other: InvertibleCharSet) -> Self {
+        match (self, other) {
+            (InvertibleCharSet::Normal(a), InvertibleCharSet::Normal(b)) => {
+                InvertibleCharSet::Normal(a.difference(&b).copied().collect::<HashSet<_>>())
+            }
+            (InvertibleCharSet::Inverse(a), InvertibleCharSet::Inverse(b)) => {
+                InvertibleCharSet::Inverse(a.difference(&b).copied().collect::<HashSet<_>>())
+            }
+            (InvertibleCharSet::Inverse(a), InvertibleCharSet::Normal(b)) => {
+                InvertibleCharSet::Inverse(a.union(&b).copied().collect::<HashSet<_>>())
+            }
+            (InvertibleCharSet::Normal(a), InvertibleCharSet::Inverse(b)) => {
+                InvertibleCharSet::Inverse(b.union(&a).copied().collect::<HashSet<_>>())
+            }
+        }
+    }
+}
+
+impl PartialEq for CharacterClass {
+    fn eq(&self, other: &CharacterClass) -> bool {
+        match (self, other) {
+            (CharacterClass::Empty, CharacterClass::Empty) => true,
+            (CharacterClass::Inverse(a), CharacterClass::Inverse(b)) => a == b,
+            (CharacterClass::Predicate(a), CharacterClass::Predicate(b)) => todo!(),
+            (CharacterClass::Char(a), CharacterClass::Char(b)) => a == b,
+            (CharacterClass::CharSet(a), CharacterClass::CharSet(b)) => a == b,
+            _ => false,
         }
     }
 }

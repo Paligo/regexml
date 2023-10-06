@@ -1,6 +1,8 @@
 use ahash::{HashSet, HashSetExt};
 
-use crate::{charclass::CharacterClass, re_program::ReFlags};
+use crate::{
+    charclass::CharacterClass, op_atom::OpAtom, operation::Operation, re_program::ReFlags,
+};
 
 // No flags (nothing special)
 pub(crate) const NODE_NORMAL: u32 = 0;
@@ -256,27 +258,27 @@ impl<'a> ReCompiler<'a> {
         let mut simple_char = None;
         let mut positive = true;
         let mut defining_range = false;
-        // let mut range_start = None;
-        // let mut range_end = None;
+        let mut range_start = None;
+        let mut range_end = None;
 
-        // let range = HashSet::new();
+        let mut range = HashSet::new();
         let mut addend: Option<CharacterClass> = None;
-        // let mut subtrahend = None;
+        let mut subtrahend = None;
 
-        if self.there_follows(&['^']) {
-            if self.there_follows(&['&', '-', '[']) {
+        if self.there_follows("^") {
+            if self.there_follows("&-[") {
                 return Err(Error::syntax("Nothing before subtraction operator"));
-            } else if self.there_follows(&['^', ']']) {
+            } else if self.there_follows("^]") {
                 return Err(Error::syntax("Empty negative character group"));
             } else {
                 positive = false;
                 self.idx += 1;
             }
-        } else if self.there_follows(&['-', '[']) {
+        } else if self.there_follows("-[") {
             return Err(Error::syntax("Nothing before subtraction operator"));
         }
 
-        'outer: while self.idx < self.len && self.pattern[self.idx] != ']' {
+        while self.idx < self.len && self.pattern[self.idx] != ']' {
             let ch = self.pattern[self.idx];
             simple_char = None;
             match ch {
@@ -289,7 +291,6 @@ impl<'a> ReCompiler<'a> {
                     match cc {
                         CharacterClass::Char(c) => {
                             simple_char = Some(c);
-                            break 'outer;
                         }
                         _ => {
                             if defining_range {
@@ -301,22 +302,230 @@ impl<'a> ReCompiler<'a> {
                             } else {
                                 addend = Some(cc);
                             }
-                            continue 'outer;
+                            continue;
                         }
                     }
                 }
-                _ => todo!(),
+                '-' => {
+                    if self.there_follows("-[") {
+                        self.idx += 1;
+                        subtrahend = Some(self.parse_character_class()?);
+                        if !self.there_follows("]") {
+                            return Err(Error::syntax("Expected closing ']' after subtraction"));
+                        } else if self.there_follows("-]") {
+                            simple_char = Some('-');
+                            self.idx += 1;
+                            continue;
+                        } else if range_start.is_some() {
+                            defining_range = true;
+                            self.idx += 1;
+                            continue;
+                        }
+                        if self.there_follows("--") && !self.there_follows("--[") {
+                            return Err(Error::syntax("Unescaped hyphen at start of range"));
+                        } else if !self.is_xsd_11
+                            && self.pattern[self.idx - 1] != '['
+                            && self.pattern[self.idx - 1] != '^'
+                            && !self.there_follows("]")
+                            && !self.there_follows("-[")
+                        {
+                            return Err(Error::syntax("In XSD 1.0, hyphen is allowed only at the beginning or end of a positive character group"));
+                        } else {
+                            simple_char = Some('-');
+                            self.idx += 1;
+                        }
+                    }
+                }
+                _ => {
+                    simple_char = Some(ch);
+                    self.idx += 1;
+                }
+            }
+
+            // handle simple character simpleChar
+            if defining_range {
+                // if we are defining a range make it now
+                range_end = simple_char;
+
+                // actually create a range if the range is ok
+                if let (Some(start), Some(end)) = (range_start, range_end) {
+                    if start > end {
+                        return Err(Error::syntax("Bad character range: start > end"));
+                        // Technically this is not an error in
+                        // XSD, merely a no-op; but it is so
+                        // utterly pointless that it is almost certainly a mistake; and we have no
+                        // way of indicating warnings.
+                    }
+                    for c in start..=end {
+                        range.insert(c);
+                    }
+                    if self.re_flags.is_case_independent() {
+                        if start == 'a' && end == 'z' {
+                            for c in 'A'..='Z' {
+                                range.insert(c);
+                            }
+                            // TODO
+                            // for (int v = 0; v < CaseVariants.ROMAN_VARIANTS.length; v++) {
+                            //     range.add(CaseVariants.ROMAN_VARIANTS[v]);
+                            // }
+                        } else if start == 'A' && end == 'Z' {
+                            for c in 'a'..='z' {
+                                range.insert(c);
+                            }
+                            // TODO
+                            // for (int v = 0; v < CaseVariants.ROMAN_VARIANTS.length; v++) {
+                            //     range.add(CaseVariants.ROMAN_VARIANTS[v]);
+                            // }
+                        } else {
+                            for _ in start..=end {
+                                // TODO
+                                // int[] variants = CaseVariants.getCaseVariants(k);
+                                // for (int variant : variants) {
+                                //     range.add(variant);
+                                // }
+                            }
+                        }
+                    }
+                    // we are don defining the range
+                    defining_range = false;
+                    range_start = None;
+                }
+            } else {
+                let simple_char = simple_char.unwrap();
+                // if simple character and not start of range, include it (see XSD 1.1 rules)
+                if self.there_follows("-") {
+                    if self.there_follows("-[")
+                        || self.there_follows("-]")
+                        || self.there_follows("--[")
+                    {
+                        range.insert(simple_char);
+                    } else if self.there_follows("--") {
+                        return Err(Error::syntax("Unescaped hyphen cannot act as end of range"));
+                    } else {
+                        range_start = Some(simple_char);
+                    }
+                } else {
+                    range.insert(simple_char);
+                    if self.re_flags.is_case_independent() {
+                        // TODO
+                        // int[] variants = CaseVariants.getCaseVariants(simpleChar);
+                        // for (int variant : variants) {
+                        //     range.add(variant);
+                        // }
+                    }
+                }
             }
         }
-        todo!()
+
+        // shouldn't be out of input
+        if self.idx == self.len {
+            return Err(Error::syntax("Unterminated character class"));
+        }
+
+        // absorb the ']' end of class marker
+        self.idx += 1;
+        let mut result = CharacterClass::CharSet(range);
+        if let Some(addend) = addend {
+            result = result.union(addend);
+        }
+        if !positive {
+            result = result.complement();
+        }
+        if let Some(subtrahend) = subtrahend {
+            result = result.difference(subtrahend);
+        }
+        Ok(result)
     }
 
-    fn there_follows(&self, chars: &[char]) -> bool {
+    fn parse_atom(&mut self) -> Result<Operation, Error> {
+        // length of atom
+        let mut len_atom = 0;
+
+        // loop while we've got input
+        let mut ub = Vec::new();
+
+        while self.idx < self.len {
+            // is there a next char?
+            if (self.idx + 1) < self.len {
+                let mut c = self.pattern[self.idx + 1];
+
+                // if the next 'char' is an escape, look past the whole escape
+                if self.pattern[self.idx] == '\\' {
+                    let idx_escape = self.idx;
+
+                    self.escape(false)?;
+                    if self.idx < self.len {
+                        c = self.pattern[self.idx];
+                    }
+                    self.idx = idx_escape;
+                }
+
+                // switch on next har
+                if matches!(c, '{' | '?' | '*' | '+') {
+                    // If the next character is a quantifier operator and
+                    // our atom is non-empty, the current character should
+                    // bind to the quantifier operator rather than the atom
+                    if len_atom > 0 {
+                        break;
+                    }
+                }
+            }
+            match self.pattern[self.idx] {
+                ']' | '.' | '[' | '(' | ')' | '|' => {
+                    break;
+                }
+                '{' | '?' | '*' | '+' => {
+                    // we should have an atom by now
+                    if len_atom == 0 {
+                        return Err(Error::syntax("Missing expression before quantifier"));
+                    }
+                    break;
+                }
+                '}' => {
+                    return Err(Error::syntax("Unescaped right curly brace"));
+                }
+                '\\' => {
+                    // get the escaped character (advanced input automatically)
+                    let idx_before_escape = self.idx;
+                    let character_class = self.escape(false)?;
+
+                    // check if it's a simple escape (as opposed to, say, a backreference)
+                    if let CharacterClass::Char(ch) = character_class {
+                        ub.push(ch);
+                        len_atom += 1;
+                    } else {
+                        // not a simple escape, so backup to where we were before the escape
+                        self.idx = idx_before_escape;
+                        break;
+                    }
+                }
+                c => {
+                    if (c == '^' || c == '$') && self.is_xpath {
+                        break;
+                    }
+                    ub.push(self.pattern[self.idx]);
+                    self.idx += 1;
+                    len_atom += 1;
+                }
+            }
+        }
+        // this shouldn't happen
+        if ub.is_empty() {
+            return Err(Error::Internal);
+        }
+
+        // return the instruction
+        Ok(Operation::from(OpAtom::new(ub)))
+    }
+
+    fn there_follows(&self, s: &str) -> bool {
+        let chars = s.chars().collect::<Vec<_>>();
+
         if (self.idx + chars.len()) > self.len {
             return false;
         }
-        for i in 0..chars.len() {
-            if self.pattern[self.idx + 1] != chars[i] {
+        for c in chars {
+            if self.pattern[self.idx + 1] != c {
                 return false;
             }
         }

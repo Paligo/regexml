@@ -4,12 +4,12 @@ use crate::{
 };
 
 pub(crate) struct OpAtom {
-    atom: String,
+    atom: Vec<char>,
     len: usize,
 }
 
 impl OpAtom {
-    pub(crate) fn new(atom: String) -> Self {
+    pub(crate) fn new(atom: Vec<char>) -> Self {
         Self {
             len: atom.len(),
             atom,
@@ -45,18 +45,18 @@ impl OperationControl for OpAtom {
             return Box::new(std::iter::empty());
         }
         let mut in_chars = in_.iter().skip(position);
-        let atom_chars = self.atom.chars();
+        let atom_chars = &self.atom;
         if matcher.program.flags.is_case_independent() {
             for atom_char in atom_chars {
                 let in_char = in_chars.next().unwrap();
-                if !matcher.equal_case_blind(*in_char, atom_char) {
+                if !matcher.equal_case_blind(*in_char, *atom_char) {
                     return Box::new(std::iter::empty());
                 }
             }
         } else {
             for atom_char in atom_chars {
                 let in_char = in_chars.next().unwrap();
-                if *in_char != atom_char {
+                if *in_char != *atom_char {
                     return Box::new(std::iter::empty());
                 }
             }
@@ -65,6 +65,6 @@ impl OperationControl for OpAtom {
     }
 
     fn display(&self) -> String {
-        self.atom.clone()
+        self.atom.iter().collect()
     }
 }
