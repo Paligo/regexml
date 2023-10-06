@@ -1,8 +1,9 @@
 use ahash::{HashSet, HashSetExt};
 
 use crate::{
-    character_class::CharacterClass, op_atom::OpAtom, op_bol::OpBol, op_eol::OpEol,
-    operation::Operation, re_program::ReFlags,
+    character_class::CharacterClass, op_atom::OpAtom, op_back_reference::OpBackReference,
+    op_bol::OpBol, op_character_class::OpCharacterClass, op_eol::OpEol, operation::Operation,
+    re_program::ReFlags,
 };
 
 // No flags (nothing special)
@@ -32,7 +33,7 @@ struct ReCompiler<'a> {
     is_xpath_30: bool,
     is_xsd_11: bool,
 
-    captures: HashSet<char>,
+    captures: HashSet<usize>,
     has_back_references: bool,
 
     re_flags: ReFlags,
@@ -48,6 +49,17 @@ enum Error {
 impl Error {
     fn syntax(s: impl Into<String>) -> Error {
         Error::Syntax(s.into())
+    }
+}
+
+enum CharacterClassOrBackReference {
+    CharacterClass(CharacterClass),
+    BackReference(usize),
+}
+
+impl From<CharacterClass> for CharacterClassOrBackReference {
+    fn from(cc: CharacterClass) -> Self {
+        Self::CharacterClass(cc)
     }
 }
 
@@ -135,7 +147,7 @@ impl<'a> ReCompiler<'a> {
         Ok(())
     }
 
-    fn escape(&mut self, in_square_brackets: bool) -> Result<CharacterClass, Error> {
+    fn escape(&mut self, in_square_brackets: bool) -> Result<CharacterClassOrBackReference, Error> {
         // "Shouldn't" happen
         if self.pattern[self.idx] != '\\' {
             return Err(Error::Internal);
@@ -150,21 +162,21 @@ impl<'a> ReCompiler<'a> {
         self.idx += 2;
         let escape_char = self.pattern[self.idx - 1];
         match escape_char {
-            'n' => Ok(CharacterClass::Char('\n')),
-            'r' => Ok(CharacterClass::Char('\r')),
-            't' => Ok(CharacterClass::Char('\t')),
+            'n' => Ok(CharacterClass::Char('\n').into()),
+            'r' => Ok(CharacterClass::Char('\r').into()),
+            't' => Ok(CharacterClass::Char('\t').into()),
             '\\' | '|' | '.' | '-' | '^' | '?' | '*' | '+' | '{' | '}' | '(' | ')' | '[' | ']' => {
-                Ok(CharacterClass::Char(escape_char))
+                Ok(CharacterClass::Char(escape_char).into())
             }
             '$' => {
                 if self.is_xpath {
-                    Ok(CharacterClass::Char('$'))
+                    Ok(CharacterClass::Char('$').into())
                 } else {
                     Err(Error::syntax("In XSD, '$' must not be escaped"))
                 }
             }
-            's' => Ok(CharacterClass::escape_s_lower()),
-            'S' => Ok(CharacterClass::escape_s_upper()),
+            's' => Ok(CharacterClass::escape_s_lower().into()),
+            'S' => Ok(CharacterClass::escape_s_upper().into()),
             // TODO: i, I, c, C, d, D, w, W
             'p' | 'P' => {
                 if self.idx == self.len {
@@ -202,12 +214,13 @@ impl<'a> ReCompiler<'a> {
                 if !self.is_xpath {
                     return Err(Error::syntax("digit not allowed after \\"));
                 }
-                let mut back_ref = (escape_char as u32) - ('0' as u32);
+                let mut back_ref = (escape_char as usize) - ('0' as usize);
                 while self.idx < self.len {
                     let c1 = self.pattern[self.idx].to_digit(10);
                     if let Some(c1) = c1 {
-                        let back_ref2 = back_ref * 10 + c1;
-                        if back_ref2 > (self.capturing_open_paren_count as u32 - 1) {
+                        let back_ref2 = back_ref * 10 + (c1 as usize);
+                        // TODO shaky conversion
+                        if back_ref2 > (self.capturing_open_paren_count - 1) {
                             break;
                         }
                         back_ref = back_ref2;
@@ -216,8 +229,8 @@ impl<'a> ReCompiler<'a> {
                         break;
                     }
                 }
-                if !self.captures.contains(&char::from_u32(back_ref).unwrap()) {
-                    let explanation = if back_ref > ((self.capturing_open_paren_count - 1) as u32) {
+                if !self.captures.contains(&back_ref) {
+                    let explanation = if back_ref > (self.capturing_open_paren_count - 1) {
                         "(no such group)"
                     } else {
                         "(group not yet closed)"
@@ -233,7 +246,7 @@ impl<'a> ReCompiler<'a> {
                 // TODO: need to probably introduce CharacterClass::BackReference
                 // so we can detect these. Alternatively return an enum that's
                 // either a back reference or a character class here.
-                Ok(CharacterClass::Char(char::from_u32(back_ref).unwrap()))
+                Ok(CharacterClassOrBackReference::BackReference(back_ref))
             }
             escape_char => Err(Error::syntax(format!(
                 "Escape character '{}' not allowed",
@@ -290,10 +303,10 @@ impl<'a> ReCompiler<'a> {
                     // escape always advances the stream
                     let cc = self.escape(true)?;
                     match cc {
-                        CharacterClass::Char(c) => {
+                        CharacterClassOrBackReference::CharacterClass(CharacterClass::Char(c)) => {
                             simple_char = Some(c);
                         }
-                        _ => {
+                        CharacterClassOrBackReference::CharacterClass(cc) => {
                             if defining_range {
                                 return Err(Error::syntax(
                                     "Multi-character escape cannot follow '-'",
@@ -305,6 +318,7 @@ impl<'a> ReCompiler<'a> {
                             }
                             continue;
                         }
+                        _ => unreachable!(),
                     }
                 }
                 '-' => {
@@ -491,7 +505,9 @@ impl<'a> ReCompiler<'a> {
                     let character_class = self.escape(false)?;
 
                     // check if it's a simple escape (as opposed to, say, a backreference)
-                    if let CharacterClass::Char(ch) = character_class {
+                    if let CharacterClassOrBackReference::CharacterClass(CharacterClass::Char(ch)) =
+                        character_class
+                    {
                         ub.push(ch);
                         len_atom += 1;
                     } else {
@@ -535,20 +551,61 @@ impl<'a> ReCompiler<'a> {
             }
             '.' => {
                 self.idx += 1;
-                // let predicate = if self.re_flags.is_single_line() {
-                //     // in XPath with the 's' flag, '.' matches everything
-                //     |_| true
-                // } else {
-                //     // in XSD, "." matches everything except \n and \r
-                //     |c| c != '\n' && c != '\r'
-                // };
-                todo!();
-                // Operation::from(OpCharacterClass::new(c))
+                let predicate = if self.re_flags.is_single_line() {
+                    // in XPath with the 's' flag, '.' matches everything
+                    |_| true
+                } else {
+                    // Don't we have enough information to create a non-predicate
+                    // character class?
+                    // in XSD, "." matches everything except \n and \r
+                    |c| c != '\n' && c != '\r'
+                };
+                return Ok(Operation::from(OpCharacterClass::new(
+                    CharacterClass::Predicate(Box::new(predicate)),
+                )));
             }
-            _ => todo!(),
+            '[' => {
+                let range = self.parse_character_class()?;
+                return Ok(Operation::from(OpCharacterClass::new(range)));
+            }
+            '(' => return self.parse_expr(flags),
+            ')' => return Err(Error::syntax("Unescaped closing ')'")),
+            '|' => return Err(Error::Internal),
+            ']' => return Err(Error::syntax("Unexpected closing ']'")),
+            '0' => return Err(Error::syntax("Unexpected end of input")),
+            '?' | '+' | '{' | '*' => {
+                return Err(Error::syntax("No expression before quantifier"));
+            }
+            '\\' => {
+                // don't forget, escape() advances the input stream!
+                let idx_before_escape = self.idx;
+                let esc = self.escape(false)?;
+
+                match esc {
+                    CharacterClassOrBackReference::BackReference(back_ref) => {
+                        if self.capturing_open_paren_count <= back_ref {
+                            return Err(Error::syntax("Bad backreference"));
+                        }
+                        return Ok(Operation::from(OpBackReference::new(back_ref)));
+                    }
+                    CharacterClassOrBackReference::CharacterClass(CharacterClass::Char(c)) => {
+                        // we had a simple escape and we want to have it end up in an atom,
+                        // so we back up and fall through to the default handling
+                        self.idx = idx_before_escape;
+                    }
+                    CharacterClassOrBackReference::CharacterClass(character_class) => {
+                        return Ok(Operation::from(OpCharacterClass::new(character_class)))
+                    }
+                }
+            }
+            _ => {}
         }
         // if it wasn't one of the above, it must be the start of an atom.
         self.parse_atom()
+    }
+
+    fn parse_expr(&self, flags: Vec<u32>) -> Result<Operation, Error> {
+        todo!()
     }
 
     fn there_follows(&self, s: &str) -> bool {

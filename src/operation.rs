@@ -4,6 +4,7 @@ use crate::op_atom::OpAtom;
 use crate::op_back_reference::OpBackReference;
 use crate::op_bol::OpBol;
 use crate::op_capture::OpCapture;
+use crate::op_character_class::OpCharacterClass;
 use crate::op_choice::OpChoice;
 use crate::op_end_program::OpEndProgram;
 use crate::op_eol::OpEol;
@@ -56,6 +57,7 @@ pub(crate) enum Operation {
     OpNothing,
     OpRepeat,
     OpSequence,
+    OpCharacterClass,
 }
 
 // blanket implementation for references
