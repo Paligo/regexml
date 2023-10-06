@@ -1,11 +1,11 @@
 use crate::{
-    operation::{Operation, MATCHES_ZLS_ANYWHERE},
+    operation::{OperationControl, MATCHES_ZLS_ANYWHERE},
     re_matcher::ReMatcher,
 };
 
-struct OpEndProgram;
+pub(crate) struct OpEndProgram;
 
-impl Operation for OpEndProgram {
+impl OperationControl for OpEndProgram {
     fn get_match_length(&self) -> Option<usize> {
         Some(0)
     }

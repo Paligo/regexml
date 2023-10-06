@@ -2,23 +2,23 @@ use std::rc::Rc;
 
 use crate::{
     operation::{
-        Operation, MATCHES_ZLS_ANYWHERE, MATCHES_ZLS_AT_END, MATCHES_ZLS_AT_START,
-        MATCHES_ZLS_NEVER,
+        Operation, OperationControl, MATCHES_ZLS_ANYWHERE, MATCHES_ZLS_AT_END,
+        MATCHES_ZLS_AT_START, MATCHES_ZLS_NEVER,
     },
     re_matcher::{CaptureState, ReMatcher},
 };
 
-struct OpSequence {
-    operations: Vec<Rc<dyn Operation>>,
+pub(crate) struct OpSequence {
+    operations: Vec<Rc<Operation>>,
 }
 
 impl OpSequence {
-    fn new(operations: Vec<Rc<dyn Operation>>) -> Self {
+    fn new(operations: Vec<Rc<Operation>>) -> Self {
         Self { operations }
     }
 }
 
-impl Operation for OpSequence {
+impl OperationControl for OpSequence {
     fn get_match_length(&self) -> Option<usize> {
         self.operations
             .iter()
@@ -102,7 +102,7 @@ impl Operation for OpSequence {
 struct SequenceIterator<'a> {
     primed: bool,
     iterators: Vec<Box<dyn Iterator<Item = usize> + 'a>>,
-    operations: Vec<Rc<dyn Operation + 'a>>,
+    operations: Vec<Rc<Operation>>,
     capture_state: Option<CaptureState>,
     backtracking_limit: Option<usize>,
     matcher: &'a ReMatcher<'a>,
@@ -110,11 +110,7 @@ struct SequenceIterator<'a> {
 }
 
 impl<'a> SequenceIterator<'a> {
-    fn new(
-        matcher: &'a ReMatcher<'a>,
-        operations: Vec<Rc<dyn Operation + 'a>>,
-        position: usize,
-    ) -> Self {
+    fn new(matcher: &'a ReMatcher<'a>, operations: Vec<Rc<Operation>>, position: usize) -> Self {
         Self {
             primed: false,
             capture_state: None, // TODO: saved state is based on whether it contains capturing expressions

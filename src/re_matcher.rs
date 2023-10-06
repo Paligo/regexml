@@ -1,6 +1,9 @@
 use std::cell::RefCell;
 
-use crate::{operation::Operation, re_program::ReProgram};
+use crate::{
+    operation::{Operation, OperationControl},
+    re_program::ReProgram,
+};
 
 pub(crate) struct ReMatcher<'a> {
     pub(crate) search: &'a [char],
@@ -15,7 +18,7 @@ pub(crate) struct History {}
 impl History {
     pub(crate) fn is_duplicate_zero_length_match(
         &self,
-        operation: Box<dyn Operation + '_>,
+        operation: &Operation,
         position: usize,
     ) -> bool {
         todo!()

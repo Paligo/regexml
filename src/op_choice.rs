@@ -1,18 +1,21 @@
 use std::rc::Rc;
 
-use crate::{operation::Operation, re_matcher::ReMatcher};
+use crate::{
+    operation::{Operation, OperationControl},
+    re_matcher::ReMatcher,
+};
 
-struct OpChoice {
-    branches: Vec<Rc<dyn Operation>>,
+pub(crate) struct OpChoice {
+    branches: Vec<Rc<Operation>>,
 }
 
 impl OpChoice {
-    pub(crate) fn new(branches: Vec<Rc<dyn Operation>>) -> Self {
+    pub(crate) fn new(branches: Vec<Rc<Operation>>) -> Self {
         Self { branches }
     }
 }
 
-impl Operation for OpChoice {
+impl OperationControl for OpChoice {
     fn get_match_length(&self) -> Option<usize> {
         let mut iter = self.branches.iter();
         let fixed = iter.next().unwrap().get_match_length();
@@ -70,16 +73,12 @@ impl Operation for OpChoice {
 struct ChoiceIterator<'a> {
     matcher: &'a ReMatcher<'a>,
     position: usize,
-    branches_iter: Box<dyn Iterator<Item = Rc<dyn Operation + 'a>> + 'a>,
+    branches_iter: Box<dyn Iterator<Item = Rc<Operation>> + 'a>,
     current_iter: Option<Box<dyn Iterator<Item = usize> + 'a>>,
 }
 
 impl<'a> ChoiceIterator<'a> {
-    fn new(
-        matcher: &'a ReMatcher<'a>,
-        position: usize,
-        branches: Vec<Rc<dyn Operation + 'a>>,
-    ) -> Self {
+    fn new(matcher: &'a ReMatcher<'a>, position: usize, branches: Vec<Rc<Operation>>) -> Self {
         Self {
             matcher,
             position,

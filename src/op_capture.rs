@@ -1,21 +1,21 @@
 use crate::{
-    operation::Operation,
+    operation::{Operation, OperationControl},
     re_matcher::ReMatcher,
     re_program::{ReFlags, ReProgram, OPT_HASBACKREFS},
 };
 
-struct OpCapture {
+pub(crate) struct OpCapture {
     group_nr: usize,
-    child_op: Box<dyn Operation>,
+    child_op: Box<Operation>,
 }
 
 impl OpCapture {
-    pub(crate) fn new(group_nr: usize, child_op: Box<dyn Operation>) -> Self {
+    pub(crate) fn new(group_nr: usize, child_op: Box<Operation>) -> Self {
         Self { group_nr, child_op }
     }
 }
 
-impl Operation for OpCapture {
+impl OperationControl for OpCapture {
     fn get_match_length(&self) -> Option<usize> {
         self.child_op.get_match_length()
     }

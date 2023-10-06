@@ -1,11 +1,11 @@
 use crate::{
-    operation::{Operation, MATCHES_ZLS_AT_END},
+    operation::{OperationControl, MATCHES_ZLS_AT_END},
     re_matcher::ReMatcher,
 };
 
-struct OpEol;
+pub(crate) struct OpEol;
 
-impl Operation for OpEol {
+impl OperationControl for OpEol {
     fn get_match_length(&self) -> Option<usize> {
         Some(0)
     }

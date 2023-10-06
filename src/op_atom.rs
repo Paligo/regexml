@@ -1,9 +1,9 @@
 use crate::{
-    operation::{Operation, MATCHES_ZLS_ANYWHERE, MATCHES_ZLS_NEVER},
+    operation::{OperationControl, MATCHES_ZLS_ANYWHERE, MATCHES_ZLS_NEVER},
     re_matcher::ReMatcher,
 };
 
-struct OpAtom {
+pub(crate) struct OpAtom {
     atom: String,
     len: usize,
 }
@@ -17,7 +17,7 @@ impl OpAtom {
     }
 }
 
-impl Operation for OpAtom {
+impl OperationControl for OpAtom {
     fn get_match_length(&self) -> Option<usize> {
         Some(self.len)
     }
