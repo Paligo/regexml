@@ -755,7 +755,34 @@ impl<'a> ReCompiler<'a> {
         }
     }
 
+    fn parse_branch(&mut self) -> Result<Operation, Error> {
+        // get each possibly quantified piece and concat
+        let mut current = None;
+        let mut quantifier_flags = vec![1];
+        while self.idx < self.len && self.pattern[self.idx] != '|' && self.pattern[self.idx] != ')'
+        {
+            // get new node
+            quantifier_flags[0] = NODE_NORMAL;
+            let op = self.piece(&quantifier_flags)?;
+            if let Some(c) = current {
+                current = Some(Self::make_sequence(c, op));
+            } else {
+                current = Some(op);
+            }
+        }
+        if let Some(current) = current {
+            Ok(current)
+        } else {
+            // if we don't run loop, make a nothing node
+            Ok(Operation::Nothing(Nothing))
+        }
+    }
+
     fn parse_expr(&self, flags: &[u32]) -> Result<Operation, Error> {
+        todo!()
+    }
+
+    fn make_sequence(o1: Operation, o2: Operation) -> Operation {
         todo!()
     }
 
