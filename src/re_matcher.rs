@@ -101,8 +101,21 @@ impl<'a> ReMatcher<'a> {
     }
 
     pub(crate) fn set_paren_start(&self, which: usize, i: usize) {
-        todo!()
+        while which > self.state.borrow().capture_state.startn.len() - 1 {
+            let mut s2 = Vec::with_capacity(self.state.borrow().capture_state.startn.len() * 2);
+            s2[..self.state.borrow().capture_state.startn.len()]
+                .copy_from_slice(&self.state.borrow().capture_state.startn[..]);
+            for entry in s2
+                .iter_mut()
+                .skip(self.state.borrow().capture_state.startn.len())
+            {
+                *entry = None
+            }
+            self.state.borrow_mut().capture_state.startn = s2;
+        }
+        self.state.borrow_mut().capture_state.startn[which] = Some(i);
     }
+
     pub(crate) fn set_paren_end(&self, which: usize, i: usize) {
         todo!()
     }
