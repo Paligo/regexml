@@ -7,7 +7,10 @@ use crate::{
     op_atom::Atom,
     op_back_reference::BackReference,
     op_bol::Bol,
+    op_capture::Capture,
     op_character_class::CharClass,
+    op_choice::Choice,
+    op_end_program::EndProgram,
     op_eol::Eol,
     op_greedy_fixed::GreedyFixed,
     op_nothing::Nothing,
@@ -662,7 +665,7 @@ impl<'a> ReCompiler<'a> {
                     || quantifier_type == Some('*')
                     || (quantifier_type == Some('{') && self.bracket_min == 0)
                 {
-                    return Ok(Operation::Nothing(Nothing));
+                    return Ok(Operation::from(Nothing));
                 } else {
                     quantifier_type = None
                 }
@@ -721,16 +724,16 @@ impl<'a> ReCompiler<'a> {
         }
 
         if max == 0 {
-            return Ok(Operation::Nothing(Nothing));
+            return Ok(Operation::from(Nothing));
         } else if min == 1 && max == 1 {
             return Ok(ret);
         } else if greedy {
             // actually do the quantifier now
             if ret.get_match_length().is_none() {
-                return Ok(Operation::Repeat(Repeat::new(Rc::new(ret), min, max, true)));
+                return Ok(Operation::from(Repeat::new(Rc::new(ret), min, max, true)));
             } else {
                 let match_length = ret.get_match_length().unwrap();
-                return Ok(Operation::GreedyFixed(GreedyFixed::new(
+                return Ok(Operation::from(GreedyFixed::new(
                     Rc::new(ret),
                     min,
                     max,
@@ -738,15 +741,10 @@ impl<'a> ReCompiler<'a> {
                 )));
             }
         } else if ret.get_match_length().is_none() {
-            return Ok(Operation::Repeat(Repeat::new(
-                Rc::new(ret),
-                min,
-                max,
-                false,
-            )));
+            return Ok(Operation::from(Repeat::new(Rc::new(ret), min, max, false)));
         } else {
             let match_length = ret.get_match_length().unwrap();
-            return Ok(Operation::ReluctantFixed(ReluctantFixed::new(
+            return Ok(Operation::from(ReluctantFixed::new(
                 Rc::new(ret),
                 min,
                 max,
@@ -774,12 +772,70 @@ impl<'a> ReCompiler<'a> {
             Ok(current)
         } else {
             // if we don't run loop, make a nothing node
-            Ok(Operation::Nothing(Nothing))
+            Ok(Operation::from(Nothing))
         }
     }
 
-    fn parse_expr(&self, flags: &[u32]) -> Result<Operation, Error> {
-        todo!()
+    fn parse_expr(&mut self, compiler_flags: &[u32]) -> Result<Operation, Error> {
+        // create open paren node unless we were called from the top level (which has no parens)
+        let mut paren = None;
+        let mut group = 0;
+        let mut branches = Vec::new();
+        let close_parens = self.capturing_open_paren_count;
+        let mut capturing = true;
+        if (compiler_flags[0] & NODE_TOPLEVEL) == 0 && self.pattern[self.idx] == '(' {
+            // if it's a cluster (rather than a proper subexpression ie with backrefs)
+            if (self.idx + 2) < self.len
+                && self.pattern[self.idx + 1] == '?'
+                && self.pattern[self.idx + 2] == ':'
+            {
+                if !self.is_xpath_30 {
+                    return Err(Error::syntax(
+                        "Non-capturing groups only allowed in XPath 3.0",
+                    ));
+                }
+                paren = Some(2);
+                self.idx += 3;
+                capturing = false;
+            } else {
+                paren = Some(1);
+                self.idx += 1;
+                group = self.capturing_open_paren_count;
+                self.capturing_open_paren_count += 1;
+            }
+        }
+        let mut compiler_flags = compiler_flags.to_vec();
+        compiler_flags[0] &= !NODE_TOPLEVEL;
+
+        // process contents of first branch node
+        branches.push(self.parse_branch()?);
+        // loop through brnaches
+        while self.idx < self.len && self.pattern[self.idx] == '|' {
+            self.idx += 1;
+            branches.push(self.parse_branch()?);
+        }
+
+        let mut op = if branches.len() == 1 {
+            branches.remove(0)
+        } else {
+            Operation::from(Choice::new(branches.into_iter().map(Rc::new).collect()))
+        };
+
+        // create an ending node (either a close paren or an OP_END)
+        if paren.is_some() {
+            if self.idx < self.len && self.pattern[self.idx] == ')' {
+                self.idx += 1;
+            } else {
+                return Err(Error::syntax("Missing close paren"));
+            }
+            if capturing {
+                op = Operation::from(Capture::new(group, Box::new(op)));
+                self.captures.insert(close_parens);
+            }
+        } else {
+            op = Self::make_sequence(op, Operation::from(EndProgram));
+        }
+        Ok(op)
     }
 
     fn make_sequence(o1: Operation, o2: Operation) -> Operation {
