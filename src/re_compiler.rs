@@ -18,7 +18,7 @@ use crate::{
     op_repeat::Repeat,
     op_sequence::Sequence,
     operation::{Operation, OperationControl, MATCHES_ZLS_ANYWHERE},
-    re_program::ReFlags,
+    re_program::{ReFlags, ReProgram, OPT_HASBACKREFS},
 };
 
 // No flags (nothing special)
@@ -26,11 +26,11 @@ pub(crate) const NODE_NORMAL: u32 = 0;
 // True if top level expr
 pub(crate) const NODE_TOPLEVEL: u32 = 2;
 
-struct ReCompiler<'a> {
+struct ReCompiler {
     // Input state for compiling regular expression
 
     // input string
-    pattern: &'a [char],
+    pattern: Vec<char>,
     // length of the pattern string
     len: usize,
     // current input index into ac
@@ -78,7 +78,7 @@ impl From<CharacterClass> for CharacterClassOrBackReference {
     }
 }
 
-impl<'a> ReCompiler<'a> {
+impl ReCompiler {
     fn bracket(&mut self) -> Result<(), Error> {
         if self.idx >= self.len {
             return Err(Error::Internal);
@@ -878,6 +878,88 @@ impl<'a> ReCompiler<'a> {
                 let list = vec![Rc::new(o1), Rc::new(o2)];
                 Operation::Sequence(Sequence::new(list))
             }
+        }
+    }
+
+    fn compile(&mut self, pattern: Vec<char>) -> Result<ReProgram, Error> {
+        // initialize variables for compilation
+
+        // save pattern in instance variable
+        self.pattern = pattern;
+        // precompute pattern length for speed
+        self.len = self.pattern.len();
+        // set parsing index to the first character
+        self.idx = 0;
+        // set paren level to 1 (the implicit outer parens)
+        self.capturing_open_paren_count = 1;
+
+        if self.re_flags.is_literal() {
+            // 'q' flag is set
+            // create a string node
+            let ret = Operation::from(Atom::new(self.pattern.clone()));
+            let end_node = Operation::from(EndProgram);
+            let seq = Self::make_sequence(ret, end_node);
+            Ok(ReProgram::new(
+                seq,
+                self.capturing_open_paren_count,
+                self.re_flags.clone(),
+            ))
+        } else {
+            if self.re_flags.is_allow_whitespace() {
+                // 'x' flag is set. preprocess the expression to strip whitespace,
+                // other than between square brackets
+                let mut sb = Vec::new();
+                let mut nesting = 0;
+                let mut escaped = false;
+                for ch in self.pattern.iter() {
+                    match ch {
+                        '\\' if !escaped => {
+                            escaped = true;
+                            sb.push(*ch);
+                        }
+                        '[' if !escaped => {
+                            nesting += 1;
+                            sb.push(*ch);
+                        }
+                        ']' if !escaped => {
+                            nesting -= 1;
+                            sb.push(*ch);
+                        }
+                        _ => {
+                            // TODO: wrong whitespace
+                            if nesting == 0 && ch.is_ascii_whitespace() {
+                                // no action
+                            } else {
+                                escaped = false;
+                                sb.push(*ch);
+                            }
+                        }
+                    }
+                }
+                self.pattern = sb;
+                self.len = self.pattern.len();
+            }
+
+            // initialize pass by reference flags value
+            let compiler_flags = vec![NODE_TOPLEVEL];
+
+            // parse expression
+            let exp = self.parse_expr(&compiler_flags)?;
+
+            // should be at end of input
+            if self.idx != self.len {
+                if self.pattern[self.idx] == ')' {
+                    return Err(Error::syntax("Unmatched close paren"));
+                }
+                return Err(Error::syntax("Unexpected input remains"));
+            }
+
+            let mut program =
+                ReProgram::new(exp, self.capturing_open_paren_count, self.re_flags.clone());
+            if self.has_back_references {
+                program.optimization_flags |= OPT_HASBACKREFS;
+            }
+            Ok(program)
         }
     }
 }
