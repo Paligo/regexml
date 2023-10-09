@@ -16,6 +16,7 @@ use crate::{
     op_nothing::Nothing,
     op_reluctant_fixed::ReluctantFixed,
     op_repeat::Repeat,
+    op_sequence::Sequence,
     operation::{Operation, OperationControl, MATCHES_ZLS_ANYWHERE},
     re_program::ReFlags,
 };
@@ -838,10 +839,6 @@ impl<'a> ReCompiler<'a> {
         Ok(op)
     }
 
-    fn make_sequence(o1: Operation, o2: Operation) -> Operation {
-        todo!()
-    }
-
     fn there_follows(&self, s: &str) -> bool {
         let chars = s.chars().collect::<Vec<_>>();
 
@@ -854,5 +851,33 @@ impl<'a> ReCompiler<'a> {
             }
         }
         true
+    }
+
+    fn make_sequence(o1: Operation, o2: Operation) -> Operation {
+        match (o1, o2) {
+            (Operation::Sequence(o1), Operation::Sequence(o2)) => {
+                let list1 = o1.operations;
+                let list2 = o2.operations;
+                let mut list = Vec::with_capacity(list1.len() + list2.len());
+                list.extend(list1);
+                list.extend(list2);
+                Operation::Sequence(Sequence::new(list))
+            }
+            (Operation::Sequence(o1), o2) => {
+                let mut list = o1.operations.clone();
+                list.push(Rc::new(o2));
+                Operation::Sequence(Sequence::new(list))
+            }
+            (o1, Operation::Sequence(o2)) => {
+                let mut list = Vec::with_capacity(o2.operations.len() + 1);
+                list.push(Rc::new(o1));
+                list.extend(o2.operations);
+                Operation::Sequence(Sequence::new(list))
+            }
+            (o1, o2) => {
+                let list = vec![Rc::new(o1), Rc::new(o2)];
+                Operation::Sequence(Sequence::new(list))
+            }
+        }
     }
 }

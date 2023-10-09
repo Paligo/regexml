@@ -9,11 +9,11 @@ use crate::{
 };
 
 pub(crate) struct Sequence {
-    operations: Vec<Rc<Operation>>,
+    pub(crate) operations: Vec<Rc<Operation>>,
 }
 
 impl Sequence {
-    fn new(operations: Vec<Rc<Operation>>) -> Self {
+    pub(crate) fn new(operations: Vec<Rc<Operation>>) -> Self {
         Self { operations }
     }
 }
