@@ -1,8 +1,18 @@
+use std::{f32::consts::E, rc::Rc};
+
 use ahash::{HashSet, HashSetExt};
 
 use crate::{
-    character_class::CharacterClass, op_atom::Atom, op_back_reference::BackReference, op_bol::Bol,
-    op_character_class::CharClass, op_eol::Eol, operation::Operation, re_program::ReFlags,
+    character_class::CharacterClass,
+    op_atom::Atom,
+    op_back_reference::BackReference,
+    op_bol::Bol,
+    op_character_class::CharClass,
+    op_eol::Eol,
+    op_nothing::Nothing,
+    op_repeat::Repeat,
+    operation::{Operation, OperationControl, MATCHES_ZLS_ANYWHERE},
+    re_program::ReFlags,
 };
 
 // No flags (nothing special)
@@ -534,7 +544,7 @@ impl<'a> ReCompiler<'a> {
         Ok(Operation::from(Atom::new(ub)))
     }
 
-    fn parse_terminal(&mut self, flags: Vec<u32>) -> Result<Operation, Error> {
+    fn parse_terminal(&mut self, flags: &[u32]) -> Result<Operation, Error> {
         match self.pattern[self.idx] {
             '$' => {
                 if self.is_xpath {
@@ -603,7 +613,147 @@ impl<'a> ReCompiler<'a> {
         self.parse_atom()
     }
 
-    fn parse_expr(&self, flags: Vec<u32>) -> Result<Operation, Error> {
+    fn piece(&mut self, flags: &[u32]) -> Result<Operation, Error> {
+        // values to pass by refrence to terminal()
+        let terminal_flags = vec![NODE_NORMAL];
+
+        // get terminal symbol
+        let ret = self.parse_terminal(&terminal_flags)?;
+
+        // or in flags from terminal symnbol
+        let mut modified_flags = flags.to_vec();
+        modified_flags[0] = flags[0] | terminal_flags[0];
+
+        // advance input, set NODE_NULLABLE flag and do santify checks
+        if self.idx >= self.len {
+            return Ok(ret);
+        }
+
+        let quantifier_type = self.pattern[self.idx];
+        match quantifier_type {
+            '?' | '*' | '+' => {
+                // eat quantifier character
+                self.idx += 1;
+                self.quantifier(ret, Some(quantifier_type))
+            }
+            '{' => {
+                self.bracket()?;
+                self.quantifier(ret, Some(quantifier_type))
+            }
+            _ => {
+                unreachable!();
+            }
+        }
+    }
+
+    fn quantifier(
+        &mut self,
+        ret: Operation,
+        mut quantifier_type: Option<char>,
+    ) -> Result<Operation, Error> {
+        match ret {
+            Operation::Bol(_) | Operation::Eol(_) => {
+                // pretty meaningless but legal. If the quantifier allows zero
+                // occurrences, ignore the instruction. Otherwise, ignore the
+                // quantifier.
+                if quantifier_type == Some('?')
+                    || quantifier_type == Some('*')
+                    || (quantifier_type == Some('{') && self.bracket_min == 0)
+                {
+                    return Ok(Operation::Nothing(Nothing));
+                } else {
+                    quantifier_type = None
+                }
+                if ret.matches_empty_string() == MATCHES_ZLS_ANYWHERE {
+                    match quantifier_type {
+                        Some('?') => {
+                            // can ignore the quantifier
+                            quantifier_type = None
+                        }
+                        Some('+') => {
+                            // '*' and '+' are equivalent
+                            quantifier_type = Some('*');
+                        }
+                        Some('{') => {
+                            // bounds are meaningless
+                            quantifier_type = Some('*')
+                        }
+                        _ => {}
+                    }
+                }
+            }
+            _ => {}
+        }
+
+        let mut greedy = true;
+
+        // if the next character is a '?', make the quantifier non-greedy (reluctant)
+        if self.idx < self.len && self.pattern[self.idx] == '?' {
+            if !self.is_xpath {
+                return Err(Error::syntax("Reluctant quantifier not allowed in XSD"));
+            }
+            self.idx += 1;
+            greedy = false;
+        }
+        let mut min = 1;
+        let mut max = 1;
+
+        match quantifier_type {
+            Some('{') => {
+                min = self.bracket_min;
+                max = self.bracket_max;
+            }
+            Some('?') => {
+                min = 0;
+                max = 1;
+            }
+            Some('+') => {
+                min = 1;
+                max = usize::MAX;
+            }
+            Some('*') => {
+                min = 0;
+                max = usize::MAX;
+            }
+            _ => {}
+        }
+
+        if max == 0 {
+            return Ok(Operation::Nothing(Nothing));
+        } else if min == 1 && max == 1 {
+            return Ok(ret);
+        } else if greedy {
+            // actually do the quantifier now
+            if ret.get_match_length().is_none() {
+                return Ok(Operation::Repeat(Repeat::new(Rc::new(ret), min, max, true)));
+            } else {
+                todo!()
+                // return Ok(Operation::GreedyFixed(GreedyFixed::new(
+                //     Rc::new(ret),
+                //     min,
+                //     max,
+                //     ret.get_match_length(),
+                // )));
+            }
+        } else if ret.get_match_length().is_none() {
+            return Ok(Operation::Repeat(Repeat::new(
+                Rc::new(ret),
+                min,
+                max,
+                false,
+            )));
+        } else {
+            todo!();
+            // return Ok(Operation::ReluctantFixed(ReluctantFixed::new(
+            //     Rc::new(ret),
+            //     min,
+            //     max,
+            //     ret.get_match_length(),
+            // )));
+        }
+    }
+
+    fn parse_expr(&self, flags: &[u32]) -> Result<Operation, Error> {
         todo!()
     }
 

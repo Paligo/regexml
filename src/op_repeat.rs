@@ -14,7 +14,7 @@ pub(crate) struct Repeat {
 }
 
 impl Repeat {
-    fn new(operation: Rc<Operation>, min: usize, max: usize, greedy: bool) -> Self {
+    pub(crate) fn new(operation: Rc<Operation>, min: usize, max: usize, greedy: bool) -> Self {
         Self {
             operation,
             min,
