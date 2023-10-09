@@ -52,7 +52,7 @@ impl OperationControl for Repeat {
 
     fn matches_iter<'a>(
         &self,
-        matcher: &'a crate::re_matcher::ReMatcher,
+        matcher: &'a ReMatcher,
         position: usize,
     ) -> Box<dyn Iterator<Item = usize> + 'a> {
         let mut iterators: Vec<Box<dyn Iterator<Item = usize>>> = Vec::new();
