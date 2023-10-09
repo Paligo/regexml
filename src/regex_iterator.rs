@@ -57,7 +57,7 @@ impl<'a> RegexIterator<'a> {
         self.next_substring.is_none() && self.prev_end.is_some()
     }
 
-    fn get_regex_group(&self, number: Option<usize>) -> Option<&'a str> {
+    fn get_regex_group(&'a self, number: Option<usize>) -> Option<&'a [char]> {
         if !self.is_matching() {
             return None;
         }
@@ -87,9 +87,11 @@ impl<'a> RegexIterator<'a> {
             let mut actions: HashMap<usize, Vec<i64>> = HashMap::new();
             for i in 1..=c {
                 let minus_1 = self.matcher.get_paren_start(0) > self.matcher.get_paren_start(i);
-                let start = self.matcher.get_paren_start(i) - self.matcher.get_paren_start(0);
+                let start = self.matcher.get_paren_start(i).unwrap()
+                    - self.matcher.get_paren_start(0).unwrap();
                 if !minus_1 {
-                    let end = self.matcher.get_paren_end(i) - self.matcher.get_paren_start(0);
+                    let end = self.matcher.get_paren_end(i).unwrap()
+                        - self.matcher.get_paren_start(0).unwrap();
                     if start < end {
                         // Add the start action after all other actions on the
                         // list for the same position
@@ -224,8 +226,8 @@ impl<'a> Iterator for RegexIterator<'a> {
                 }
             }
             if self.matcher.matches(self.the_string, search_start) {
-                let start = self.matcher.get_paren_start(0);
-                let end = self.matcher.get_paren_end(0);
+                let start = self.matcher.get_paren_start(0).unwrap();
+                let end = self.matcher.get_paren_end(0).unwrap();
                 self.skip = start == end;
                 if self.prev_end == Some(start) {
                     // there's no intervening non-matching string to return
@@ -260,7 +262,7 @@ impl<'a> Iterator for RegexIterator<'a> {
             if self.prev_end.is_some() {
                 self.current = self.next_substring;
                 self.next_substring = None;
-                self.prev_end = Some(self.matcher.get_paren_end(0));
+                self.prev_end = Some(self.matcher.get_paren_end(0).unwrap());
                 self.current
             } else {
                 self.current = None;

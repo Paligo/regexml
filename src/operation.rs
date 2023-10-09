@@ -14,10 +14,7 @@ use crate::op_reluctant_fixed::ReluctantFixed;
 use crate::op_repeat::Repeat;
 use crate::op_sequence::Sequence;
 
-use crate::{
-    re_matcher::ReMatcher,
-    re_program::{ReFlags, ReProgram},
-};
+use crate::re_matcher::ReMatcher;
 
 pub(crate) const MATCHES_ZLS_AT_START: u32 = 1;
 pub(crate) const MATCHES_ZLS_AT_END: u32 = 2;

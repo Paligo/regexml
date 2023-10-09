@@ -18,7 +18,8 @@ use crate::{
     op_repeat::Repeat,
     op_sequence::Sequence,
     operation::{Operation, OperationControl, MATCHES_ZLS_ANYWHERE},
-    re_program::{ReFlags, ReProgram, OPT_HASBACKREFS},
+    re_flags::ReFlags,
+    re_program::{ReProgram, OPT_HASBACKREFS},
 };
 
 // No flags (nothing special)
@@ -901,7 +902,7 @@ impl ReCompiler {
             let seq = Self::make_sequence(ret, end_node);
             Ok(ReProgram::new(
                 seq,
-                self.capturing_open_paren_count,
+                Some(self.capturing_open_paren_count),
                 self.re_flags.clone(),
             ))
         } else {
@@ -954,8 +955,11 @@ impl ReCompiler {
                 return Err(Error::syntax("Unexpected input remains"));
             }
 
-            let mut program =
-                ReProgram::new(exp, self.capturing_open_paren_count, self.re_flags.clone());
+            let mut program = ReProgram::new(
+                exp,
+                Some(self.capturing_open_paren_count),
+                self.re_flags.clone(),
+            );
             if self.has_back_references {
                 program.optimization_flags |= OPT_HASBACKREFS;
             }

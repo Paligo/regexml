@@ -1,7 +1,7 @@
 use crate::{
     operation::{Operation, OperationControl},
     re_matcher::ReMatcher,
-    re_program::{ReFlags, ReProgram, OPT_HASBACKREFS},
+    re_program::OPT_HASBACKREFS,
 };
 
 pub(crate) struct Capture {
