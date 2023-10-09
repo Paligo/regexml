@@ -56,13 +56,13 @@ struct ReCompiler {
     warning: Vec<String>,
 }
 
-enum Error {
+pub(crate) enum Error {
     Internal,
     Syntax(String),
 }
 
 impl Error {
-    fn syntax(s: impl Into<String>) -> Error {
+    pub(crate) fn syntax(s: impl Into<String>) -> Error {
         Error::Syntax(s.into())
     }
 }

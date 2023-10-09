@@ -14,6 +14,7 @@ mod op_repeat;
 mod op_sequence;
 mod operation;
 mod re_compiler;
+mod re_flags;
 mod re_matcher;
 mod re_program;
 mod regex_iterator;
