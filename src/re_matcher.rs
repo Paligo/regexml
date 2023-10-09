@@ -66,7 +66,7 @@ impl<'a> ReMatcher<'a> {
         todo!()
     }
 
-    pub(crate) fn clear_capture_groups_beyond(&self, position: usize) {}
+    pub(crate) fn clear_captured_groups_beyond(&self, position: usize) {}
 }
 
 #[derive(Debug, Clone)]

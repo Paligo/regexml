@@ -91,7 +91,7 @@ impl<'a> ChoiceIterator<'a> {
     fn next_branch(&mut self) -> bool {
         let next_op = self.branches_iter.next();
         if let Some(next_op) = next_op {
-            self.matcher.clear_capture_groups_beyond(self.position);
+            self.matcher.clear_captured_groups_beyond(self.position);
             self.current_iter = Some(next_op.matches_iter(self.matcher, self.position));
             true
         } else {

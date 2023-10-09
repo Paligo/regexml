@@ -8,7 +8,9 @@ use crate::op_character_class::CharClass;
 use crate::op_choice::Choice;
 use crate::op_end_program::EndProgram;
 use crate::op_eol::Eol;
+use crate::op_greedy_fixed::GreedyFixed;
 use crate::op_nothing::Nothing;
+use crate::op_reluctant_fixed::ReluctantFixed;
 use crate::op_repeat::Repeat;
 use crate::op_sequence::Sequence;
 
@@ -58,6 +60,8 @@ pub(crate) enum Operation {
     Repeat,
     Sequence,
     CharClass,
+    GreedyFixed,
+    ReluctantFixed,
 }
 
 // blanket implementation for references

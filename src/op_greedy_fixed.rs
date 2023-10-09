@@ -10,7 +10,6 @@ pub(crate) struct GreedyFixed {
     operation: Rc<Operation>,
     min: usize,
     max: usize,
-
     len: usize,
 }
 

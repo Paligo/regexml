@@ -9,7 +9,9 @@ use crate::{
     op_bol::Bol,
     op_character_class::CharClass,
     op_eol::Eol,
+    op_greedy_fixed::GreedyFixed,
     op_nothing::Nothing,
+    op_reluctant_fixed::ReluctantFixed,
     op_repeat::Repeat,
     operation::{Operation, OperationControl, MATCHES_ZLS_ANYWHERE},
     re_program::ReFlags,
@@ -727,13 +729,13 @@ impl<'a> ReCompiler<'a> {
             if ret.get_match_length().is_none() {
                 return Ok(Operation::Repeat(Repeat::new(Rc::new(ret), min, max, true)));
             } else {
-                todo!()
-                // return Ok(Operation::GreedyFixed(GreedyFixed::new(
-                //     Rc::new(ret),
-                //     min,
-                //     max,
-                //     ret.get_match_length(),
-                // )));
+                let match_length = ret.get_match_length().unwrap();
+                return Ok(Operation::GreedyFixed(GreedyFixed::new(
+                    Rc::new(ret),
+                    min,
+                    max,
+                    match_length,
+                )));
             }
         } else if ret.get_match_length().is_none() {
             return Ok(Operation::Repeat(Repeat::new(
@@ -743,13 +745,13 @@ impl<'a> ReCompiler<'a> {
                 false,
             )));
         } else {
-            todo!();
-            // return Ok(Operation::ReluctantFixed(ReluctantFixed::new(
-            //     Rc::new(ret),
-            //     min,
-            //     max,
-            //     ret.get_match_length(),
-            // )));
+            let match_length = ret.get_match_length().unwrap();
+            return Ok(Operation::ReluctantFixed(ReluctantFixed::new(
+                Rc::new(ret),
+                min,
+                max,
+                match_length,
+            )));
         }
     }
 
