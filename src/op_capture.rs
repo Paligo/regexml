@@ -38,7 +38,7 @@ impl OperationControl for Capture {
         position: usize,
     ) -> Box<dyn Iterator<Item = usize> + 'a> {
         if (matcher.program.optimization_flags & OPT_HASBACKREFS) != 0 {
-            matcher.state.borrow_mut().start_back_ref[self.group_nr] = Some(position);
+            matcher.state.borrow_mut().start_backref[self.group_nr] = Some(position);
         }
         let basis = self.child_op.matches_iter(matcher, position);
 
@@ -95,8 +95,8 @@ impl<'a> Iterator for CaptureGroupIterator<'a> {
 
         if (self.matcher.program.optimization_flags & OPT_HASBACKREFS) != 0 {
             let mut state = self.matcher.state.borrow_mut();
-            state.start_back_ref[self.group_nr] = Some(self.position);
-            state.end_back_ref[self.group_nr] = Some(next);
+            state.start_backref[self.group_nr] = Some(self.position);
+            state.end_backref[self.group_nr] = Some(next);
         }
         Some(next)
     }

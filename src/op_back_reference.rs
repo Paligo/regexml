@@ -22,8 +22,8 @@ impl OperationControl for BackReference {
         position: usize,
     ) -> Box<dyn Iterator<Item = usize> + 'a> {
         // Get the start and end of the backref
-        let s = matcher.state.borrow().start_back_ref[self.group_nr];
-        let e = matcher.state.borrow().end_back_ref[self.group_nr];
+        let s = matcher.state.borrow().start_backref[self.group_nr];
+        let e = matcher.state.borrow().end_backref[self.group_nr];
 
         // We don't know the backref yet
         if s.is_none() || e.is_none() {

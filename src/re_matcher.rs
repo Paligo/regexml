@@ -4,7 +4,7 @@ use ahash::{HashMap, HashMapExt, HashSet};
 
 use crate::{
     operation::{Operation, OperationControl},
-    re_program::ReProgram,
+    re_program::{ReProgram, OPT_HASBACKREFS},
 };
 
 pub(crate) struct ReMatcher<'a> {
@@ -16,10 +16,6 @@ pub(crate) struct ReMatcher<'a> {
     pub(crate) max_paren: Option<usize>,
     // parenthesized subexpressions
     pub(crate) state: RefCell<State>,
-
-    // back references
-    start_backref: Vec<Option<usize>>,
-    end_backref: Vec<Option<usize>>,
 
     pub(crate) anchored_match: bool,
 }
@@ -45,16 +41,16 @@ impl History {
 }
 
 pub(crate) struct State {
-    pub(crate) start_back_ref: Vec<Option<usize>>,
-    pub(crate) end_back_ref: Vec<Option<usize>>,
+    pub(crate) start_backref: Vec<Option<usize>>,
+    pub(crate) end_backref: Vec<Option<usize>>,
     pub(crate) capture_state: CaptureState,
 }
 
 impl State {
     pub(crate) fn new() -> Self {
         Self {
-            start_back_ref: vec![],
-            end_back_ref: vec![],
+            start_backref: vec![],
+            end_backref: vec![],
             capture_state: CaptureState::new(),
         }
     }
@@ -69,8 +65,6 @@ impl<'a> ReMatcher<'a> {
             history: History::new(),
             max_paren,
             state: RefCell::new(State::new()),
-            start_backref: vec![],
-            end_backref: vec![],
             anchored_match: false,
         }
     }
@@ -101,14 +95,10 @@ impl<'a> ReMatcher<'a> {
     }
 
     pub(crate) fn set_paren_start(&self, which: usize, i: usize) {
-        while which > self.state.borrow().capture_state.startn.len() - 1 {
-            let mut s2 = Vec::with_capacity(self.state.borrow().capture_state.startn.len() * 2);
-            s2[..self.state.borrow().capture_state.startn.len()]
-                .copy_from_slice(&self.state.borrow().capture_state.startn[..]);
-            for entry in s2
-                .iter_mut()
-                .skip(self.state.borrow().capture_state.startn.len())
-            {
+        while which > self.start_len() - 1 {
+            let mut s2 = Vec::with_capacity(self.start_len() * 2);
+            s2[..self.start_len()].copy_from_slice(&self.state.borrow().capture_state.startn[..]);
+            for entry in s2.iter_mut().skip(self.start_len()) {
                 *entry = None
             }
             self.state.borrow_mut().capture_state.startn = s2;
@@ -116,8 +106,61 @@ impl<'a> ReMatcher<'a> {
         self.state.borrow_mut().capture_state.startn[which] = Some(i);
     }
 
+    fn start_len(&self) -> usize {
+        self.state.borrow().capture_state.startn.len()
+    }
+
     pub(crate) fn set_paren_end(&self, which: usize, i: usize) {
-        todo!()
+        while which > self.end_len() - 1 {
+            let mut s2 = Vec::with_capacity(self.end_len() * 2);
+            s2[..self.end_len()].copy_from_slice(&self.state.borrow().capture_state.endn[..]);
+            for entry in s2.iter_mut().skip(self.end_len()) {
+                *entry = None
+            }
+            self.state.borrow_mut().capture_state.endn = s2;
+        }
+        self.state.borrow_mut().capture_state.startn[which] = Some(i);
+    }
+
+    fn end_len(&self) -> usize {
+        self.state.borrow().capture_state.endn.len()
+    }
+    pub(crate) fn clear_captured_groups_beyond(&self, pos: usize) {
+        for i in 0..self.start_len() {
+            if self.state.borrow().capture_state.startn[i] >= Some(pos) {
+                self.state.borrow_mut().capture_state.endn[i] =
+                    self.state.borrow().capture_state.startn[i];
+            }
+            for i in 0..self.state.borrow().start_backref.len() {
+                if self.state.borrow().start_backref[i] >= Some(pos) {
+                    self.state.borrow_mut().end_backref[i] = self.state.borrow().start_backref[i];
+                }
+            }
+        }
+    }
+
+    pub(crate) fn match_at(&mut self, i: usize, anchored: bool) -> bool {
+        // initialize start pointer, paren cache and paren count
+        self.state.borrow_mut().capture_state.paren_count = 1;
+        self.anchored_match = anchored;
+        self.set_paren_start(0, i);
+
+        // allocate backref arrays (unless optimizations indicate otherwise)
+        if self.program.optimization_flags & OPT_HASBACKREFS != 0 {
+            self.state.borrow_mut().start_backref = vec![None; self.program.max_parens.unwrap()];
+            self.state.borrow_mut().end_backref = vec![None; self.program.max_parens.unwrap()];
+        }
+
+        // match against string
+        let mut iter = self.program.operation.matches_iter(self, i);
+        if let Some(idx) = iter.next() {
+            self.set_paren_end(0, idx);
+            true
+        } else {
+            // didn't match
+            self.state.borrow_mut().capture_state.paren_count = 0;
+            false
+        }
     }
 
     pub(crate) fn get_paren_count(&self) -> usize {
@@ -135,8 +178,6 @@ impl<'a> ReMatcher<'a> {
     pub(crate) fn equal_case_blind(&self, a: char, b: char) -> bool {
         todo!()
     }
-
-    pub(crate) fn clear_captured_groups_beyond(&self, position: usize) {}
 }
 
 #[derive(Debug, Clone)]
