@@ -7,8 +7,8 @@ use crate::{
 
 #[derive(Clone)]
 pub(crate) struct Repeat {
-    operation: Rc<Operation>,
-    min: usize,
+    pub(crate) operation: Rc<Operation>,
+    pub(crate) min: usize,
     max: usize,
     greedy: bool,
 }

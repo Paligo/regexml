@@ -1,5 +1,8 @@
+use std::rc::Rc;
+
 use crate::{
     character_class::CharacterClass,
+    op_repeat::Repeat,
     operation::{Operation, OperationControl},
     re_flags::ReFlags,
 };
@@ -7,10 +10,17 @@ use crate::{
 pub(crate) const OPT_HASBACKREFS: u32 = 1;
 pub(crate) const OPT_HASBOL: u32 = 2;
 
+pub(crate) struct RegexPrecondition {
+    operation: Rc<Operation>,
+    fixed_position: Option<usize>,
+    min_position: usize,
+}
+
 pub(crate) struct ReProgram {
     pub(crate) operation: Operation,
     pub(crate) flags: ReFlags,
     pub(crate) prefix: Option<Vec<char>>,
+    pub(crate) preconditions: Vec<RegexPrecondition>,
     pub(crate) minimum_length: usize,
     pub(crate) fixed_length: Option<usize>,
     pub(crate) optimization_flags: u32,
@@ -47,6 +57,7 @@ impl ReProgram {
             operation,
             flags,
             prefix,
+            preconditions: Vec::new(),
             optimization_flags,
             max_parens,
             minimum_length,
@@ -73,10 +84,67 @@ impl ReProgram {
 
     pub(crate) fn add_precondition(
         &mut self,
-        op: Operation,
+        op: Rc<Operation>,
         fixed_position: Option<usize>,
         min_position: usize,
     ) {
-        todo!()
+        match op.as_ref() {
+            Operation::Atom(_) | Operation::CharClass(_) => {
+                self.preconditions.push(RegexPrecondition {
+                    operation: op.clone(),
+                    fixed_position,
+                    min_position,
+                })
+            }
+            Operation::Repeat(repeat) if repeat.min >= 1 => {
+                let child = &repeat.operation;
+                match child.as_ref() {
+                    Operation::Atom(_) | Operation::CharClass(_) => {
+                        if repeat.min == 1 {
+                            self.preconditions.push(RegexPrecondition {
+                                operation: op.clone(),
+                                fixed_position,
+                                min_position,
+                            })
+                        } else {
+                            let repeat = Operation::from(Repeat::new(
+                                child.clone(),
+                                repeat.min,
+                                repeat.min,
+                                true,
+                            ));
+                            self.preconditions.push(RegexPrecondition {
+                                operation: Rc::new(repeat),
+                                fixed_position,
+                                min_position,
+                            });
+                        }
+                    }
+                    _ => {
+                        self.add_precondition(child.clone(), fixed_position, min_position);
+                    }
+                }
+            }
+            Operation::Capture(capture) => {
+                self.add_precondition(capture.child_op.clone(), fixed_position, min_position)
+            }
+            Operation::Sequence(sequence) => {
+                let mut fp = fixed_position;
+                let mut mp = min_position;
+                for o in &sequence.operations {
+                    if matches!(o.as_ref(), Operation::Bol(_)) {
+                        fp = Some(0);
+                    }
+                    self.add_precondition(o.clone(), fp, mp);
+                    if let (Some(some_fp), Some(match_length)) = (fp, o.get_match_length()) {
+                        fp = Some(some_fp + match_length);
+                    } else {
+                        fp = None;
+                    }
+                    mp += o.get_minimum_match_length();
+                }
+            }
+            _ => {}
+        }
     }
 }

@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use crate::{
     operation::{Operation, OperationControl},
     re_matcher::ReMatcher,
@@ -6,11 +8,11 @@ use crate::{
 
 pub(crate) struct Capture {
     group_nr: usize,
-    child_op: Box<Operation>,
+    pub(crate) child_op: Rc<Operation>,
 }
 
 impl Capture {
-    pub(crate) fn new(group_nr: usize, child_op: Box<Operation>) -> Self {
+    pub(crate) fn new(group_nr: usize, child_op: Rc<Operation>) -> Self {
         Self { group_nr, child_op }
     }
 }

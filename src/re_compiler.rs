@@ -831,7 +831,7 @@ impl ReCompiler {
                 return Err(Error::syntax("Missing close paren"));
             }
             if capturing {
-                op = Operation::from(Capture::new(group, Box::new(op)));
+                op = Operation::from(Capture::new(group, Rc::new(op)));
                 self.captures.insert(close_parens);
             }
         } else {
