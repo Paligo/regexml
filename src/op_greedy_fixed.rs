@@ -1,14 +1,14 @@
 use std::rc::Rc;
 
 use crate::{
-    operation::{Operation, OperationControl, MATCHES_ZLS_ANYWHERE},
+    operation::{Operation, OperationControl, RepeatOperation, MATCHES_ZLS_ANYWHERE},
     re_matcher::ReMatcher,
 };
 
 #[derive(Clone)]
 pub(crate) struct GreedyFixed {
     operation: Rc<Operation>,
-    min: usize,
+    pub(crate) min: usize,
     max: usize,
     len: usize,
 }
@@ -43,6 +43,11 @@ impl OperationControl for GreedyFixed {
         } else {
             self.operation.matches_empty_string()
         }
+    }
+
+    fn contains_capturing_expressions(&self) -> bool {
+        matches!(self.operation.as_ref(), Operation::Capture(_))
+            || self.operation.contains_capturing_expressions()
     }
 
     fn matches_iter<'a>(
@@ -91,6 +96,16 @@ impl OperationControl for GreedyFixed {
     }
 }
 
+impl RepeatOperation for GreedyFixed {
+    fn child(&self) -> Rc<Operation> {
+        self.operation.clone()
+    }
+
+    fn min(&self) -> usize {
+        self.min
+    }
+}
+
 struct IntStepIterator {
     current: usize,
     step: i64,
@@ -121,9 +136,13 @@ impl Iterator for IntStepIterator {
         }
         let n = self.current;
         if self.step < 0 {
-            self.current -= self.step.abs() as usize;
+            let negative_step = self.step.unsigned_abs() as usize;
+            if self.current <= negative_step {
+                return None;
+            }
+            self.current -= negative_step;
         } else {
-            self.current += self.step as usize;
+            self.current += self.step.unsigned_abs() as usize;
         }
         Some(n)
     }

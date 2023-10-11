@@ -45,8 +45,14 @@ impl OperationControl for Choice {
             .fold(0, |acc, branch| acc | branch.matches_empty_string())
     }
 
-    // TODO
-    // fn contains_capturing_expressions() -> bool {}
+    fn contains_capturing_expressions(&self) -> bool {
+        for o in &self.branches {
+            if matches!(o.as_ref(), Operation::Capture(_)) || o.contains_capturing_expressions() {
+                return true;
+            }
+        }
+        false
+    }
 
     fn matches_iter<'a>(
         &self,

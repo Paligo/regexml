@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use enum_dispatch::enum_dispatch;
 
 use crate::op_atom::Atom;
@@ -13,6 +15,7 @@ use crate::op_nothing::Nothing;
 use crate::op_reluctant_fixed::ReluctantFixed;
 use crate::op_repeat::Repeat;
 use crate::op_sequence::Sequence;
+use crate::op_unambiguous_repeat::UnambiguousRepeat;
 
 use crate::re_matcher::ReMatcher;
 
@@ -41,7 +44,16 @@ pub(crate) trait OperationControl {
 
     // fn optimize(&mut self, program: &ReProgram, flags: &ReFlags) {}
 
+    fn contains_capturing_expressions(&self) -> bool {
+        false
+    }
+
     fn display(&self) -> String;
+}
+
+pub(crate) trait RepeatOperation {
+    fn child(&self) -> Rc<Operation>;
+    fn min(&self) -> usize;
 }
 
 // TODO: how come I can derive these here without deriving them for the operations?
@@ -62,6 +74,7 @@ pub(crate) enum Operation {
     CharClass,
     GreedyFixed,
     ReluctantFixed,
+    UnambiguousRepeat,
 }
 
 // blanket implementation for references

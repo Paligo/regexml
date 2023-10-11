@@ -1,14 +1,14 @@
 use std::rc::Rc;
 
 use crate::{
-    operation::{Operation, OperationControl, MATCHES_ZLS_ANYWHERE},
+    operation::{Operation, OperationControl, RepeatOperation, MATCHES_ZLS_ANYWHERE},
     re_matcher::ReMatcher,
 };
 
 #[derive(Clone)]
 pub(crate) struct ReluctantFixed {
     operation: Rc<Operation>,
-    min: usize,
+    pub(crate) min: usize,
     max: usize,
     len: usize,
 }
@@ -45,6 +45,11 @@ impl OperationControl for ReluctantFixed {
         }
     }
 
+    fn contains_capturing_expressions(&self) -> bool {
+        matches!(self.operation.as_ref(), Operation::Capture(_))
+            || self.operation.contains_capturing_expressions()
+    }
+
     fn matches_iter<'a>(
         &self,
         matcher: &'a ReMatcher,
@@ -61,6 +66,16 @@ impl OperationControl for ReluctantFixed {
 
     fn display(&self) -> String {
         todo!();
+    }
+}
+
+impl RepeatOperation for ReluctantFixed {
+    fn child(&self) -> Rc<Operation> {
+        self.operation.clone()
+    }
+
+    fn min(&self) -> usize {
+        self.min
     }
 }
 

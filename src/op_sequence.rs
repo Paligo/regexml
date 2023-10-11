@@ -87,6 +87,7 @@ impl OperationControl for Sequence {
             matcher,
             self.operations.clone(),
             position,
+            self.contains_capturing_expressions(),
         ))
     }
 
@@ -103,23 +104,43 @@ struct SequenceIterator<'a> {
     primed: bool,
     iterators: Vec<Box<dyn Iterator<Item = usize> + 'a>>,
     operations: Vec<Rc<Operation>>,
-    capture_state: Option<CaptureState>,
     backtracking_limit: Option<usize>,
     matcher: &'a ReMatcher<'a>,
     position: usize,
+    saved_state: Option<CaptureState>,
 }
 
 impl<'a> SequenceIterator<'a> {
-    fn new(matcher: &'a ReMatcher<'a>, operations: Vec<Rc<Operation>>, position: usize) -> Self {
+    fn new(
+        matcher: &'a ReMatcher<'a>,
+        operations: Vec<Rc<Operation>>,
+        position: usize,
+        contains_capturing_expressions: bool,
+    ) -> Self {
+        let saved_state = if contains_capturing_expressions {
+            Some(matcher.state.borrow().capture_state.clone())
+        } else {
+            None
+        };
+
         Self {
             primed: false,
-            capture_state: None, // TODO: saved state is based on whether it contains capturing expressions
             iterators: Vec::new(),
             operations,
             backtracking_limit: matcher.program.backtracking_limit,
             matcher,
             position,
+            saved_state,
         }
+    }
+
+    fn contains_capturing_expressions(&self) -> bool {
+        for o in &self.operations {
+            if matches!(o.as_ref(), Operation::Capture(_)) || o.contains_capturing_expressions() {
+                return true;
+            }
+        }
+        false
     }
 }
 
@@ -163,8 +184,9 @@ impl<'a> Iterator for SequenceIterator<'a> {
             }
             counter += 1;
         }
-        // TODO: if saved state, reset state in matcher with the saved state
-
+        if let Some(saved_state) = self.saved_state.take() {
+            self.matcher.reset_state(saved_state);
+        }
         None
     }
 }

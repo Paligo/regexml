@@ -143,6 +143,10 @@ impl<'a> ReMatcher<'a> {
         self.state.borrow().capture_state.endn.len()
     }
 
+    pub(crate) fn reset_state(&self, capture_state: CaptureState) {
+        self.state.borrow_mut().capture_state = capture_state;
+    }
+
     pub(crate) fn clear_captured_groups_beyond(&self, pos: usize) {
         for i in 0..self.start_len() {
             let start = self.state.borrow().capture_state.startn[i];

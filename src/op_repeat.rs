@@ -1,7 +1,9 @@
 use std::rc::Rc;
 
 use crate::{
-    operation::{ForceProgressIterator, Operation, OperationControl, MATCHES_ZLS_ANYWHERE},
+    operation::{
+        ForceProgressIterator, Operation, OperationControl, RepeatOperation, MATCHES_ZLS_ANYWHERE,
+    },
     re_matcher::ReMatcher,
 };
 
@@ -47,8 +49,10 @@ impl OperationControl for Repeat {
         }
     }
 
-    // TODO
-    // fn contains_capturing_expressions() -> bool {}
+    fn contains_capturing_expressions(&self) -> bool {
+        matches!(self.operation.as_ref(), Operation::Capture(_))
+            || self.operation.contains_capturing_expressions()
+    }
 
     fn matches_iter<'a>(
         &self,
@@ -111,6 +115,16 @@ impl OperationControl for Repeat {
 
     fn display(&self) -> String {
         todo!()
+    }
+}
+
+impl RepeatOperation for Repeat {
+    fn child(&self) -> Rc<Operation> {
+        self.operation.clone()
+    }
+
+    fn min(&self) -> usize {
+        self.min
     }
 }
 

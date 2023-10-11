@@ -3,7 +3,7 @@ use std::rc::Rc;
 use crate::{
     character_class::CharacterClass,
     op_repeat::Repeat,
-    operation::{Operation, OperationControl},
+    operation::{Operation, OperationControl, RepeatOperation},
     re_flags::ReFlags,
 };
 
@@ -97,33 +97,16 @@ impl ReProgram {
                 })
             }
             Operation::Repeat(repeat) if repeat.min >= 1 => {
-                let child = &repeat.operation;
-                match child.as_ref() {
-                    Operation::Atom(_) | Operation::CharClass(_) => {
-                        if repeat.min == 1 {
-                            self.preconditions.push(RegexPrecondition {
-                                operation: op.clone(),
-                                fixed_position,
-                                min_position,
-                            })
-                        } else {
-                            let repeat = Operation::from(Repeat::new(
-                                child.clone(),
-                                repeat.min,
-                                repeat.min,
-                                true,
-                            ));
-                            self.preconditions.push(RegexPrecondition {
-                                operation: Rc::new(repeat),
-                                fixed_position,
-                                min_position,
-                            });
-                        }
-                    }
-                    _ => {
-                        self.add_precondition(child.clone(), fixed_position, min_position);
-                    }
-                }
+                self.add_repeat_precondition(op.clone(), repeat, fixed_position, min_position)
+            }
+            Operation::ReluctantFixed(repeat) if repeat.min >= 1 => {
+                self.add_repeat_precondition(op.clone(), repeat, fixed_position, min_position)
+            }
+            Operation::GreedyFixed(repeat) if repeat.min >= 1 => {
+                self.add_repeat_precondition(op.clone(), repeat, fixed_position, min_position)
+            }
+            Operation::UnambiguousRepeat(repeat) if repeat.min >= 1 => {
+                self.add_repeat_precondition(op.clone(), repeat, fixed_position, min_position)
             }
             Operation::Capture(capture) => {
                 self.add_precondition(capture.child_op.clone(), fixed_position, min_position)
@@ -145,6 +128,42 @@ impl ReProgram {
                 }
             }
             _ => {}
+        }
+    }
+
+    fn add_repeat_precondition<R: RepeatOperation>(
+        &mut self,
+        op: Rc<Operation>,
+        repeat: &R,
+        fixed_position: Option<usize>,
+        min_position: usize,
+    ) {
+        let child = &repeat.child();
+        match child.as_ref() {
+            Operation::Atom(_) | Operation::CharClass(_) => {
+                if repeat.min() == 1 {
+                    self.preconditions.push(RegexPrecondition {
+                        operation: op.clone(),
+                        fixed_position,
+                        min_position,
+                    })
+                } else {
+                    let repeat = Operation::from(Repeat::new(
+                        child.clone(),
+                        repeat.min(),
+                        repeat.min(),
+                        true,
+                    ));
+                    self.preconditions.push(RegexPrecondition {
+                        operation: Rc::new(repeat),
+                        fixed_position,
+                        min_position,
+                    });
+                }
+            }
+            _ => {
+                self.add_precondition(child.clone(), fixed_position, min_position);
+            }
         }
     }
 }

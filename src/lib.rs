@@ -12,6 +12,7 @@ mod op_nothing;
 mod op_reluctant_fixed;
 mod op_repeat;
 mod op_sequence;
+mod op_unambiguous_repeat;
 mod operation;
 mod re_compiler;
 mod re_flags;
