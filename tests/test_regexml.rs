@@ -8,11 +8,20 @@ fn test_is_match_simple() {
 }
 
 // #[test]
-// fn test_is_match_star() {
-//     let regex = Regex::new("a*").unwrap();
+// fn test_is_match_optional() {
+//     let regex = Regex::new("a?").unwrap();
 //     assert!(regex.is_match(""));
 //     assert!(regex.is_match("a"));
 //     assert!(regex.is_match("aa"));
-//     assert!(regex.is_match("aaa"));
 //     assert!(!regex.is_match("b"));
 // }
+
+#[test]
+fn test_is_match_star() {
+    let regex = Regex::new("a*").unwrap();
+    assert!(regex.is_match(""));
+    assert!(regex.is_match("a"));
+    assert!(regex.is_match("aa"));
+    assert!(regex.is_match("aaa"));
+    assert!(!regex.is_match("b"));
+}
