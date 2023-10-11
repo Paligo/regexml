@@ -1,6 +1,6 @@
 use std::cell::RefCell;
 
-use ahash::{HashMap, HashMapExt, HashSet};
+use ahash::{HashMap, HashMapExt, HashSet, HashSetExt};
 
 use crate::{
     operation::{Operation, OperationControl},
@@ -9,17 +9,16 @@ use crate::{
 
 pub(crate) struct ReMatcher<'a> {
     // current program
-    pub(crate) program: ReProgram,
+    pub(crate) program: &'a ReProgram,
     // string being matched against
     pub(crate) search: &'a [char],
-    pub(crate) history: History,
     pub(crate) max_paren: Option<usize>,
     // parenthesized subexpressions
     pub(crate) state: RefCell<State>,
 }
 
 pub(crate) struct History {
-    zero_length_matches: HashMap<Operation, HashSet<char>>,
+    zero_length_matches: HashMap<Operation, HashSet<usize>>,
 }
 
 impl History {
@@ -30,11 +29,25 @@ impl History {
     }
 
     pub(crate) fn is_duplicate_zero_length_match(
-        &self,
-        operation: &Operation,
+        &mut self,
+        operation: Operation,
         position: usize,
     ) -> bool {
-        todo!()
+        // TODO: hashing an operation; how can that work with enum dispatch?
+        let positions = self.zero_length_matches.get_mut(&operation);
+        if let Some(positions) = positions {
+            if positions.contains(&position) {
+                true
+            } else {
+                positions.insert(position);
+                false
+            }
+        } else {
+            let mut positions = HashSet::new();
+            positions.insert(position);
+            self.zero_length_matches.insert(operation, positions);
+            false
+        }
     }
 }
 
@@ -43,6 +56,7 @@ pub(crate) struct State {
     pub(crate) end_backref: Vec<Option<usize>>,
     pub(crate) capture_state: CaptureState,
     pub(crate) anchored_match: bool,
+    pub(crate) history: History,
 }
 
 impl State {
@@ -52,17 +66,17 @@ impl State {
             end_backref: vec![],
             capture_state: CaptureState::new(),
             anchored_match: false,
+            history: History::new(),
         }
     }
 }
 
 impl<'a> ReMatcher<'a> {
-    pub(crate) fn new(program: ReProgram) -> Self {
+    pub(crate) fn new(program: &'a ReProgram) -> Self {
         let max_paren = program.max_parens;
         Self {
             program,
             search: &[],
-            history: History::new(),
             max_paren,
             state: RefCell::new(State::new()),
         }
@@ -128,16 +142,18 @@ impl<'a> ReMatcher<'a> {
     fn end_len(&self) -> usize {
         self.state.borrow().capture_state.endn.len()
     }
+
     pub(crate) fn clear_captured_groups_beyond(&self, pos: usize) {
         for i in 0..self.start_len() {
-            if self.state.borrow().capture_state.startn[i] >= Some(pos) {
-                self.state.borrow_mut().capture_state.endn[i] =
-                    self.state.borrow().capture_state.startn[i];
+            let start = self.state.borrow().capture_state.startn[i];
+            if start >= Some(pos) {
+                self.state.borrow_mut().capture_state.endn[i] = start;
             }
-            for i in 0..self.state.borrow().start_backref.len() {
-                if self.state.borrow().start_backref[i] >= Some(pos) {
-                    self.state.borrow_mut().end_backref[i] = self.state.borrow().start_backref[i];
-                }
+        }
+        for i in 0..self.state.borrow().start_backref.len() {
+            let start = self.state.borrow().start_backref[i];
+            if start >= Some(pos) {
+                self.state.borrow_mut().end_backref[i] = start;
             }
         }
     }
@@ -213,7 +229,7 @@ impl<'a> ReMatcher<'a> {
         }
 
         // is the string long enough to match?
-        let actual_length = self.search.len() - 1;
+        let actual_length = self.search.len() - i;
         if actual_length < self.program.minimum_length {
             return false;
         }
@@ -276,6 +292,10 @@ impl<'a> ReMatcher<'a> {
         }
     }
 
+    pub(crate) fn is_match(&mut self, search: &'a [char]) -> bool {
+        self.matches(search, 0)
+    }
+
     fn check_preconditions(&self, start: usize) -> bool {
         for condition in &self.program.preconditions {
             if let Some(fixed_position) = condition.fixed_position {
@@ -309,11 +329,23 @@ impl<'a> ReMatcher<'a> {
     }
 
     pub(crate) fn is_new_line(&self, i: usize) -> bool {
-        todo!();
+        self.search[i] == '\n'
     }
 
     pub(crate) fn equal_case_blind(&self, a: char, b: char) -> bool {
-        todo!()
+        // TODO: should this be done or should we just do a case-blind compare?
+        if a == b {
+            return true;
+        }
+        // TODO case variants story
+        for (c_a, c_b) in a.to_lowercase().zip(b.to_lowercase()) {
+            if c_a != c_b {
+                return false;
+            }
+        }
+        // TODO NOTE: this is false in the original code due to case
+        // variants story
+        true
     }
 }
 

@@ -1,6 +1,7 @@
 use crate::operation::{OperationControl, MATCHES_ZLS_AT_START};
 use crate::re_matcher::ReMatcher;
 
+#[derive(Hash)]
 pub(crate) struct Bol;
 
 impl OperationControl for Bol {

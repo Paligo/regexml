@@ -44,6 +44,9 @@ pub(crate) trait OperationControl {
     fn display(&self) -> String;
 }
 
+// TODO: how come I can derive these here without deriving them for the operations?
+// is that correct?
+#[derive(Hash, PartialEq, Eq)]
 #[enum_dispatch(OperationControl)]
 pub(crate) enum Operation {
     Bol,

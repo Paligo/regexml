@@ -6,15 +6,15 @@ struct Action {}
 
 impl Action {
     fn characters(&mut self, current: &[char]) {
-        todo!()
+        // nothing yet
     }
 
     fn on_group_start(&mut self, group: i64) {
-        todo!()
+        // nothing yet
     }
 
     fn on_group_end(&mut self, group: i64) {
-        todo!()
+        // nothing yet
     }
 }
 

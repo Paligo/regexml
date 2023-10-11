@@ -1,5 +1,6 @@
 use crate::{operation::OperationControl, re_matcher::ReMatcher};
 
+#[derive(Hash)]
 pub(crate) struct BackReference {
     group_nr: usize,
 }

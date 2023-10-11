@@ -1,4 +1,4 @@
-use std::{f32::consts::E, rc::Rc};
+use std::rc::Rc;
 
 use ahash::{HashSet, HashSetExt};
 
@@ -27,7 +27,7 @@ pub(crate) const NODE_NORMAL: u32 = 0;
 // True if top level expr
 pub(crate) const NODE_TOPLEVEL: u32 = 2;
 
-struct ReCompiler {
+pub(crate) struct ReCompiler {
     // Input state for compiling regular expression
 
     // input string
@@ -57,7 +57,8 @@ struct ReCompiler {
     warning: Vec<String>,
 }
 
-pub(crate) enum Error {
+#[derive(Debug)]
+pub enum Error {
     Internal,
     Syntax(String),
 }
@@ -80,6 +81,24 @@ impl From<CharacterClass> for CharacterClassOrBackReference {
 }
 
 impl ReCompiler {
+    pub(crate) fn new(re_flags: ReFlags) -> Self {
+        Self {
+            pattern: Vec::new(),
+            len: 0,
+            idx: 0,
+            capturing_open_paren_count: 0,
+            bracket_min: 0,
+            bracket_max: 0,
+            is_xpath: true,
+            is_xpath_30: true,
+            is_xsd_11: false,
+            captures: HashSet::new(),
+            has_back_references: false,
+            re_flags,
+            warning: Vec::new(),
+        }
+    }
+
     fn bracket(&mut self) -> Result<(), Error> {
         if self.idx >= self.len {
             return Err(Error::Internal);
@@ -882,7 +901,7 @@ impl ReCompiler {
         }
     }
 
-    fn compile(&mut self, pattern: Vec<char>) -> Result<ReProgram, Error> {
+    pub(crate) fn compile(&mut self, pattern: Vec<char>) -> Result<ReProgram, Error> {
         // initialize variables for compilation
 
         // save pattern in instance variable
@@ -901,7 +920,7 @@ impl ReCompiler {
             let end_node = Operation::from(EndProgram);
             let seq = Self::make_sequence(ret, end_node);
             Ok(ReProgram::new(
-                seq,
+                Rc::new(seq),
                 Some(self.capturing_open_paren_count),
                 self.re_flags.clone(),
             ))
@@ -956,7 +975,7 @@ impl ReCompiler {
             }
 
             let mut program = ReProgram::new(
-                exp,
+                Rc::new(exp),
                 Some(self.capturing_open_paren_count),
                 self.re_flags.clone(),
             );

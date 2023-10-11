@@ -116,7 +116,7 @@ impl<'a> SequenceIterator<'a> {
             capture_state: None, // TODO: saved state is based on whether it contains capturing expressions
             iterators: Vec::new(),
             operations,
-            backtracking_limit: matcher.program.get_backtracking_limit(),
+            backtracking_limit: matcher.program.backtracking_limit,
             matcher,
             position,
         }

@@ -17,7 +17,7 @@ pub(crate) struct RegexPrecondition {
 }
 
 pub(crate) struct ReProgram {
-    pub(crate) operation: Operation,
+    pub(crate) operation: Rc<Operation>,
     pub(crate) flags: ReFlags,
     pub(crate) prefix: Option<Vec<char>>,
     pub(crate) preconditions: Vec<RegexPrecondition>,
@@ -25,10 +25,11 @@ pub(crate) struct ReProgram {
     pub(crate) fixed_length: Option<usize>,
     pub(crate) optimization_flags: u32,
     pub(crate) max_parens: Option<usize>,
+    pub(crate) backtracking_limit: Option<usize>,
 }
 
 impl ReProgram {
-    pub(crate) fn new(operation: Operation, max_parens: Option<usize>, flags: ReFlags) -> Self {
+    pub(crate) fn new(operation: Rc<Operation>, max_parens: Option<usize>, flags: ReFlags) -> Self {
         let minimum_length = operation.get_minimum_match_length();
         let fixed_length = operation.get_match_length();
 
@@ -37,23 +38,21 @@ impl ReProgram {
 
         // TODO: optimize()
 
-        if let Operation::Sequence(op) = &operation {
+        let precondition_operation = if let Operation::Sequence(op) = operation.as_ref() {
             let first = op.operations.first().unwrap();
             match first.as_ref() {
                 Operation::Bol(_) => {
                     optimization_flags |= OPT_HASBOL;
                 }
                 Operation::Atom(atom) => prefix = Some(atom.atom.clone()),
-                // Operation::CharClass(op) => initial_character_class = { todo!(); //
-                //     // get initial character class dynamically from pr
-                //     Some(op.character_class),
-                // }
                 _ => {}
             }
-            // r.add_precondition(Operation::from(op), None, 0);
-        }
+            Some(operation.clone())
+        } else {
+            None
+        };
 
-        Self {
+        let mut r = Self {
             operation,
             flags,
             prefix,
@@ -62,11 +61,16 @@ impl ReProgram {
             max_parens,
             minimum_length,
             fixed_length,
+            backtracking_limit: None,
+        };
+        if let Some(precondition_operation) = precondition_operation {
+            r.add_precondition(precondition_operation, None, 0);
         }
+        r
     }
 
     pub(crate) fn initial_character_class(&self) -> Option<&CharacterClass> {
-        if let Operation::Sequence(op) = &self.operation {
+        if let Operation::Sequence(op) = self.operation.as_ref() {
             let first = op.operations.first().unwrap();
             if let Operation::CharClass(op) = first.as_ref() {
                 Some(&op.character_class)
@@ -76,10 +80,6 @@ impl ReProgram {
         } else {
             None
         }
-    }
-
-    pub(crate) fn get_backtracking_limit(&self) -> Option<usize> {
-        todo!()
     }
 
     pub(crate) fn add_precondition(
