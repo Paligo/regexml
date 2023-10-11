@@ -11,9 +11,9 @@ pub(crate) const OPT_HASBACKREFS: u32 = 1;
 pub(crate) const OPT_HASBOL: u32 = 2;
 
 pub(crate) struct RegexPrecondition {
-    operation: Rc<Operation>,
-    fixed_position: Option<usize>,
-    min_position: usize,
+    pub(crate) operation: Rc<Operation>,
+    pub(crate) fixed_position: Option<usize>,
+    pub(crate) min_position: usize,
 }
 
 pub(crate) struct ReProgram {

@@ -276,8 +276,36 @@ impl<'a> ReMatcher<'a> {
         }
     }
 
-    fn check_preconditions(&self, i: usize) -> bool {
-        todo!()
+    fn check_preconditions(&self, start: usize) -> bool {
+        for condition in &self.program.preconditions {
+            if let Some(fixed_position) = condition.fixed_position {
+                let match_ = condition
+                    .operation
+                    .matches_iter(self, fixed_position)
+                    .next();
+                if match_.is_none() {
+                    return false;
+                }
+            } else {
+                let mut i = start;
+                if i < condition.min_position {
+                    i = condition.min_position;
+                }
+                let mut found = false;
+                for j in i..self.search.len() {
+                    if (condition.fixed_position.is_none() || condition.fixed_position == Some(j))
+                        && condition.operation.matches_iter(self, i).next().is_some()
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if !found {
+                    return false;
+                }
+            }
+        }
+        true
     }
 
     pub(crate) fn is_new_line(&self, i: usize) -> bool {
