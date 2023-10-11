@@ -4,7 +4,7 @@ use crate::{
 };
 
 pub(crate) struct Atom {
-    atom: Vec<char>,
+    pub(crate) atom: Vec<char>,
     len: usize,
 }
 

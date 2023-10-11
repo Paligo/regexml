@@ -4,7 +4,7 @@ use crate::{
 };
 
 pub(crate) struct CharClass {
-    character_class: CharacterClass,
+    pub(crate) character_class: CharacterClass,
 }
 
 impl CharClass {
