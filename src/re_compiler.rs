@@ -607,7 +607,6 @@ impl ReCompiler {
             ')' => return Err(Error::syntax("Unescaped closing ')'")),
             '|' => return Err(Error::Internal),
             ']' => return Err(Error::syntax("Unexpected closing ']'")),
-            '0' => return Err(Error::syntax("Unexpected end of input")),
             '?' | '+' | '{' | '*' => {
                 return Err(Error::syntax("No expression before quantifier"));
             }
@@ -662,6 +661,7 @@ impl ReCompiler {
                 // eat quantifier character
                 self.idx += 1;
             }
+            '{' => self.bracket()?,
             _ => {}
         }
 

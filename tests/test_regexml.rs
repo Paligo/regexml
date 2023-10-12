@@ -72,3 +72,39 @@ fn test_mixed_problem() {
     let regex = Regex::new("^a?b+c*$").unwrap();
     assert!(regex.is_match("ab"));
 }
+
+#[test]
+fn test_matches_1() {
+    let regex = Regex::new("bra").unwrap();
+    assert!(regex.is_match("abracadabra"));
+}
+
+#[test]
+fn test_matches_2() {
+    let regex = Regex::new("^a.*a$").unwrap();
+    assert!(regex.is_match("abracadabra"));
+}
+
+#[test]
+fn test_matches_3() {
+    let regex = Regex::new("^bra").unwrap();
+    assert!(!regex.is_match("abracadabra"));
+}
+
+#[test]
+fn test_matches_6() {
+    let regex = Regex::new("\\^").unwrap();
+    assert!(regex.is_match("abracadabra^abracadabra"));
+}
+
+#[test]
+fn test_matches_20() {
+    let regex = Regex::new("\t").unwrap();
+    assert!(regex.is_match("abracadbra\tabracadabra"));
+}
+
+#[test]
+fn test_matches_22() {
+    let regex = Regex::new("aa{1}").unwrap();
+    assert!(regex.is_match("abracadabraabracadabra"));
+}
