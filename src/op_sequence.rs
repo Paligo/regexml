@@ -135,20 +135,26 @@ impl<'a> SequenceIterator<'a> {
         }
     }
 
-    fn contains_capturing_expressions(&self) -> bool {
-        for o in &self.operations {
-            if matches!(o.as_ref(), Operation::Capture(_)) || o.contains_capturing_expressions() {
-                return true;
-            }
-        }
-        false
-    }
+    // fn contains_capturing_expressions(&self) -> bool {
+    //     for o in &self.operations {
+    //         if matches!(o.as_ref(), Operation::Capture(_)) || o.contains_capturing_expressions() {
+    //             return true;
+    //         }
+    //     }
+    //     false
+    // }
 }
 
 impl<'a> Iterator for SequenceIterator<'a> {
     type Item = usize;
 
+    // Get the first match for all subsequent iterators in the sequence. If we
+    // get all the way to the end of the sequence, return the position in the
+    // input string that we have reached. If we don't get all the way to the
+    // end of the sequence, work backwards getting the next match for each term
+    // in the sequence until we find a route through.
     fn next(&mut self) -> Option<Self::Item> {
+        // TODO: can this move to constructor?
         if !self.primed {
             self.iterators.push(
                 self.operations
@@ -169,8 +175,8 @@ impl<'a> Iterator for SequenceIterator<'a> {
                     if i >= self.operations.len() {
                         return Some(p);
                     }
-                    let top = self.operations[i].matches_iter(self.matcher, p);
-                    self.iterators.push(top);
+                    let new_top = self.operations[i].matches_iter(self.matcher, p);
+                    self.iterators.push(new_top);
                 } else {
                     break;
                 }

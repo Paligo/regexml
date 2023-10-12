@@ -304,9 +304,9 @@ impl<'a> ReMatcher<'a> {
     }
 
     fn check_preconditions(&self, start: usize) -> bool {
-        for condition in &self.program.preconditions {
-            if let Some(fixed_position) = condition.fixed_position {
-                let match_ = condition
+        for precondition in &self.program.preconditions {
+            if let Some(fixed_position) = precondition.fixed_position {
+                let match_ = precondition
                     .operation
                     .matches_iter(self, fixed_position)
                     .next();
@@ -315,13 +315,18 @@ impl<'a> ReMatcher<'a> {
                 }
             } else {
                 let mut i = start;
-                if i < condition.min_position {
-                    i = condition.min_position;
+                if i < precondition.min_position {
+                    i = precondition.min_position;
                 }
                 let mut found = false;
                 for j in i..self.search.len() {
-                    if (condition.fixed_position.is_none() || condition.fixed_position == Some(j))
-                        && condition.operation.matches_iter(self, i).next().is_some()
+                    if (precondition.fixed_position.is_none()
+                        || precondition.fixed_position == Some(j))
+                        && precondition
+                            .operation
+                            .matches_iter(self, j)
+                            .next()
+                            .is_some()
                     {
                         found = true;
                         break;
