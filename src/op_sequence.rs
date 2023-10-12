@@ -132,15 +132,6 @@ impl<'a> SequenceIterator<'a> {
             saved_state,
         }
     }
-
-    // fn contains_capturing_expressions(&self) -> bool {
-    //     for o in &self.operations {
-    //         if matches!(o.as_ref(), Operation::Capture(_)) || o.contains_capturing_expressions() {
-    //             return true;
-    //         }
-    //     }
-    //     false
-    // }
 }
 
 impl<'a> Iterator for SequenceIterator<'a> {
