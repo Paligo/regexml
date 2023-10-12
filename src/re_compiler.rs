@@ -656,27 +656,17 @@ impl ReCompiler {
         }
 
         let quantifier_type = self.pattern[self.idx];
+
         match quantifier_type {
             '?' | '*' | '+' => {
                 // eat quantifier character
                 self.idx += 1;
-                self.quantifier(ret, Some(quantifier_type))
             }
-            '{' => {
-                self.bracket()?;
-                self.quantifier(ret, Some(quantifier_type))
-            }
-            _ => {
-                unreachable!();
-            }
+            _ => {}
         }
-    }
 
-    fn quantifier(
-        &mut self,
-        ret: Operation,
-        mut quantifier_type: Option<char>,
-    ) -> Result<Operation, Error> {
+        let mut quantifier_type = Some(quantifier_type);
+
         match ret {
             Operation::Bol(_) | Operation::Eol(_) => {
                 // pretty meaningless but legal. If the quantifier allows zero
@@ -1006,5 +996,10 @@ mod tests {
     #[test]
     fn test_compile_a_star() {
         assert_debug_snapshot!(compiled("a*").operation);
+    }
+
+    #[test]
+    fn test_compile_combined() {
+        assert_debug_snapshot!(compiled("^a?b+c*$").operation);
     }
 }
