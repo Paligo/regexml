@@ -3,6 +3,7 @@ use crate::{
     operation::{OperationControl, MATCHES_ZLS_NEVER},
 };
 
+#[derive(Debug)]
 pub(crate) struct CharClass {
     pub(crate) character_class: CharacterClass,
 }

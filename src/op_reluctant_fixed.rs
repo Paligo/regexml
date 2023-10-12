@@ -5,7 +5,7 @@ use crate::{
     re_matcher::ReMatcher,
 };
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub(crate) struct ReluctantFixed {
     operation: Rc<Operation>,
     pub(crate) min: usize,

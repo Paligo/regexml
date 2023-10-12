@@ -3,7 +3,7 @@ use std::rc::Rc;
 use ahash::{HashSet, HashSetExt};
 
 use crate::{
-    character_class::CharacterClass,
+    character_class::{CharacterClass, PredicateFn},
     op_atom::Atom,
     op_back_reference::BackReference,
     op_bol::Bol,
@@ -596,7 +596,7 @@ impl ReCompiler {
                     |c| c != '\n' && c != '\r'
                 };
                 return Ok(Operation::from(CharClass::new(CharacterClass::Predicate(
-                    Box::new(predicate),
+                    PredicateFn::new(predicate),
                 ))));
             }
             '[' => {

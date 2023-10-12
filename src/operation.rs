@@ -58,8 +58,8 @@ pub(crate) trait RepeatOperation {
 
 // TODO: how come I can derive these here without deriving them for the operations?
 // is that correct?
-#[derive(Hash, PartialEq, Eq)]
 #[enum_dispatch(OperationControl)]
+#[derive(Debug)]
 pub(crate) enum Operation {
     Bol,
     Atom,

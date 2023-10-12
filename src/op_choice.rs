@@ -5,6 +5,7 @@ use crate::{
     re_matcher::ReMatcher,
 };
 
+#[derive(Debug)]
 pub(crate) struct Choice {
     branches: Vec<Rc<Operation>>,
 }

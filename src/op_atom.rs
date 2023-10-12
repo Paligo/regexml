@@ -3,6 +3,7 @@ use crate::{
     re_matcher::ReMatcher,
 };
 
+#[derive(Debug)]
 pub(crate) struct Atom {
     pub(crate) atom: Vec<char>,
     len: usize,

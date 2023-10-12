@@ -7,7 +7,7 @@ use crate::{
     re_matcher::ReMatcher,
 };
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub(crate) struct Repeat {
     pub(crate) operation: Rc<Operation>,
     pub(crate) min: usize,

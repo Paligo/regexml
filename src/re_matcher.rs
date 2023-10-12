@@ -33,21 +33,24 @@ impl History {
         operation: Operation,
         position: usize,
     ) -> bool {
+        // TODO: make this hashable
+        false
+
         // TODO: hashing an operation; how can that work with enum dispatch?
-        let positions = self.zero_length_matches.get_mut(&operation);
-        if let Some(positions) = positions {
-            if positions.contains(&position) {
-                true
-            } else {
-                positions.insert(position);
-                false
-            }
-        } else {
-            let mut positions = HashSet::new();
-            positions.insert(position);
-            self.zero_length_matches.insert(operation, positions);
-            false
-        }
+        // let positions = self.zero_length_matches.get_mut(&operation);
+        // if let Some(positions) = positions {
+        //     if positions.contains(&position) {
+        //         true
+        //     } else {
+        //         positions.insert(position);
+        //         false
+        //     }
+        // } else {
+        //     let mut positions = HashSet::new();
+        //     positions.insert(position);
+        //     self.zero_length_matches.insert(operation, positions);
+        //     false
+        // }
     }
 }
 

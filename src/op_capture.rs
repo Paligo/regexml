@@ -6,6 +6,7 @@ use crate::{
     re_program::OPT_HASBACKREFS,
 };
 
+#[derive(Debug)]
 pub(crate) struct Capture {
     group_nr: usize,
     pub(crate) child_op: Rc<Operation>,

@@ -1,11 +1,32 @@
+use std::fmt;
+
 use ahash::{HashSet, HashSetExt};
 
+#[derive(Debug)]
 pub(crate) enum CharacterClass {
     Empty,
     Inverse(Box<CharacterClass>),
-    Predicate(Box<dyn Fn(char) -> bool>),
+    Predicate(PredicateFn),
     Char(char),
     CharSet(HashSet<char>),
+}
+
+pub(crate) struct PredicateFn(Box<dyn Fn(char) -> bool>);
+
+impl PredicateFn {
+    pub(crate) fn new(f: impl Fn(char) -> bool + 'static) -> Self {
+        Self(Box::new(f))
+    }
+
+    fn call(&self, c: char) -> bool {
+        (self.0)(c)
+    }
+}
+
+impl fmt::Debug for PredicateFn {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "PredicateFn")
+    }
 }
 
 impl CharacterClass {
@@ -32,7 +53,7 @@ impl CharacterClass {
                         }
                     }
                 } else {
-                    CharacterClass::Predicate(Box::new(move |c| a.test(c) || b.test(c)))
+                    CharacterClass::Predicate(PredicateFn::new(move |c| a.test(c) || b.test(c)))
                 }
             }
         }
@@ -60,7 +81,7 @@ impl CharacterClass {
                         }
                     }
                 } else {
-                    CharacterClass::Predicate(Box::new(move |c| a.test(c) && !b.test(c)))
+                    CharacterClass::Predicate(PredicateFn::new(move |c| a.test(c) && !b.test(c)))
                 }
             }
         }
@@ -78,7 +99,7 @@ impl CharacterClass {
         match self {
             CharacterClass::Empty => false,
             CharacterClass::Inverse(complement) => complement.test(value),
-            CharacterClass::Predicate(predicate) => predicate(value),
+            CharacterClass::Predicate(predicate) => predicate.call(value),
             CharacterClass::Char(c) => value == *c,
             CharacterClass::CharSet(set) => set.contains(&value),
         }

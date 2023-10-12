@@ -8,6 +8,7 @@ use crate::{
     re_matcher::{CaptureState, ReMatcher},
 };
 
+#[derive(Debug)]
 pub(crate) struct Sequence {
     pub(crate) operations: Vec<Rc<Operation>>,
 }
