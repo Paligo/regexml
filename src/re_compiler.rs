@@ -993,12 +993,20 @@ mod tests {
 
     use super::*;
 
-    #[test]
-    fn test_simple_compile() {
+    fn compiled(pattern: &str) -> ReProgram {
         let re_flags = ReFlags::new("", "XP30").unwrap();
         let mut re_compiler = ReCompiler::new(re_flags);
-        let pattern = "abc".chars().collect();
-        let re_program = re_compiler.compile(pattern).unwrap();
-        assert_debug_snapshot!(re_program.operation);
+        let pattern = pattern.chars().collect();
+        re_compiler.compile(pattern).unwrap()
+    }
+
+    #[test]
+    fn test_simple_compile() {
+        assert_debug_snapshot!(compiled("abc").operation);
+    }
+
+    #[test]
+    fn test_compile_a_star() {
+        assert_debug_snapshot!(compiled("a*").operation);
     }
 }

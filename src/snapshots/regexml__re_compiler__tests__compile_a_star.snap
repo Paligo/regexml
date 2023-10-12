@@ -1,0 +1,28 @@
+---
+source: src/re_compiler.rs
+expression: "compiled(\"a*\").operation"
+---
+Sequence(
+    Sequence {
+        operations: [
+            GreedyFixed(
+                GreedyFixed {
+                    operation: Atom(
+                        Atom {
+                            atom: [
+                                'a',
+                            ],
+                            len: 1,
+                        },
+                    ),
+                    min: 0,
+                    max: 18446744073709551615,
+                    len: 1,
+                },
+            ),
+            EndProgram(
+                EndProgram,
+            ),
+        ],
+    },
+)

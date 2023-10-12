@@ -5,6 +5,8 @@ use crate::{
     re_matcher::ReMatcher,
 };
 
+/// Handle a greedy repetition (with possible min and max) where the size of the
+/// repeated unit is fixed.
 #[derive(Debug, Clone)]
 pub(crate) struct GreedyFixed {
     operation: Rc<Operation>,
