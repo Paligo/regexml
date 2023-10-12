@@ -102,7 +102,6 @@ impl OperationControl for Sequence {
 }
 
 struct SequenceIterator<'a> {
-    primed: bool,
     iterators: Vec<Box<dyn Iterator<Item = usize> + 'a>>,
     operations: Vec<Rc<Operation>>,
     backtracking_limit: Option<usize>,
@@ -125,8 +124,7 @@ impl<'a> SequenceIterator<'a> {
         };
 
         Self {
-            primed: false,
-            iterators: Vec::new(),
+            iterators: vec![operations.first().unwrap().matches_iter(matcher, position)],
             operations,
             backtracking_limit: matcher.program.backtracking_limit,
             matcher,
@@ -154,16 +152,6 @@ impl<'a> Iterator for SequenceIterator<'a> {
     // end of the sequence, work backwards getting the next match for each term
     // in the sequence until we find a route through.
     fn next(&mut self) -> Option<Self::Item> {
-        // TODO: can this move to constructor?
-        if !self.primed {
-            self.iterators.push(
-                self.operations
-                    .first()
-                    .unwrap()
-                    .matches_iter(self.matcher, self.position),
-            );
-            self.primed = true;
-        }
         let mut counter = 0;
         while !self.iterators.is_empty() {
             loop {
