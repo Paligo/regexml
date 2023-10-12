@@ -73,6 +73,9 @@ fn test_mixed_problem() {
     assert!(regex.is_match("ab"));
 }
 
+// these tests are a sampling from qt3/fn/matches.xml to ensure
+// that at least some basics work, and to help debug it when not.
+
 #[test]
 fn test_matches_1() {
     let regex = Regex::new("bra").unwrap();
@@ -107,4 +110,22 @@ fn test_matches_20() {
 fn test_matches_22() {
     let regex = Regex::new("aa{1}").unwrap();
     assert!(regex.is_match("abracadabraabracadabra"));
+}
+
+#[test]
+fn test_matches_23() {
+    let regex = Regex::new("aa{1,}").unwrap();
+    assert!(regex.is_match("abracadabraabracadabraabracadabra"));
+}
+
+#[test]
+fn test_matches_30() {
+    let regex = Regex::new("(?:abra(?:cad)?)*").unwrap();
+    assert!(regex.is_match("abracadabra"));
+}
+
+#[test]
+fn test_matches_52() {
+    let regex = Regex::new("^(a*b?a*){3,3}$").unwrap();
+    assert!(regex.is_match("aaababaaabaa"))
 }

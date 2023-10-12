@@ -100,6 +100,7 @@ impl ReCompiler {
     }
 
     fn bracket(&mut self) -> Result<(), Error> {
+        // current character must be a '{'
         if self.idx >= self.len {
             return Err(Error::Internal);
         }
@@ -179,6 +180,7 @@ impl ReCompiler {
         if self.idx >= self.len || self.pattern[self.idx] != '}' {
             return Err(Error::syntax("Missing closing brace"));
         }
+        self.idx += 1;
         Ok(())
     }
 
@@ -515,11 +517,13 @@ impl ReCompiler {
                     // If the next character is a quantifier operator and
                     // our atom is non-empty, the current character should
                     // bind to the quantifier operator rather than the atom
-                    if len_atom > 0 {
+                    if len_atom != 0 {
                         break;
                     }
                 }
             }
+
+            // switch on currenct char
             match self.pattern[self.idx] {
                 ']' | '.' | '[' | '(' | ')' | '|' => {
                     break;
