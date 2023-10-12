@@ -8,3 +8,6 @@ edition = "2021"
 [dependencies]
 ahash = "0.8.3"
 enum_dispatch = "0.3.12"
+
+[dev-dependencies]
+insta = { version = "1.29.0", features = ["yaml", "glob"] }

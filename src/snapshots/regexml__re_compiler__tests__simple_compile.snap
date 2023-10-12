@@ -1,0 +1,23 @@
+---
+source: src/re_compiler.rs
+expression: re_program.operation
+---
+Sequence(
+    Sequence {
+        operations: [
+            Atom(
+                Atom {
+                    atom: [
+                        'a',
+                        'b',
+                        'c',
+                    ],
+                    len: 3,
+                },
+            ),
+            EndProgram(
+                EndProgram,
+            ),
+        ],
+    },
+)

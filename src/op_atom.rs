@@ -3,6 +3,7 @@ use crate::{
     re_matcher::ReMatcher,
 };
 
+/// A match against a fixed string of any length, within a regular expression.
 #[derive(Debug)]
 pub(crate) struct Atom {
     pub(crate) atom: Vec<char>,

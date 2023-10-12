@@ -10,12 +10,14 @@ use crate::{
 pub(crate) const OPT_HASBACKREFS: u32 = 1;
 pub(crate) const OPT_HASBOL: u32 = 2;
 
+#[derive(Debug)]
 pub(crate) struct RegexPrecondition {
     pub(crate) operation: Rc<Operation>,
     pub(crate) fixed_position: Option<usize>,
     pub(crate) min_position: usize,
 }
 
+#[derive(Debug)]
 pub(crate) struct ReProgram {
     pub(crate) operation: Rc<Operation>,
     pub(crate) flags: ReFlags,

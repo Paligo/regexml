@@ -986,3 +986,19 @@ impl ReCompiler {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use insta::assert_debug_snapshot;
+
+    use super::*;
+
+    #[test]
+    fn test_simple_compile() {
+        let re_flags = ReFlags::new("", "XP30").unwrap();
+        let mut re_compiler = ReCompiler::new(re_flags);
+        let pattern = "abc".chars().collect();
+        let re_program = re_compiler.compile(pattern).unwrap();
+        assert_debug_snapshot!(re_program.operation);
+    }
+}
