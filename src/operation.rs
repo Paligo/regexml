@@ -26,16 +26,45 @@ pub(crate) const MATCHES_ZLS_NEVER: u32 = 1024;
 
 #[enum_dispatch]
 pub(crate) trait OperationControl {
+    /// Get the length of the matches returned by this operation if they are
+    /// fixed-length.
     fn get_match_length(&self) -> Option<usize> {
         None
     }
 
+    /// Get the minimum length of the matches returned by this operation.
     fn get_minimum_match_length(&self) -> usize {
         self.get_match_length().unwrap_or(0)
     }
 
+    /// Ask whether the regular expression is known, after static analysis, to
+    /// match a zero-length string.
+    ///
+    /// Specifically:
+    ///
+    /// * MATCHES_ZLS_AT_START if the expression is statically known to match a
+    ///   zero-length string at the start of the supplied input
+    ///
+    /// * MATCHES_ZLS_AT_END} if it is statically known to return a zero-length
+    ///   string at the end of the supplied input.
+    ///
+    /// * MATCHES_ZLS_ANYWHERE if it is statically known to match a zero-length
+    ///   string anywhere in the input.
+    ///
+    /// * MATCHES_ZLS_NEVER if it is statically known that the regex will never
+    ///   match a zero length string.
+    ///
+    /// Returning 0 means that it is not known statically whether or not the
+    /// regex will match a zero-length string; this case typically arises when
+    /// back-references are involved.
     fn matches_empty_string(&self) -> u32;
 
+    /// Get an iterator returning all the matches for this operation.
+    ///
+    /// The `matcher` supplies the context for the matching; may be updated
+    /// with information about captured groups.
+    ///
+    /// The position is the start position to seek a match.
     fn matches_iter<'a>(
         &self,
         matcher: &'a ReMatcher<'a>,
@@ -44,6 +73,10 @@ pub(crate) trait OperationControl {
 
     // fn optimize(&mut self, program: &ReProgram, flags: &ReFlags) {}
 
+    /// Ask whether the expression contains any capturing sub-expressions
+    /// Returns true if the expression contains any capturing sub-expressions
+    /// (but not if it is a capturing expression itself, unless it contains
+    /// nested capturing expressions).
     fn contains_capturing_expressions(&self) -> bool {
         false
     }

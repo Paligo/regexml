@@ -745,32 +745,30 @@ impl ReCompiler {
         }
 
         if max == 0 {
-            return Ok(Operation::from(Nothing));
+            Ok(Operation::from(Nothing))
         } else if min == 1 && max == 1 {
-            return Ok(ret);
+            Ok(ret)
         } else if greedy {
             // actually do the quantifier now
-            if ret.get_match_length().is_none() {
-                return Ok(Operation::from(Repeat::new(Rc::new(ret), min, max, true)));
-            } else {
-                let match_length = ret.get_match_length().unwrap();
-                return Ok(Operation::from(GreedyFixed::new(
+            if let Some(match_length) = ret.get_match_length() {
+                Ok(Operation::from(GreedyFixed::new(
                     Rc::new(ret),
                     min,
                     max,
                     match_length,
-                )));
+                )))
+            } else {
+                Ok(Operation::from(Repeat::new(Rc::new(ret), min, max, true)))
             }
-        } else if ret.get_match_length().is_none() {
-            return Ok(Operation::from(Repeat::new(Rc::new(ret), min, max, false)));
-        } else {
-            let match_length = ret.get_match_length().unwrap();
-            return Ok(Operation::from(ReluctantFixed::new(
+        } else if let Some(match_length) = ret.get_match_length() {
+            Ok(Operation::from(ReluctantFixed::new(
                 Rc::new(ret),
                 min,
                 max,
                 match_length,
-            )));
+            )))
+        } else {
+            Ok(Operation::from(Repeat::new(Rc::new(ret), min, max, false)))
         }
     }
 

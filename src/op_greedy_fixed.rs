@@ -69,11 +69,7 @@ impl OperationControl for GreedyFixed {
         let mut matches = 0;
         while p <= guard {
             let mut it = self.operation.matches_iter(matcher, p);
-            let mut matched = false;
-            if let Some(next) = it.next() {
-                matched = true;
-            }
-            if matched {
+            if it.next().is_some() {
                 matches += 1;
                 p += self.len;
                 if matches == self.max {
@@ -109,17 +105,17 @@ impl RepeatOperation for GreedyFixed {
 }
 
 struct IntStepIterator {
-    current: usize,
+    current: i64,
     step: i64,
-    limit: usize,
+    limit: i64,
 }
 
 impl IntStepIterator {
     pub(crate) fn new(current: usize, step: i64, limit: usize) -> Self {
         Self {
-            current,
+            current: current as i64,
             step,
-            limit,
+            limit: limit as i64,
         }
     }
 }
@@ -137,15 +133,7 @@ impl Iterator for IntStepIterator {
             return None;
         }
         let n = self.current;
-        if self.step < 0 {
-            let negative_step = self.step.unsigned_abs() as usize;
-            if self.current <= negative_step {
-                return None;
-            }
-            self.current -= negative_step;
-        } else {
-            self.current += self.step.unsigned_abs() as usize;
-        }
-        Some(n)
+        self.current += self.step;
+        Some(n as usize)
     }
 }
