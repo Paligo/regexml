@@ -168,14 +168,13 @@ impl<'a> Iterator for SequenceIterator<'a> {
         while !self.iterators.is_empty() {
             loop {
                 let top = self.iterators.last_mut().unwrap();
-                let p = top.next();
-                if let Some(p) = p {
-                    self.matcher.clear_captured_groups_beyond(p);
+                if let Some(next) = top.next() {
+                    self.matcher.clear_captured_groups_beyond(next);
                     let i = self.iterators.len();
                     if i >= self.operations.len() {
-                        return Some(p);
+                        return Some(next);
                     }
-                    let new_top = self.operations[i].matches_iter(self.matcher, p);
+                    let new_top = self.operations[i].matches_iter(self.matcher, next);
                     self.iterators.push(new_top);
                 } else {
                     break;
