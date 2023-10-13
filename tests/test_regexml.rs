@@ -2,14 +2,14 @@ use regexml::Regex;
 
 #[test]
 fn test_is_match_simple() {
-    let regex = Regex::new("hello").unwrap();
+    let regex = Regex::xpath("hello", "").unwrap();
     assert!(regex.is_match("hello"));
     assert!(!regex.is_match("world"));
 }
 
 #[test]
 fn test_is_match_question_mark() {
-    let regex = Regex::new("a?").unwrap();
+    let regex = Regex::xpath("a?", "").unwrap();
     assert!(regex.is_match(""));
     assert!(regex.is_match("a"));
     assert!(regex.is_match("aa"));
@@ -17,7 +17,7 @@ fn test_is_match_question_mark() {
 
 #[test]
 fn test_is_match_question_mark_complete() {
-    let regex = Regex::new("^a?$").unwrap();
+    let regex = Regex::xpath("^a?$", "").unwrap();
     assert!(regex.is_match(""));
     assert!(regex.is_match("a"));
     assert!(!regex.is_match("aa"));
@@ -26,7 +26,7 @@ fn test_is_match_question_mark_complete() {
 
 #[test]
 fn test_is_match_star() {
-    let regex = Regex::new("a*").unwrap();
+    let regex = Regex::xpath("a*", "").unwrap();
     assert!(regex.is_match(""));
     assert!(regex.is_match("a"));
     assert!(regex.is_match("aa"));
@@ -35,7 +35,7 @@ fn test_is_match_star() {
 
 #[test]
 fn test_is_match_star_complete() {
-    let regex = Regex::new("^a*$").unwrap();
+    let regex = Regex::xpath("^a*$", "").unwrap();
     assert!(!regex.is_match("b"));
     assert!(regex.is_match(""));
     assert!(regex.is_match("a"));
@@ -45,7 +45,7 @@ fn test_is_match_star_complete() {
 
 #[test]
 fn test_is_match_plus() {
-    let regex = Regex::new("a+").unwrap();
+    let regex = Regex::xpath("a+", "").unwrap();
     assert!(!regex.is_match(""));
     assert!(regex.is_match("a"));
     assert!(regex.is_match("aa"));
@@ -54,7 +54,7 @@ fn test_is_match_plus() {
 
 #[test]
 fn test_mixed() {
-    let regex = Regex::new("^a?b+c*$").unwrap();
+    let regex = Regex::xpath("^a?b+c*$", "").unwrap();
     assert!(regex.is_match("bc"));
     assert!(regex.is_match("abc"));
     assert!(regex.is_match("abbc"));
@@ -69,7 +69,7 @@ fn test_mixed() {
 
 #[test]
 fn test_mixed_problem() {
-    let regex = Regex::new("^a?b+c*$").unwrap();
+    let regex = Regex::xpath("^a?b+c*$", "").unwrap();
     assert!(regex.is_match("ab"));
 }
 
@@ -78,73 +78,73 @@ fn test_mixed_problem() {
 
 #[test]
 fn test_matches_1() {
-    let regex = Regex::new("bra").unwrap();
+    let regex = Regex::xpath("bra", "").unwrap();
     assert!(regex.is_match("abracadabra"));
 }
 
 #[test]
 fn test_matches_2() {
-    let regex = Regex::new("^a.*a$").unwrap();
+    let regex = Regex::xpath("^a.*a$", "").unwrap();
     assert!(regex.is_match("abracadabra"));
 }
 
 #[test]
 fn test_matches_3() {
-    let regex = Regex::new("^bra").unwrap();
+    let regex = Regex::xpath("^bra", "").unwrap();
     assert!(!regex.is_match("abracadabra"));
 }
 
 #[test]
 fn test_matches_6() {
-    let regex = Regex::new("\\^").unwrap();
+    let regex = Regex::xpath("\\^", "").unwrap();
     assert!(regex.is_match("abracadabra^abracadabra"));
 }
 
 #[test]
 fn test_matches_20() {
-    let regex = Regex::new("\t").unwrap();
+    let regex = Regex::xpath("\t", "").unwrap();
     assert!(regex.is_match("abracadbra\tabracadabra"));
 }
 
 #[test]
 fn test_matches_22() {
-    let regex = Regex::new("aa{1}").unwrap();
+    let regex = Regex::xpath("aa{1}", "").unwrap();
     assert!(regex.is_match("abracadabraabracadabra"));
 }
 
 #[test]
 fn test_matches_23() {
-    let regex = Regex::new("aa{1,}").unwrap();
+    let regex = Regex::xpath("aa{1,}", "").unwrap();
     assert!(regex.is_match("abracadabraabracadabraabracadabra"));
 }
 
 #[test]
 fn test_matches_30() {
-    let regex = Regex::new("(?:abra(?:cad)?)*").unwrap();
+    let regex = Regex::xpath("(?:abra(?:cad)?)*", "").unwrap();
     assert!(regex.is_match("abracadabra"));
 }
 
 #[test]
 fn test_matches_52() {
-    let regex = Regex::new("^(a*b?a*){3,3}$").unwrap();
+    let regex = Regex::xpath("^(a*b?a*){3,3}$", "").unwrap();
     assert!(regex.is_match("aaababaaabaa"))
 }
 
 #[test]
 fn test_matches_character_range() {
-    let regex = Regex::new("[A-Z]").unwrap();
+    let regex = Regex::xpath("[A-Z]", "").unwrap();
     assert!(regex.is_match("A"))
 }
 
 #[test]
 fn test_matches_53() {
-    let regex = Regex::new("([A-Z])\\1*").unwrap();
+    let regex = Regex::xpath("([A-Z])\\1*", "").unwrap();
     assert!(regex.is_match("A"))
 }
 
 #[test]
 fn test_simple_replace() {
-    let regex = Regex::new("hello").unwrap();
+    let regex = Regex::xpath("hello", "").unwrap();
 
     assert_eq!(
         regex.replace_all("hello world", "bye").unwrap(),
@@ -154,7 +154,41 @@ fn test_simple_replace() {
 
 #[test]
 fn test_replace_48() {
-    let regex = Regex::new("^a(.).$|^a...$").unwrap();
+    let regex = Regex::xpath("^a(.).$|^a...$", "").unwrap();
 
     assert_eq!(regex.replace_all("abcd", "$1").unwrap(), "")
+}
+
+#[test]
+fn test_tokenize_9() {
+    let regex = Regex::xpath("(ab)|(a)", "").unwrap();
+    assert_eq!(
+        regex.tokenize("abracadabra").unwrap(),
+        vec![
+            "".to_string(),
+            "r".to_string(),
+            "c".to_string(),
+            "d".to_string(),
+            "r".to_string(),
+            "".to_string(),
+        ]
+    );
+}
+
+#[test]
+fn test_tokenize_10() {
+    let regex = Regex::xpath("ww", "").unwrap();
+    assert_eq!(
+        regex.tokenize("abracadabra").unwrap(),
+        vec!["abracadabra".to_string(),]
+    );
+}
+
+#[test]
+fn test_tokenize_11() {
+    let regex = Regex::xpath("^a", "").unwrap();
+    assert_eq!(
+        regex.tokenize("abracadabra").unwrap(),
+        vec!["".to_string(), "bracadabra".to_string()]
+    );
 }
