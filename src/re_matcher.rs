@@ -4,6 +4,7 @@ use ahash::{HashMap, HashMapExt, HashSet, HashSetExt};
 
 use crate::{
     operation::{Operation, OperationControl},
+    re_compiler::Error,
     re_program::{ReProgram, OPT_HASBACKREFS, OPT_HASBOL},
 };
 
@@ -338,6 +339,132 @@ impl<'a> ReMatcher<'a> {
             }
         }
         true
+    }
+
+    pub(crate) fn replace(
+        &mut self,
+        input: &'a [char],
+        replacement: &[char],
+    ) -> Result<Vec<char>, Error> {
+        // string to return
+        let mut result = Vec::new();
+
+        // start at position 0 and search the whole string
+        let mut pos = 0;
+        let len = input.len();
+
+        let mut first_match = true;
+        let mut simple_replacement = false;
+
+        // try a match at each position
+        while pos < len && self.matches(input, pos) {
+            // append chars from input string before match
+            result.extend(&input[pos..self.get_paren_start(0).unwrap()]);
+
+            if first_match {
+                simple_replacement = self.program.flags.is_literal();
+                first_match = false;
+            }
+
+            if !simple_replacement {
+                // process references to captured substrings
+                let max_capture = self.program.max_parens.unwrap() - 1;
+                simple_replacement = true;
+                let mut i = 0;
+                while i < replacement.len() {
+                    let ch = replacement[i];
+                    match ch {
+                        '\\' => {
+                            simple_replacement = false;
+                            i += 1;
+                            let index = i;
+                            let ch = replacement[index];
+                            match ch {
+                                '\\' | '$' => {
+                                    result.push(ch);
+                                }
+                                _ => {
+                                    return Err(Error::syntax(format!(
+                                        "Invalid escape '{}' in replacement string",
+                                        ch
+                                    )))
+                                }
+                            }
+                        }
+                        '$' => {
+                            simple_replacement = false;
+                            i += 1;
+                            let index = i;
+                            let ch = replacement[index];
+                            if !ch.is_ascii_digit() {
+                                return Err(Error::syntax(
+                                    "$ in replacement string must be followed by a digit",
+                                ));
+                            }
+                            let mut n = (ch as usize) - ('0' as usize);
+                            if max_capture <= 9 {
+                                if max_capture >= n {
+                                    let captured = self.get_paren(n);
+                                    if let Some(captured) = captured {
+                                        result.extend(captured);
+                                    }
+                                }
+                            } else {
+                                loop {
+                                    i += 1;
+                                    if i > replacement.len() {
+                                        break;
+                                    }
+                                    let ch = replacement[i];
+                                    if ch.is_ascii_digit() {
+                                        let m = n * 10 + ((ch as usize) - ('0' as usize));
+                                        if m > max_capture {
+                                            i -= 1;
+                                            break;
+                                        } else {
+                                            n = m;
+                                        }
+                                    } else {
+                                        i -= 1;
+                                        break;
+                                    }
+                                }
+                                let captured = self.get_paren(n);
+                                if let Some(captured) = captured {
+                                    result.extend(captured);
+                                }
+                            }
+                        }
+                        _ => {
+                            result.push(ch);
+                        }
+                    }
+                }
+            } else {
+                // append substitution without processing backreferences
+                result.extend(replacement);
+            }
+
+            // move forward, skipping past match
+            let mut newpos = self.get_paren_end(0).unwrap();
+
+            if newpos == pos {
+                newpos += 1;
+            }
+
+            // try new position
+            pos = newpos;
+        }
+        // if no matches were found, return the input unchanged
+        if first_match {
+            return Ok(input.to_vec());
+        }
+
+        // if there's remaining input, append it
+        result.extend(&input[pos..len]);
+
+        // return the string buffer
+        Ok(result)
     }
 
     pub(crate) fn is_new_line(&self, i: usize) -> bool {
