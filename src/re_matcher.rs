@@ -91,7 +91,7 @@ impl<'a> ReMatcher<'a> {
     }
 
     pub(crate) fn get_paren(&self, which: usize) -> Option<&[char]> {
-        if which < self.state.borrow().capture_state.paren_count {
+        if which < self.get_paren_count() {
             if let (Some(start), Some(end)) =
                 (self.get_paren_start(which), self.get_paren_end(which))
             {
