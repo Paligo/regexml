@@ -301,16 +301,16 @@ impl ReCompiler {
         // check for unterminated or empty class
         let index = self.idx;
         self.idx += 1;
-        if self.idx + 1 >= self.len || self.pattern[self.idx] == ']' {
+        if self.idx + 1 >= self.len || self.pattern[index] == ']' {
             return Err(Error::syntax("Missing ']"));
         }
 
         // parse class declaration
-        let mut simple_char = None;
+        let mut simple_char;
         let mut positive = true;
         let mut defining_range = false;
         let mut range_start = None;
-        let mut range_end = None;
+        let mut range_end;
 
         let mut range = HashSet::new();
         let mut addend: Option<CharacterClass> = None;
@@ -367,13 +367,11 @@ impl ReCompiler {
                         } else if self.there_follows("-]") {
                             simple_char = Some('-');
                             self.idx += 1;
-                            continue;
                         } else if range_start.is_some() {
                             defining_range = true;
                             self.idx += 1;
                             continue;
-                        }
-                        if self.there_follows("--") && !self.there_follows("--[") {
+                        } else if self.there_follows("--") && !self.there_follows("--[") {
                             return Err(Error::syntax("Unescaped hyphen at start of range"));
                         } else if !self.is_xsd_11
                             && self.pattern[self.idx - 1] != '['
@@ -403,10 +401,10 @@ impl ReCompiler {
                 if let (Some(start), Some(end)) = (range_start, range_end) {
                     if start > end {
                         return Err(Error::syntax("Bad character range: start > end"));
-                        // Technically this is not an error in
-                        // XSD, merely a no-op; but it is so
-                        // utterly pointless that it is almost certainly a mistake; and we have no
-                        // way of indicating warnings.
+                        // Technically this is not an error in XSD, merely a
+                        // no-op; but it is so utterly pointless that it is
+                        // almost certainly a mistake; and we have no way of
+                        // indicating warnings.
                     }
                     for c in start..=end {
                         range.insert(c);
@@ -443,21 +441,25 @@ impl ReCompiler {
                     range_start = None;
                 }
             } else {
-                let simple_char = simple_char.unwrap();
-                // if simple character and not start of range, include it (see XSD 1.1 rules)
+                // if simple character and not start of range, include it (see
+                // XSD 1.1 rules)
                 if self.there_follows("-") {
                     if self.there_follows("-[")
                         || self.there_follows("-]")
                         || self.there_follows("--[")
                     {
-                        range.insert(simple_char);
+                        if let Some(simple_char) = simple_char {
+                            range.insert(simple_char);
+                        }
                     } else if self.there_follows("--") {
                         return Err(Error::syntax("Unescaped hyphen cannot act as end of range"));
                     } else {
-                        range_start = Some(simple_char);
+                        range_start = simple_char;
                     }
                 } else {
-                    range.insert(simple_char);
+                    if let Some(simple_char) = simple_char {
+                        range.insert(simple_char);
+                    }
                     if self.re_flags.is_case_independent() {
                         // TODO
                         // int[] variants = CaseVariants.getCaseVariants(simpleChar);

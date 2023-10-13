@@ -26,43 +26,42 @@ impl OperationControl for BackReference {
         let s = matcher.state.borrow().start_backref[self.group_nr];
         let e = matcher.state.borrow().end_backref[self.group_nr];
 
-        // We don't know the backref yet
-        if s.is_none() || e.is_none() {
-            return Box::new(std::iter::empty());
-        }
-        let s = s.unwrap();
-        let e = e.unwrap();
+        if let (Some(s), Some(e)) = (s, e) {
+            // The backref is the empty size
+            if s == e {
+                return Box::new(std::iter::once(position));
+            }
 
-        // The backref is the empty size
-        if s == e {
-            return Box::new(std::iter::once(position));
-        }
+            // Get the length of the backref
+            let l = e - s;
 
-        // Get the length of the backref
-        let l = e - s;
+            // if there's not enough input left, give up
+            let search = matcher.search;
+            if (position + l - 1) >= search.len() {
+                return Box::new(std::iter::empty());
+            }
 
-        let search = matcher.search;
-        if (position + l - 1) >= search.len() {
-            return Box::new(std::iter::empty());
-        }
-
-        // Case fold the backref?
-        if matcher.program.flags.is_case_independent() {
-            // Compare backref to input
-            for i in 0..l {
-                if !matcher.equal_case_blind(search[position + i], search[s + i]) {
-                    return Box::new(std::iter::empty());
+            // Case fold the backref?
+            if matcher.program.flags.is_case_independent() {
+                // Compare backref to input
+                for i in 0..l {
+                    if !matcher.equal_case_blind(search[position + i], search[s + i]) {
+                        return Box::new(std::iter::empty());
+                    }
+                }
+            } else {
+                // Compare backref to input
+                for i in 0..l {
+                    if search[position + i] != search[s + i] {
+                        return Box::new(std::iter::empty());
+                    }
                 }
             }
+            Box::new(std::iter::once(position + l))
         } else {
-            // Compare backref to input
-            for i in 0..l {
-                if search[position + i] != search[s + i] {
-                    return Box::new(std::iter::empty());
-                }
-            }
+            // We don't know the backref yet
+            Box::new(std::iter::empty())
         }
-        Box::new(std::iter::once(position + l))
     }
 
     fn display(&self) -> String {
