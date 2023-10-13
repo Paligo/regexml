@@ -105,18 +105,6 @@ impl ReFlags {
         self.language
     }
 
-    // pub(crate) fn allows_xpath20_extensions(&self) -> bool {
-    //     self.xpath20
-    // }
-
-    // pub(crate) fn allows_xpath30_extensions(&self) -> bool {
-    //     self.xpath30
-    // }
-
-    // pub(crate) fn allows_xsd11_syntax(&self) -> bool {
-    //     self.xsd11
-    // }
-
     pub(crate) fn is_debug(&self) -> bool {
         self.debug
     }
