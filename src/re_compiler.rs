@@ -427,6 +427,8 @@ impl ReCompiler {
                             range.extend(ROMAN_VARIANTS)
                         } else {
                             for k in start..=end {
+                                // TODO: case_variants isn't filled with
+                                // anything yet
                                 let variants = self.case_variants.get_case_variants(k);
                                 range.extend(variants);
                             }
