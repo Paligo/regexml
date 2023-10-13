@@ -3,6 +3,7 @@ use std::rc::Rc;
 use ahash::{HashSet, HashSetExt};
 
 use crate::{
+    case_variants::{CaseVariants, ROMAN_VARIANTS},
     character_class::{CharacterClass, PredicateFn},
     op_atom::Atom,
     op_back_reference::BackReference,
@@ -53,6 +54,7 @@ pub(crate) struct ReCompiler {
     has_back_references: bool,
 
     re_flags: ReFlags,
+    case_variants: CaseVariants,
 
     warning: Vec<String>,
 }
@@ -81,7 +83,7 @@ impl From<CharacterClass> for CharacterClassOrBackReference {
 }
 
 impl ReCompiler {
-    pub(crate) fn new(re_flags: ReFlags) -> Self {
+    pub(crate) fn new(re_flags: ReFlags, case_variants: CaseVariants) -> Self {
         Self {
             pattern: Vec::new(),
             len: 0,
@@ -95,6 +97,7 @@ impl ReCompiler {
             captures: HashSet::new(),
             has_back_references: false,
             re_flags,
+            case_variants,
             warning: Vec::new(),
         }
     }
@@ -256,7 +259,6 @@ impl ReCompiler {
                     let c1 = self.pattern[self.idx].to_digit(10);
                     if let Some(c1) = c1 {
                         let back_ref2 = back_ref * 10 + (c1 as usize);
-                        // TODO shaky conversion
                         if back_ref2 > (self.capturing_open_paren_count - 1) {
                             break;
                         }
@@ -412,29 +414,21 @@ impl ReCompiler {
                         range.insert(c);
                     }
                     if self.re_flags.is_case_independent() {
+                        // special case A-Z and a-z
                         if start == 'a' && end == 'z' {
                             for c in 'A'..='Z' {
                                 range.insert(c);
                             }
-                            // TODO
-                            // for (int v = 0; v < CaseVariants.ROMAN_VARIANTS.length; v++) {
-                            //     range.add(CaseVariants.ROMAN_VARIANTS[v]);
-                            // }
+                            range.extend(ROMAN_VARIANTS);
                         } else if start == 'A' && end == 'Z' {
                             for c in 'a'..='z' {
                                 range.insert(c);
                             }
-                            // TODO
-                            // for (int v = 0; v < CaseVariants.ROMAN_VARIANTS.length; v++) {
-                            //     range.add(CaseVariants.ROMAN_VARIANTS[v]);
-                            // }
+                            range.extend(ROMAN_VARIANTS)
                         } else {
-                            for _ in start..=end {
-                                // TODO
-                                // int[] variants = CaseVariants.getCaseVariants(k);
-                                // for (int variant : variants) {
-                                //     range.add(variant);
-                                // }
+                            for k in start..=end {
+                                let variants = self.case_variants.get_case_variants(k);
+                                range.extend(variants);
                             }
                         }
                     }
@@ -991,7 +985,8 @@ mod tests {
 
     fn compiled(pattern: &str) -> ReProgram {
         let re_flags = ReFlags::new("", "XP30").unwrap();
-        let mut re_compiler = ReCompiler::new(re_flags);
+        let case_variants = CaseVariants::empty();
+        let mut re_compiler = ReCompiler::new(re_flags, case_variants);
         let pattern = pattern.chars().collect();
         re_compiler.compile(pattern).unwrap()
     }

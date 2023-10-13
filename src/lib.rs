@@ -1,3 +1,4 @@
+mod case_variants;
 mod character_class;
 mod op_atom;
 mod op_back_reference;
@@ -33,7 +34,8 @@ pub struct Regex {
 impl Regex {
     pub fn new(re: &str) -> Result<Self, Error> {
         let re_flags = ReFlags::new("", "XP30")?;
-        let mut re_compiler = ReCompiler::new(re_flags);
+        let case_variants = case_variants::CaseVariants::empty();
+        let mut re_compiler = ReCompiler::new(re_flags, case_variants);
         let pattern = re.chars().collect();
         let re_program = re_compiler.compile(pattern)?;
         Ok(Self { re_program })
