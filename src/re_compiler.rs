@@ -3,7 +3,6 @@ use std::rc::Rc;
 use ahash::{HashSet, HashSetExt};
 
 use crate::{
-    case_variants::{CaseVariants, ROMAN_VARIANTS},
     character_class::{CharacterClass, PredicateFn},
     op_atom::Atom,
     op_back_reference::BackReference,
@@ -50,7 +49,6 @@ pub(crate) struct ReCompiler {
     has_back_references: bool,
 
     re_flags: ReFlags,
-    case_variants: CaseVariants,
 
     warning: Vec<String>,
 }
@@ -79,7 +77,7 @@ impl From<CharacterClass> for CharacterClassOrBackReference {
 }
 
 impl ReCompiler {
-    pub(crate) fn new(re_flags: ReFlags, case_variants: CaseVariants) -> Self {
+    pub(crate) fn new(re_flags: ReFlags) -> Self {
         Self {
             pattern: Vec::new(),
             len: 0,
@@ -90,7 +88,6 @@ impl ReCompiler {
             captures: HashSet::new(),
             has_back_references: false,
             re_flags,
-            case_variants,
             warning: Vec::new(),
         }
     }
@@ -397,25 +394,38 @@ impl ReCompiler {
                         range.insert(c);
                     }
                     if self.re_flags.is_case_independent() {
-                        // special case A-Z and a-z
-                        if start == 'a' && end == 'z' {
-                            for c in 'A'..='Z' {
-                                range.insert(c);
+                        for c in start..=end {
+                            let chars = c.to_uppercase().collect::<Vec<_>>();
+                            // any special situations where the uppercase or
+                            // lower case version is multiple characters is
+                            // ignored
+                            if chars.len() == 1 {
+                                range.insert(chars[0]);
                             }
-                            range.extend(ROMAN_VARIANTS);
-                        } else if start == 'A' && end == 'Z' {
-                            for c in 'a'..='z' {
-                                range.insert(c);
-                            }
-                            range.extend(ROMAN_VARIANTS)
-                        } else {
-                            for k in start..=end {
-                                // TODO: case_variants isn't filled with
-                                // anything yet
-                                let variants = self.case_variants.get_case_variants(k);
-                                range.extend(variants);
+                            let chars = c.to_lowercase().collect::<Vec<_>>();
+                            if chars.len() == 1 {
+                                range.insert(chars[0]);
                             }
                         }
+                        // // special case A-Z and a-z
+                        // if start == 'a' && end == 'z' {
+                        //     for c in 'A'..='Z' {
+                        //         range.insert(c);
+                        //     }
+                        //     range.extend(ROMAN_VARIANTS);
+                        // } else if start == 'A' && end == 'Z' {
+                        //     for c in 'a'..='z' {
+                        //         range.insert(c);
+                        //     }
+                        //     range.extend(ROMAN_VARIANTS)
+                        // } else {
+                        //     for k in start..=end {
+                        //         // TODO: case_variants isn't filled with
+                        //         // anything yet
+                        //         let variants = self.case_variants.get_case_variants(k);
+                        //         range.extend(variants);
+                        //     }
+                        // }
                     }
                     // we are don defining the range
                     defining_range = false;
@@ -968,8 +978,7 @@ mod tests {
 
     fn compiled(pattern: &str) -> ReProgram {
         let re_flags = ReFlags::new("", Language::XPath).unwrap();
-        let case_variants = CaseVariants::empty();
-        let mut re_compiler = ReCompiler::new(re_flags, case_variants);
+        let mut re_compiler = ReCompiler::new(re_flags);
         let pattern = pattern.chars().collect();
         re_compiler.compile(pattern).unwrap()
     }

@@ -1,4 +1,3 @@
-mod case_variants;
 mod character_class;
 mod op_atom;
 mod op_back_reference;
@@ -37,8 +36,7 @@ pub struct Regex {
 impl Regex {
     fn new(re: &str, flags: &str, language: Language) -> Result<Self, Error> {
         let re_flags = ReFlags::new(flags, language)?;
-        let case_variants = case_variants::CaseVariants::empty();
-        let mut re_compiler = ReCompiler::new(re_flags, case_variants);
+        let mut re_compiler = ReCompiler::new(re_flags);
         let pattern = re.chars().collect();
         let re_program = re_compiler.compile(pattern)?;
         Ok(Self { re_program })
@@ -72,6 +70,7 @@ impl Regex {
             .map(|chars| chars.into_iter().collect())
     }
 
+    /// Returns a vector of the regular expression tokenized.
     pub fn tokenize(&self, haystack: &str) -> Result<Vec<String>, Error> {
         let mut matcher = ReMatcher::new(&self.re_program);
 

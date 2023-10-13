@@ -477,19 +477,18 @@ impl<'a> ReMatcher<'a> {
     }
 
     pub(crate) fn equal_case_blind(&self, a: char, b: char) -> bool {
-        // TODO: should this be done or should we just do a case-blind compare?
         if a == b {
             return true;
         }
-        // TODO case variants story
-        for (c_a, c_b) in a.to_lowercase().zip(b.to_lowercase()) {
-            if c_a != c_b {
-                return false;
-            }
+        let uppercase = a.to_uppercase().collect::<Vec<_>>();
+        if uppercase.len() == 1 && uppercase[0] == b {
+            return true;
         }
-        // TODO NOTE: this is false in the original code due to case
-        // variants story
-        true
+        let lowercase = a.to_lowercase().collect::<Vec<_>>();
+        if lowercase.len() == 1 {
+            return lowercase[0] == b;
+        }
+        false
     }
 }
 

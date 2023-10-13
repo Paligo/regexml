@@ -192,3 +192,15 @@ fn test_tokenize_11() {
         vec!["".to_string(), "bracadabra".to_string()]
     );
 }
+
+#[test]
+fn test_caselessmatch01() {
+    let regex = Regex::xpath("ABC", "i").unwrap();
+    assert!(regex.is_match("abc"));
+}
+
+#[test]
+fn test_caselessmatch01_inverted() {
+    let regex = Regex::xpath("abc", "i").unwrap();
+    assert!(regex.is_match("ABC"));
+}
