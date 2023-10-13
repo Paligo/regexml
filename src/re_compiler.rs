@@ -299,8 +299,8 @@ impl ReCompiler {
         }
 
         // check for unterminated or empty class
-        let index = self.idx;
         self.idx += 1;
+        let index = self.idx;
         if self.idx + 1 >= self.len || self.pattern[index] == ']' {
             return Err(Error::syntax("Missing ']"));
         }
@@ -364,26 +364,28 @@ impl ReCompiler {
                         subtrahend = Some(self.parse_character_class()?);
                         if !self.there_follows("]") {
                             return Err(Error::syntax("Expected closing ']' after subtraction"));
-                        } else if self.there_follows("-]") {
-                            simple_char = Some('-');
-                            self.idx += 1;
-                        } else if range_start.is_some() {
-                            defining_range = true;
-                            self.idx += 1;
-                            continue;
-                        } else if self.there_follows("--") && !self.there_follows("--[") {
-                            return Err(Error::syntax("Unescaped hyphen at start of range"));
-                        } else if !self.is_xsd_11
-                            && self.pattern[self.idx - 1] != '['
-                            && self.pattern[self.idx - 1] != '^'
-                            && !self.there_follows("]")
-                            && !self.there_follows("-[")
-                        {
-                            return Err(Error::syntax("In XSD 1.0, hyphen is allowed only at the beginning or end of a positive character group"));
-                        } else {
-                            simple_char = Some('-');
-                            self.idx += 1;
                         }
+                    } else if self.there_follows("-]") {
+                        simple_char = Some('-');
+                        self.idx += 1;
+                    } else if range_start.is_some() {
+                        defining_range = true;
+                        self.idx += 1;
+                        continue;
+                    } else if defining_range {
+                        return Err(Error::syntax("Bad range"));
+                    } else if self.there_follows("--") && !self.there_follows("--[") {
+                        return Err(Error::syntax("Unescaped hyphen at start of range"));
+                    } else if !self.is_xsd_11
+                        && self.pattern[self.idx - 1] != '['
+                        && self.pattern[self.idx - 1] != '^'
+                        && !self.there_follows("]")
+                        && !self.there_follows("-[")
+                    {
+                        return Err(Error::syntax("In XSD 1.0, hyphen is allowed only at the beginning or end of a positive character group"));
+                    } else {
+                        simple_char = Some('-');
+                        self.idx += 1;
                     }
                 }
                 _ => {
@@ -859,8 +861,8 @@ impl ReCompiler {
         if (self.idx + chars.len()) > self.len {
             return false;
         }
-        for c in chars {
-            if self.pattern[self.idx + 1] != c {
+        for (i, c) in chars.iter().enumerate() {
+            if self.pattern[self.idx + i] != *c {
                 return false;
             }
         }

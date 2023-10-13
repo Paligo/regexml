@@ -30,7 +30,7 @@ impl OperationControl for CharClass {
     ) -> Box<dyn Iterator<Item = usize> + 'a> {
         let search = matcher.search;
         if position < search.len() && self.character_class.test(search[position]) {
-            Box::new(std::iter::once(position))
+            Box::new(std::iter::once(position + 1))
         } else {
             Box::new(std::iter::empty())
         }

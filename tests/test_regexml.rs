@@ -130,11 +130,11 @@ fn test_matches_52() {
     assert!(regex.is_match("aaababaaabaa"))
 }
 
-// #[test]
-// fn test_matches_character_range() {
-//     let regex = Regex::new("([A-Z]").unwrap();
-//     assert!(regex.is_match("A"))
-// }
+#[test]
+fn test_matches_character_range() {
+    let regex = Regex::new("[A-Z]").unwrap();
+    assert!(regex.is_match("A"))
+}
 
 // #[test]
 // fn test_matches_53() {
