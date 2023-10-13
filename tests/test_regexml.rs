@@ -204,3 +204,9 @@ fn test_caselessmatch01_inverted() {
     let regex = Regex::xpath("abc", "i").unwrap();
     assert!(regex.is_match("ABC"));
 }
+
+#[test]
+fn test_caseless_match_character_classes() {
+    let regex = Regex::xpath("[A-Z]", "i").unwrap();
+    assert!(regex.is_match("a"));
+}
