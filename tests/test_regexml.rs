@@ -136,8 +136,8 @@ fn test_matches_character_range() {
     assert!(regex.is_match("A"))
 }
 
-// #[test]
-// fn test_matches_53() {
-//     let regex = Regex::new("([A-Z]\\1*").unwrap();
-//     assert!(regex.is_match("A"))
-// }
+#[test]
+fn test_matches_53() {
+    let regex = Regex::new("([A-Z])\\1*").unwrap();
+    assert!(regex.is_match("A"))
+}
