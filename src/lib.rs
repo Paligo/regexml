@@ -70,7 +70,7 @@ impl Regex {
             .map(|chars| chars.into_iter().collect())
     }
 
-    /// Returns a vector of the regular expression tokenized.
+    /// Returns a vector of the input string tokenized by the regular expression.
     pub fn tokenize(&self, haystack: &str) -> Result<Vec<String>, Error> {
         let mut matcher = ReMatcher::new(&self.re_program);
 
@@ -91,4 +91,60 @@ impl Regex {
         }
         Ok(result)
     }
+
+    // /// Use this regular expression to analyze an input string, The resulting
+    // /// vector provides both the matching and non-matching substrings. It also
+    // /// provides access to matched subgroups.
+    // // pub fn analyze(&self, haystack: &str) -> Result<Vec<AnalyzeEntry>, Error> {
+    //     let mut matcher = ReMatcher::new(&self.re_program);
+
+    //     let mut result: Vec<AnalyzeEntry> = Vec::new();
+    //     let mut next_substring = None;
+    //     let mut prevend = Some(0);
+    //     let mut skip = false;
+
+    //     loop {
+    //         if let Some(substring) = next_substring {
+    //             // we've added a non-match, so now added the match that follows
+    //             // it, if there is one
+    //             if let Some(end) = prevend {
+    //                 result.push(AnalyzeEntry::Match(vec![MatchEntry::String(substring)]));
+    //                 next_substring = None;
+    //                 prevend = matcher.get_paren_end(0);
+    //             } else {
+    //                 break;
+    //             }
+    //         } else {
+    //             if let Some(end) = prevend {
+    //                 // we've added a match (or we're at the start) so find the
+    //                 // next match
+    //                 let mut search_start = end;
+    //                 if skip {
+    //                     // previous match was zero-length
+    //                     search_start += 1;
+    //                     if search_start >= haystack.len() {
+    //                         if end < haystack.len() {
+    //                             result.push()
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     todo!();
+    // }
+    // TODO: continue translating ARegexIterator
+    // this also has an isMatching protocol, and a processMatchingSubstring story
+    // and a computeNestingTable story too. Need to read more into how this is
+    // actually used. - it seems vastly complicated.
+}
+
+pub enum AnalyzeEntry {
+    Match(Vec<MatchEntry>),
+    NonMatch(String),
+}
+
+pub enum MatchEntry {
+    String(String),
+    Group { nr: usize, value: String },
 }
