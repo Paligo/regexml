@@ -89,8 +89,6 @@ pub(crate) trait RepeatOperation {
     fn min(&self) -> usize;
 }
 
-// TODO: how come I can derive these here without deriving them for the operations?
-// is that correct?
 #[enum_dispatch(OperationControl)]
 #[derive(Debug)]
 pub(crate) enum Operation {
