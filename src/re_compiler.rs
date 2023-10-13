@@ -19,7 +19,7 @@ use crate::{
     op_repeat::Repeat,
     op_sequence::Sequence,
     operation::{Operation, OperationControl, MATCHES_ZLS_ANYWHERE},
-    re_flags::ReFlags,
+    re_flags::{Language, ReFlags},
     re_program::{ReProgram, OPT_HASBACKREFS},
 };
 
@@ -45,10 +45,6 @@ pub(crate) struct ReCompiler {
     bracket_min: usize,
     // maximum number of matches
     bracket_max: usize,
-
-    is_xpath: bool,
-    is_xpath_30: bool,
-    is_xsd_11: bool,
 
     captures: HashSet<usize>,
     has_back_references: bool,
@@ -91,9 +87,6 @@ impl ReCompiler {
             capturing_open_paren_count: 0,
             bracket_min: 0,
             bracket_max: 0,
-            is_xpath: true,
-            is_xpath_30: true,
-            is_xsd_11: false,
             captures: HashSet::new(),
             has_back_references: false,
             re_flags,
@@ -208,13 +201,10 @@ impl ReCompiler {
             '\\' | '|' | '.' | '-' | '^' | '?' | '*' | '+' | '{' | '}' | '(' | ')' | '[' | ']' => {
                 Ok(CharacterClass::Char(escape_char).into())
             }
-            '$' => {
-                if self.is_xpath {
-                    Ok(CharacterClass::Char('$').into())
-                } else {
-                    Err(Error::syntax("In XSD, '$' must not be escaped"))
-                }
-            }
+            '$' => match self.re_flags.language() {
+                Language::XPath => Ok(CharacterClass::Char('$').into()),
+                Language::XSD => Err(Error::syntax("In XSD, '$' must not be escaped")),
+            },
             's' => Ok(CharacterClass::escape_s_lower().into()),
             'S' => Ok(CharacterClass::escape_s_upper().into()),
             // TODO: i, I, c, C, d, D, w, W
@@ -251,7 +241,7 @@ impl ReCompiler {
                         "Backreferences not allowed within character classes",
                     ));
                 }
-                if !self.is_xpath {
+                if self.re_flags.language() != Language::XPath {
                     return Err(Error::syntax("digit not allowed after \\"));
                 }
                 let mut back_ref = (escape_char as usize) - ('0' as usize);
@@ -378,13 +368,6 @@ impl ReCompiler {
                         return Err(Error::syntax("Bad range"));
                     } else if self.there_follows("--") && !self.there_follows("--[") {
                         return Err(Error::syntax("Unescaped hyphen at start of range"));
-                    } else if !self.is_xsd_11
-                        && self.pattern[self.idx - 1] != '['
-                        && self.pattern[self.idx - 1] != '^'
-                        && !self.there_follows("]")
-                        && !self.there_follows("-[")
-                    {
-                        return Err(Error::syntax("In XSD 1.0, hyphen is allowed only at the beginning or end of a positive character group"));
                     } else {
                         simple_char = Some('-');
                         self.idx += 1;
@@ -556,7 +539,7 @@ impl ReCompiler {
                     }
                 }
                 c => {
-                    if (c == '^' || c == '$') && self.is_xpath {
+                    if (c == '^' || c == '$') && self.re_flags.language() == Language::XPath {
                         break;
                     }
                     ub.push(self.pattern[self.idx]);
@@ -577,13 +560,13 @@ impl ReCompiler {
     fn parse_terminal(&mut self, flags: &[u32]) -> Result<Operation, Error> {
         match self.pattern[self.idx] {
             '$' => {
-                if self.is_xpath {
+                if self.re_flags.language() == Language::XPath {
                     self.idx += 1;
                     return Ok(Operation::from(Eol));
                 }
             }
             '^' => {
-                if self.is_xpath {
+                if self.re_flags.language() == Language::XPath {
                     self.idx += 1;
                     return Ok(Operation::from(Bol));
                 }
@@ -709,7 +692,7 @@ impl ReCompiler {
 
         // if the next character is a '?', make the quantifier non-greedy (reluctant)
         if self.idx < self.len && self.pattern[self.idx] == '?' {
-            if !self.is_xpath {
+            if self.re_flags.language() == Language::XSD {
                 return Err(Error::syntax("Reluctant quantifier not allowed in XSD"));
             }
             self.idx += 1;
@@ -802,10 +785,8 @@ impl ReCompiler {
                 && self.pattern[self.idx + 1] == '?'
                 && self.pattern[self.idx + 2] == ':'
             {
-                if !self.is_xpath_30 {
-                    return Err(Error::syntax(
-                        "Non-capturing groups only allowed in XPath 3.0",
-                    ));
+                if self.re_flags.language() != Language::XPath {
+                    return Err(Error::syntax("Non-capturing groups only allowed in XPath"));
                 }
                 paren = Some(2);
                 self.idx += 3;
@@ -986,7 +967,7 @@ mod tests {
     use super::*;
 
     fn compiled(pattern: &str) -> ReProgram {
-        let re_flags = ReFlags::new("", "XP30").unwrap();
+        let re_flags = ReFlags::new("", Language::XPath).unwrap();
         let case_variants = CaseVariants::empty();
         let mut re_compiler = ReCompiler::new(re_flags, case_variants);
         let pattern = pattern.chars().collect();

@@ -1,5 +1,11 @@
 use crate::re_compiler::Error;
 
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum Language {
+    XSD,
+    XPath,
+}
+
 #[derive(Debug, Clone)]
 pub(crate) struct ReFlags {
     case_independent: bool,
@@ -7,40 +13,23 @@ pub(crate) struct ReFlags {
     single_line: bool,
     allow_whitespace: bool,
     literal: bool,
-    xpath20: bool,
-    xpath30: bool,
-    xsd11: bool,
+    language: Language,
     debug: bool,                     // flags = ';g'
     allow_unknown_block_names: bool, // flags = ';k'
 }
 
 impl ReFlags {
-    pub(crate) fn new(flags: &str, language: &str) -> Result<Self, Error> {
+    pub(crate) fn new(flags: &str, language: Language) -> Result<Self, Error> {
         let mut r = Self {
             case_independent: false,
             multi_line: false,
             single_line: false,
             allow_whitespace: false,
             literal: false,
-            xpath20: false,
-            xpath30: false,
-            xsd11: false,
+            language,
             debug: false,
             allow_unknown_block_names: false,
         };
-
-        if language == "XSD10" {
-            // no action
-        } else if language.contains("XSD11") {
-            r.allow_unknown_block_names = !language.contains("XP");
-            r.xsd11 = true;
-        }
-        if language.contains("XP20") {
-            r.xpath20 = true;
-        } else if language.contains("XP30") || language.contains("XP311") {
-            r.xpath20 = true;
-            r.xpath30 = true;
-        }
 
         let mut chars = flags.chars();
 
@@ -60,7 +49,7 @@ impl ReFlags {
                 }
                 'q' => {
                     r.literal = true;
-                    if !r.xpath30 {
+                    if language != Language::XPath {
                         return Err(Error::syntax("'q' flag requires XPath 3.0 to be enabled"));
                     }
                 }
@@ -112,13 +101,21 @@ impl ReFlags {
         self.literal
     }
 
-    pub(crate) fn is_allows_xpath20_extensions(&self) -> bool {
-        self.xpath20
+    pub(crate) fn language(&self) -> Language {
+        self.language
     }
 
-    pub(crate) fn is_allows_xpath30_extensions(&self) -> bool {
-        self.xpath30
-    }
+    // pub(crate) fn allows_xpath20_extensions(&self) -> bool {
+    //     self.xpath20
+    // }
+
+    // pub(crate) fn allows_xpath30_extensions(&self) -> bool {
+    //     self.xpath30
+    // }
+
+    // pub(crate) fn allows_xsd11_syntax(&self) -> bool {
+    //     self.xsd11
+    // }
 
     pub(crate) fn is_debug(&self) -> bool {
         self.debug

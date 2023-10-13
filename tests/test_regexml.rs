@@ -151,3 +151,10 @@ fn test_simple_replace() {
         "bye world"
     )
 }
+
+#[test]
+fn test_replace_48() {
+    let regex = Regex::new("^a(.).$|^a...$").unwrap();
+
+    assert_eq!(regex.replace_all("abcd", "$1").unwrap(), "")
+}

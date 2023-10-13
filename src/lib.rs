@@ -27,13 +27,15 @@ use crate::re_flags::ReFlags;
 use crate::re_matcher::ReMatcher;
 use crate::re_program::ReProgram;
 
+pub use crate::re_flags::Language;
+
 pub struct Regex {
     re_program: ReProgram,
 }
 
 impl Regex {
     pub fn new(re: &str) -> Result<Self, Error> {
-        let re_flags = ReFlags::new("", "XP30")?;
+        let re_flags = ReFlags::new("", Language::XPath)?;
         let case_variants = case_variants::CaseVariants::empty();
         let mut re_compiler = ReCompiler::new(re_flags, case_variants);
         let pattern = re.chars().collect();
