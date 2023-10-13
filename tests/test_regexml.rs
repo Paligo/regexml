@@ -141,3 +141,13 @@ fn test_matches_53() {
     let regex = Regex::new("([A-Z])\\1*").unwrap();
     assert!(regex.is_match("A"))
 }
+
+#[test]
+fn test_simple_replace() {
+    let regex = Regex::new("hello").unwrap();
+
+    assert_eq!(
+        regex.replace_all("hello world", "bye").unwrap(),
+        "bye world"
+    )
+}

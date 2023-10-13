@@ -46,4 +46,13 @@ impl Regex {
         let search: Vec<char> = haystack.chars().collect();
         matcher.is_match(&search)
     }
+
+    pub fn replace_all(&self, haystack: &str, replacement: &str) -> Result<String, Error> {
+        let mut matcher = ReMatcher::new(&self.re_program);
+        let search: Vec<char> = haystack.chars().collect();
+        let replacement: Vec<char> = replacement.chars().collect();
+        matcher
+            .replace(&search, &replacement)
+            .map(|chars| chars.into_iter().collect())
+    }
 }

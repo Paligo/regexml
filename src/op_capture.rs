@@ -92,7 +92,6 @@ impl<'a> Iterator for CaptureGroupIterator<'a> {
             self.matcher.state.borrow_mut().capture_state.paren_count = self.group_nr + 1;
         }
 
-        // Don't set paren if already set later on
         self.matcher.set_paren_start(self.group_nr, self.position);
         self.matcher.set_paren_end(self.group_nr, next);
 

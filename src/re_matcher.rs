@@ -118,8 +118,9 @@ impl<'a> ReMatcher<'a> {
     pub(crate) fn set_paren_start(&self, which: usize, i: usize) {
         while which > self.start_len() - 1 {
             let mut s2 = Vec::with_capacity(self.start_len() * 2);
-            s2[..self.start_len()].copy_from_slice(&self.state.borrow().capture_state.startn[..]);
-            for entry in s2.iter_mut().skip(self.start_len()) {
+            let start_len = self.start_len();
+            s2[..start_len].copy_from_slice(&self.state.borrow().capture_state.startn[..start_len]);
+            for entry in s2.iter_mut().skip(start_len) {
                 *entry = None
             }
             self.state.borrow_mut().capture_state.startn = s2;
@@ -134,13 +135,14 @@ impl<'a> ReMatcher<'a> {
     pub(crate) fn set_paren_end(&self, which: usize, i: usize) {
         while which > self.end_len() - 1 {
             let mut s2 = Vec::with_capacity(self.end_len() * 2);
-            s2[..self.end_len()].copy_from_slice(&self.state.borrow().capture_state.endn[..]);
-            for entry in s2.iter_mut().skip(self.end_len()) {
+            let end_len = self.end_len();
+            s2[..end_len].copy_from_slice(&self.state.borrow().capture_state.endn[..end_len]);
+            for entry in s2.iter_mut().skip(end_len) {
                 *entry = None
             }
             self.state.borrow_mut().capture_state.endn = s2;
         }
-        self.state.borrow_mut().capture_state.startn[which] = Some(i);
+        self.state.borrow_mut().capture_state.endn[which] = Some(i);
     }
 
     fn end_len(&self) -> usize {
@@ -359,8 +361,9 @@ impl<'a> ReMatcher<'a> {
         // try a match at each position
         while pos < len && self.matches(input, pos) {
             // append chars from input string before match
-            result.extend(&input[pos..self.get_paren_start(0).unwrap()]);
-
+            if let Some(start) = self.get_paren_start(0) {
+                result.extend(&input[pos..start]);
+            }
             if first_match {
                 simple_replacement = self.program.flags.is_literal();
                 first_match = false;
@@ -439,6 +442,7 @@ impl<'a> ReMatcher<'a> {
                             result.push(ch);
                         }
                     }
+                    i += 1;
                 }
             } else {
                 // append substitution without processing backreferences
@@ -455,6 +459,7 @@ impl<'a> ReMatcher<'a> {
             // try new position
             pos = newpos;
         }
+
         // if no matches were found, return the input unchanged
         if first_match {
             return Ok(input.to_vec());
