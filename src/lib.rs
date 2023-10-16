@@ -169,6 +169,54 @@ impl<'a> AnalyzeIter<'a> {
             todo!();
         }
     }
+
+    fn compute_nesting_table(&self, regex: &'a [char]) -> HashMap<usize, usize> {
+        let mut nesting_table = HashMap::new();
+        let mut stack = Vec::with_capacity(regex.len());
+        let mut tos = 0;
+        let mut capture_stack = Vec::with_capacity(regex.len());
+        let mut capture_tos = 0;
+        let mut group = 1;
+        let mut in_brackets = 0;
+        stack[0] = 0;
+        tos += 1;
+        let mut i = 0;
+        while i < regex.len() {
+            let ch = regex[i];
+            match ch {
+                '\\' => {
+                    i += 1;
+                }
+                '[' => {
+                    in_brackets += 1;
+                }
+                ']' => {
+                    in_brackets -= 1;
+                }
+                '(' if in_brackets == 0 => {
+                    let capture = regex[i + 1] != '?';
+                    capture_stack[capture_tos] = capture;
+                    capture_tos += 1;
+                    if capture {
+                        nesting_table.insert(group, stack[tos - 1]);
+                        stack[tos] = group;
+                        tos += 1;
+                        group += 1;
+                    }
+                }
+                ')' if in_brackets == 0 => {
+                    capture_tos -= 1;
+                    let capture = capture_stack[capture_tos];
+                    if capture {
+                        tos -= 1;
+                    }
+                }
+                _ => {}
+            }
+            i += 1;
+        }
+        nesting_table
+    }
 }
 
 impl<'a> Iterator for AnalyzeIter<'a> {
