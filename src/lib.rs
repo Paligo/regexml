@@ -21,6 +21,8 @@ mod re_program;
 mod regex_iterator;
 mod regular_expression;
 
+use ahash::{HashMap, HashMapExt};
+
 use crate::re_compiler::{Error, ReCompiler};
 use crate::re_flags::ReFlags;
 use crate::re_matcher::ReMatcher;
@@ -92,51 +94,141 @@ impl Regex {
         Ok(result)
     }
 
-    // /// Use this regular expression to analyze an input string, The resulting
-    // /// vector provides both the matching and non-matching substrings. It also
-    // /// provides access to matched subgroups.
-    // // pub fn analyze(&self, haystack: &str) -> Result<Vec<AnalyzeEntry>, Error> {
-    //     let mut matcher = ReMatcher::new(&self.re_program);
+    /// Use this regular expression to analyze an input string, The resulting
+    /// vector provides both the matching and non-matching substrings. It also
+    /// provides access to matched subgroups.
+    pub fn analyze(&self, haystack: &str) -> Result<Vec<AnalyzeEntry>, Error> {
+        todo!();
+    }
 
-    //     let mut result: Vec<AnalyzeEntry> = Vec::new();
-    //     let mut next_substring = None;
-    //     let mut prevend = Some(0);
-    //     let mut skip = false;
-
-    //     loop {
-    //         if let Some(substring) = next_substring {
-    //             // we've added a non-match, so now added the match that follows
-    //             // it, if there is one
-    //             if let Some(end) = prevend {
-    //                 result.push(AnalyzeEntry::Match(vec![MatchEntry::String(substring)]));
-    //                 next_substring = None;
-    //                 prevend = matcher.get_paren_end(0);
-    //             } else {
-    //                 break;
-    //             }
-    //         } else {
-    //             if let Some(end) = prevend {
-    //                 // we've added a match (or we're at the start) so find the
-    //                 // next match
-    //                 let mut search_start = end;
-    //                 if skip {
-    //                     // previous match was zero-length
-    //                     search_start += 1;
-    //                     if search_start >= haystack.len() {
-    //                         if end < haystack.len() {
-    //                             result.push()
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     todo!();
-    // }
     // TODO: continue translating ARegexIterator
     // this also has an isMatching protocol, and a processMatchingSubstring story
     // and a computeNestingTable story too. Need to read more into how this is
     // actually used. - it seems vastly complicated.
+}
+
+struct AnalyzeIter<'a> {
+    // the input string being matched
+    the_string: &'a [char],
+    matcher: ReMatcher<'a>,
+    next_substring: Option<&'a [char]>,
+    prevend: Option<usize>,
+    nesting_table: Option<HashMap<usize, usize>>,
+    skip: bool,
+}
+
+impl<'a> AnalyzeIter<'a> {
+    fn new(the_string: &'a [char], matcher: ReMatcher<'a>) -> Self {
+        AnalyzeIter {
+            the_string,
+            matcher,
+            // current: None,
+            next_substring: None,
+            prevend: Some(0),
+            nesting_table: None,
+            skip: false,
+        }
+    }
+
+    fn is_matching(&self) -> bool {
+        self.next_substring.is_none() && self.prevend.is_some()
+    }
+
+    fn process_matching_substring(&self, current: &'a [char]) -> Result<Vec<MatchEntry>, Error> {
+        let c = self.matcher.get_paren_count() - 1;
+        if c == 0 {
+            Ok(vec![MatchEntry::String(current.iter().collect())])
+        } else {
+            // create a map from positions in the string to lists of actions
+            // the "actions" in each list are: +N: start group N, -N: end group N.
+            let mut actions: HashMap<usize, Vec<isize>> = HashMap::new();
+            for i in 1..=c {
+                if let (Some(start_i), Some(start_0)) = (
+                    self.matcher.get_paren_start(i),
+                    self.matcher.get_paren_start(0),
+                ) {
+                    let start = start_i - start_0;
+                    let end = self.matcher.get_paren_end(i).unwrap() - start_0;
+                    if start < end {
+                        // add the start action after all other actions on the
+                        // list for the same position
+                        let s = actions
+                            .entry(start)
+                            .or_insert_with(|| Vec::with_capacity(4));
+                        s.push(i.try_into().unwrap());
+                        // add the end action after all other actions on the
+                        // list for the same position
+                        let e = actions.entry(end).or_insert_with(|| Vec::with_capacity(4));
+                        let i: isize = i.try_into().unwrap();
+                        e.insert(0, -i);
+                    } else {
+                        todo!()
+                    }
+                }
+            }
+            todo!();
+        }
+    }
+}
+
+impl<'a> Iterator for AnalyzeIter<'a> {
+    type Item = &'a [char];
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(prevend) = self.prevend {
+            if let Some(substring) = self.next_substring {
+                // we've added a non-match, so now added the match that follows
+                // it, if there is one
+                let current = substring;
+                self.next_substring = None;
+                self.prevend = self.matcher.get_paren_end(0);
+                Some(current)
+            } else {
+                // we've returned a match (or we're at the start) so find the
+                // next match
+                let mut search_start = prevend;
+                if self.skip {
+                    // previous match was zero-length
+                    search_start += 1;
+                    if search_start >= self.the_string.len() {
+                        if prevend < self.the_string.len() {
+                            self.next_substring = None;
+                        } else {
+                            self.prevend = None;
+                            return None;
+                        }
+                    }
+                }
+                if self.matcher.matches(self.the_string, search_start) {
+                    let start = self.matcher.get_paren_start(0).unwrap();
+                    let end = self.matcher.get_paren_end(0).unwrap();
+                    self.skip = start == end;
+                    if prevend == start {
+                        // there's no intervening non-matching string to return
+                        self.next_substring = None;
+                        self.prevend = Some(end);
+                        Some(&self.the_string[start..end])
+                    } else {
+                        // return the non-matching substring first
+                        self.next_substring = Some(&self.the_string[start..end]);
+                        Some(&self.the_string[prevend..start])
+                    }
+                } else {
+                    // there are no more regex matches, we must return the final non-match
+                    if prevend < self.the_string.len() {
+                        self.next_substring = None;
+                        Some(&self.the_string[prevend..])
+                    } else {
+                        // this really is the end...
+                        self.prevend = None;
+                        None
+                    }
+                }
+            }
+        } else {
+            None
+        }
+    }
 }
 
 pub enum AnalyzeEntry {
