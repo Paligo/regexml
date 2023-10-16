@@ -110,6 +110,7 @@ impl Regex {
 struct AnalyzeIter<'a> {
     // the input string being matched
     the_string: &'a [char],
+    regex: &'a [char],
     matcher: ReMatcher<'a>,
     next_substring: Option<&'a [char]>,
     prevend: Option<usize>,
@@ -118,9 +119,10 @@ struct AnalyzeIter<'a> {
 }
 
 impl<'a> AnalyzeIter<'a> {
-    fn new(the_string: &'a [char], matcher: ReMatcher<'a>) -> Self {
+    fn new(the_string: &'a [char], regex: &'a [char], matcher: ReMatcher<'a>) -> Self {
         AnalyzeIter {
             the_string,
+            regex,
             matcher,
             // current: None,
             next_substring: None,
@@ -134,7 +136,10 @@ impl<'a> AnalyzeIter<'a> {
         self.next_substring.is_none() && self.prevend.is_some()
     }
 
-    fn process_matching_substring(&self, current: &'a [char]) -> Result<Vec<MatchEntry>, Error> {
+    fn process_matching_substring(
+        &mut self,
+        current: &'a [char],
+    ) -> Result<Vec<MatchEntry>, Error> {
         let c = self.matcher.get_paren_count() - 1;
         if c == 0 {
             Ok(vec![MatchEntry::String(current.iter().collect())])
@@ -162,7 +167,13 @@ impl<'a> AnalyzeIter<'a> {
                         let i: isize = i.try_into().unwrap();
                         e.insert(0, -i);
                     } else {
-                        todo!()
+                        // let nesting_table = if let Some(nesting_table) = &self.nesting_table {
+                        //     nesting_table
+                        // } else {
+                        //     let nesting_table = self.compute_nesting_table(self.regex);
+                        //     self.nesting_table = Some(nesting_table);
+                        //     &nesting_table
+                        // };
                     }
                 }
             }
