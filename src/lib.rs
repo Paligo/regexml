@@ -21,6 +21,8 @@ mod re_program;
 mod regex_iterator;
 mod regular_expression;
 
+use std::cell::{Ref, RefCell};
+
 use ahash::{HashMap, HashMapExt};
 
 use crate::re_compiler::{Error, ReCompiler};
@@ -110,11 +112,10 @@ impl Regex {
 struct AnalyzeIter<'a> {
     // the input string being matched
     the_string: &'a [char],
-    regex: &'a [char],
     matcher: ReMatcher<'a>,
     next_substring: Option<&'a [char]>,
     prevend: Option<usize>,
-    nesting_table: Option<HashMap<usize, usize>>,
+    nesting_table: HashMap<usize, usize>,
     skip: bool,
 }
 
@@ -122,12 +123,11 @@ impl<'a> AnalyzeIter<'a> {
     fn new(the_string: &'a [char], regex: &'a [char], matcher: ReMatcher<'a>) -> Self {
         AnalyzeIter {
             the_string,
-            regex,
             matcher,
             // current: None,
             next_substring: None,
             prevend: Some(0),
-            nesting_table: None,
+            nesting_table: Self::compute_nesting_table(regex),
             skip: false,
         }
     }
@@ -167,21 +167,77 @@ impl<'a> AnalyzeIter<'a> {
                         let i: isize = i.try_into().unwrap();
                         e.insert(0, -i);
                     } else {
-                        // let nesting_table = if let Some(nesting_table) = &self.nesting_table {
-                        //     nesting_table
-                        // } else {
-                        //     let nesting_table = self.compute_nesting_table(self.regex);
-                        //     self.nesting_table = Some(nesting_table);
-                        //     &nesting_table
-                        // };
+                        let parent_group = self.nesting_table.get(&i).unwrap();
+                        // insert the start and end events immediately before
+                        // the end event for the parent group, if present;
+                        // otherwise after all existing events for this
+                        // position
+                        actions
+                            .entry(start)
+                            .and_modify(|v| {
+                                let mut pos = v.len();
+                                for e in 0..v.len() {
+                                    let parent_group: isize = (*parent_group).try_into().unwrap();
+                                    if v.get(e) == Some(&-parent_group) {
+                                        pos = e;
+                                        break;
+                                    }
+                                }
+                                let i: isize = i.try_into().unwrap();
+                                v.insert(pos, -i);
+                                v.insert(pos, i);
+                            })
+                            .or_insert_with(|| {
+                                let mut v = Vec::with_capacity(4);
+                                let i: isize = i.try_into().unwrap();
+                                v.push(-i);
+                                v.push(i);
+                                v
+                            });
                     }
                 }
             }
-            todo!();
+
+            let mut result = Vec::new();
+            let mut buff = Some(String::new());
+            let mut in_group = None;
+            for i in 0..=current.len() {
+                let events = actions.get(&i);
+                if let Some(events) = events {
+                    if let Some(buff) = buff.take() {
+                        let match_entry = if let Some(in_group) = in_group {
+                            MatchEntry::Group {
+                                nr: in_group,
+                                value: buff,
+                            }
+                        } else {
+                            MatchEntry::String(buff)
+                        };
+                        result.push(match_entry);
+                    }
+                    for group in events {
+                        if group > &0 {
+                            in_group = Some((*group).try_into().unwrap());
+                        } else {
+                            in_group = None;
+                        }
+                    }
+                }
+                if i < current.len() {
+                    if let Some(buff) = &mut buff {
+                        buff.push(current[i]);
+                    } else {
+                        let mut s = String::new();
+                        s.push(current[i]);
+                        buff = Some(s)
+                    }
+                }
+            }
+            Ok(result)
         }
     }
 
-    fn compute_nesting_table(&self, regex: &'a [char]) -> HashMap<usize, usize> {
+    fn compute_nesting_table(regex: &'a [char]) -> HashMap<usize, usize> {
         let mut nesting_table = HashMap::new();
         let mut stack = Vec::with_capacity(regex.len());
         let mut tos = 0;
