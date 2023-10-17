@@ -210,3 +210,9 @@ fn test_caseless_match_character_classes() {
     let regex = Regex::xpath("[A-Z]", "i").unwrap();
     assert!(regex.is_match("a"));
 }
+
+#[test]
+fn test_matches_multiline() {
+    let regex = Regex::xpath("^$", "m").unwrap();
+    assert!(!regex.is_match("abracadrabra\ntwentythree"));
+}

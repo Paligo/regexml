@@ -224,12 +224,12 @@ impl<'a> ReMatcher<'a> {
                 } else {
                     None
                 };
-                if let Some(nl) = nl {
-                    let nl = nl + 1;
-                    if nl >= self.search.len() {
+                if let Some(n) = nl {
+                    let n = n + 1;
+                    nl = Some(n);
+                    if n >= self.search.len() {
                         return false;
-                    }
-                    if self.match_at(nl, false) {
+                    } else if self.match_at(n, false) {
                         return true;
                     }
                 } else {
