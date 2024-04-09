@@ -117,8 +117,9 @@ impl<'a> ReMatcher<'a> {
 
     pub(crate) fn set_paren_start(&self, which: usize, i: usize) {
         while which > self.start_len() - 1 {
-            let mut s2 = Vec::with_capacity(self.start_len() * 2);
             let start_len = self.start_len();
+            let mut s2 = vec![Some(0); start_len * 2];
+            dbg!(&s2, start_len);
             s2[..start_len].copy_from_slice(&self.state.borrow().capture_state.startn[..start_len]);
             for entry in s2.iter_mut().skip(start_len) {
                 *entry = None
@@ -134,8 +135,8 @@ impl<'a> ReMatcher<'a> {
 
     pub(crate) fn set_paren_end(&self, which: usize, i: usize) {
         while which > self.end_len() - 1 {
-            let mut s2 = Vec::with_capacity(self.end_len() * 2);
             let end_len = self.end_len();
+            let mut s2 = vec![Some(0); end_len * 2];
             s2[..end_len].copy_from_slice(&self.state.borrow().capture_state.endn[..end_len]);
             for entry in s2.iter_mut().skip(end_len) {
                 *entry = None
