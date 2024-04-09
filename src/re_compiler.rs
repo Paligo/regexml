@@ -57,9 +57,10 @@ pub(crate) struct ReCompiler {
 pub enum Error {
     Internal,
     // FORX0001
-    Syntax(String),
-    // FORX0002
     InvalidFlags(String),
+    // FORX0002
+    Syntax(String),
+
     // FORX0003
     MatchesZeroLengthString,
     // FORX0004
