@@ -235,28 +235,29 @@ impl<'a> Iterator for ReluctantRepeatIterator<'a> {
     type Item = usize;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if let Some(position) = self.position {
-            loop {
+        dbg!(&self.counter);
+
+        loop {
+            if let Some(position) = self.position {
                 let mut it = self.operation.matches_iter(self.matcher, position);
                 if let Some(position) = it.next() {
                     self.counter += 1;
                     if self.counter > self.max {
                         self.position = None;
-                        break;
                     } else {
                         self.position = Some(position);
                     }
-                } else if self.min == 0 && self.counter == 0 {
-                    self.counter += 1;
-                } else {
-                    self.position = None;
-                    break;
                 }
-                if self.counter >= self.min {
-                    break;
-                }
+            } else if self.min == 0 && self.counter == 0 {
+                self.counter += 1;
+            } else {
+                self.position = None;
+            }
+            if self.counter >= self.min || self.position.is_none() {
+                break;
             }
         }
+        println!("Yielded {:?}", self.position);
         self.position
     }
 }

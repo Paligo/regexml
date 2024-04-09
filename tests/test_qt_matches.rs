@@ -533,28 +533,34 @@ fn test_matches_58() {
     assert_eq!(found, [false, false, false, true, true, true]);
 }
 
-// <test-case name="fn-matches-58">
-// <description> Matching reluctant quantifier with min cardinality, variable length item that repeats. See Saxon bug 3902</description>
-// <created by="Michael Kay" on="2018-09-13"/>
-// <modified by="Michael Kay" on="2018-09-26" change="Requires XP30+|XQ30+" />
-// <dependency type="spec" value="XP30+ XQ30+"/>
-// <test>("b", "ab", "aab", "aaab", "aaazab", "aaaaab") ! fn:matches(., "^((az?){3,}?)b")</test>
-// <result>
-//     <assert-deep-eq>false(), false(), false(), true(), true(), true()</assert-deep-eq>
-// </result>
-// </test-case>
+// Matching reluctant quantifier with max cardinality, variable length item
+// that repeats. See Saxon bug 3902
+#[test]
+fn test_matches_59() {
+    let regex = Regex::xpath("^((az?){0,3}?)b", "").unwrap();
+    let found: Vec<bool> = ["b", "ab", "aazb", "aaab", "aaaab", "aaaaab"]
+        .iter()
+        .map(|s| regex.is_match(s))
+        .collect();
+    assert_eq!(found, [true, true, true, true, false, false]);
+}
 
-// <test-case name="fn-matches-59">
-// <description> Matching reluctant quantifier with max cardinality, variable length item that repeats. See Saxon bug 3902</description>
-// <created by="Michael Kay" on="2018-09-13"/>
-// <modified by="Michael Kay" on="2018-09-26" change="Requires XP30+|XQ30+" />
-// <dependency type="spec" value="XP30+ XQ30+"/>
-// <test>("b", "ab", "aazb", "aaab", "aaaab", "aaaaab") ! fn:matches(., "^((az?){0,3}?)b")</test>
-// <result>
-//     <assert-deep-eq>true(), true(), true(), true(), false(), false()</assert-deep-eq>
-// </result>
-// </test-case>
+// Matching reluctant quantifier with min and max cardinality, variable length
+#[test]
+fn test_matches_60() {
+    let regex = Regex::xpath("^((az?){2,3}?)b", "").unwrap();
+    let found: Vec<bool> = ["b", "ab", "aazb", "aaab", "aaaab", "aaaaab"]
+        .iter()
+        .map(|s| regex.is_match(s))
+        .collect();
+    assert_eq!(found, [false, false, true, true, false, false]);
+}
 
+#[test]
+fn test_matches_60a() {
+    let regex = Regex::xpath("^((az?){2,3}?)b", "").unwrap();
+    assert!(regex.is_match("aaab"));
+}
 // <test-case name="fn-matches-60">
 // <description> Matching reluctant quantifier with min and max cardinality, variable length item that repeats. See Saxon bug 3902</description>
 // <created by="Michael Kay" on="2018-09-13"/>
