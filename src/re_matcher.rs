@@ -216,24 +216,25 @@ impl<'a> ReMatcher<'a> {
             if self.match_at(i, false) {
                 return true;
             }
-            let mut nl = Some(i);
+            // TODO: transliterated as close to the Java code as possible to
+            // make sure it works correctly.
+            let mut nl: isize = i.try_into().unwrap();
             loop {
-                // search for position from previous nl
-                nl = if let Some(skip) = nl {
-                    self.search.iter().skip(skip).position(|c| *c == '\n')
-                } else {
-                    None
-                };
-                if let Some(n) = nl {
-                    let n = n + 1;
-                    nl = Some(n);
-                    if n >= self.search.len() {
-                        return false;
-                    } else if self.match_at(n, false) {
-                        return true;
-                    }
-                } else {
+                nl = self
+                    .search
+                    .iter()
+                    .enumerate()
+                    .skip(nl.try_into().unwrap())
+                    .find(|(_, c)| **c == '\n')
+                    .map(|(i, _)| i.try_into().unwrap())
+                    .unwrap_or(-1)
+                    + 1;
+
+                if nl >= self.search.len().try_into().unwrap() || nl <= 0 {
+                    // "^" does not match a NL at the end of the string
                     return false;
+                } else if self.match_at(nl.try_into().unwrap(), false) {
+                    return true;
                 }
             }
         }

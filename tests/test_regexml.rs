@@ -214,5 +214,12 @@ fn test_caseless_match_character_classes() {
 #[test]
 fn test_matches_multiline() {
     let regex = Regex::xpath("^$", "m").unwrap();
-    assert!(!regex.is_match("abracadrabra\ntwentythree"));
+    assert!(!regex.is_match("abcd\ndefg\n"));
+}
+
+#[test]
+fn test_position_assumption() {
+    let a = [0, 1, 2, 3, 4, 5];
+    // find the index of first matching element while skipping the first two
+    a.iter().enumerate().skip(2).find(|(_, &x)| x == 3);
 }
