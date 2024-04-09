@@ -53,10 +53,17 @@ pub(crate) struct ReCompiler {
     warning: Vec<String>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Error {
     Internal,
+    // FORX0001
     Syntax(String),
+    // FORX0002
+    InvalidFlags(String),
+    // FORX0003
+    MatchesZeroLengthString,
+    // FORX0004
+    InvalidReplacementString,
 }
 
 impl Error {

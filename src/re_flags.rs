@@ -50,14 +50,16 @@ impl ReFlags {
                 'q' => {
                     r.literal = true;
                     if language != Language::XPath {
-                        return Err(Error::syntax("'q' flag requires XPath 3.0 to be enabled"));
+                        return Err(Error::InvalidFlags(
+                            "'q' flag requires XPath 3.0 to be enabled".to_string(),
+                        ));
                     }
                 }
                 'x' => {
                     r.allow_whitespace = true;
                 }
                 _ => {
-                    return Err(Error::syntax(format!("Unrecognized flag '{}'", c)));
+                    return Err(Error::InvalidFlags(format!("Unrecognized flag '{}'", c)));
                 }
             }
         }
@@ -74,7 +76,7 @@ impl ReFlags {
                     r.allow_unknown_block_names = false;
                 }
                 _ => {
-                    return Err(Error::syntax(format!("Unrecognized flag '{}'", c)));
+                    return Err(Error::InvalidFlags(format!("Unrecognized flag '{}'", c)));
                 }
             }
         }

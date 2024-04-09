@@ -223,3 +223,9 @@ fn test_position_assumption() {
     // find the index of first matching element while skipping the first two
     a.iter().enumerate().skip(2).find(|(_, &x)| x == 3);
 }
+
+#[test]
+fn test_matches_31() {
+    let regex = Regex::xpath("(?:abra(?:cad)?)*", "").unwrap();
+    assert!(regex.is_match("abracadabra"));
+}

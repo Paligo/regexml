@@ -25,14 +25,17 @@ use std::cell::{Ref, RefCell};
 
 use ahash::{HashMap, HashMapExt};
 
-use crate::re_compiler::{Error, ReCompiler};
+use crate::re_compiler::ReCompiler;
 use crate::re_flags::ReFlags;
 use crate::re_matcher::ReMatcher;
 use crate::re_program::ReProgram;
 
 pub use crate::re_flags::Language;
 
+pub use crate::re_compiler::Error;
+
 /// A XML-style regular expression.
+#[derive(Debug)]
 pub struct Regex {
     re_program: ReProgram,
 }
