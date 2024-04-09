@@ -139,6 +139,6 @@ impl<'a> Iterator for ReluctantFixedIterator<'a> {
                 return Some(self.pos);
             }
         }
-        return None;
+        None
     }
 }

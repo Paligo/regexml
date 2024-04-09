@@ -22,6 +22,7 @@ pub(crate) struct ReProgram {
     pub(crate) operation: Rc<Operation>,
     pub(crate) flags: ReFlags,
     pub(crate) prefix: Option<Vec<char>>,
+    pub(crate) initial_char_class: Option<CharacterClass>,
     pub(crate) preconditions: Vec<RegexPrecondition>,
     pub(crate) minimum_length: usize,
     pub(crate) fixed_length: Option<usize>,
@@ -37,6 +38,7 @@ impl ReProgram {
 
         let mut prefix = None;
         let mut optimization_flags = 0;
+        let mut initial_char_class = None;
 
         // TODO: optimize()
 
@@ -47,6 +49,9 @@ impl ReProgram {
                     optimization_flags |= OPT_HASBOL;
                 }
                 Operation::Atom(atom) => prefix = Some(atom.atom.clone()),
+                Operation::CharClass(char_class) => {
+                    initial_char_class = Some(char_class.character_class.clone());
+                }
                 _ => {}
             }
             Some(operation.clone())
@@ -58,6 +63,7 @@ impl ReProgram {
             operation,
             flags,
             prefix,
+            initial_char_class,
             preconditions: Vec::new(),
             optimization_flags,
             max_parens,

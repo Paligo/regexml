@@ -1,3 +1,6 @@
+// these test cases are a transliteration of test cases in matches.xml
+// part of the qt3 test suite
+
 use regexml::{Error, Regex};
 
 #[test]
@@ -302,281 +305,233 @@ fn test_matches_31() {
     assert!(regex.is_match("abracadabra"));
 }
 
-// <test-case name="fn-matches-32" covers-30="regex-non-capturing regex-q-flag">
-// <description> Evaluation of matches function with "q" flag (allowed in XQuery 3.0) </description>
-// <created by="Michael Kay" on="2009-10-23"/>
-// <modified by="Michael Kay" on="2011-09-05" change="remove option of returning error code"/>
-// <dependency type="spec" value="XP30+ XQ30+"/>
-// <test>fn:matches("abracadabra", "(?:abra(?:cad)?)*", "q")</test>
-// <result>
-//     <assert-false/>
-// </result>
-// </test-case>
+// Evaluation of matches function with "q" flag (allowed in XQuery 3.0)
+#[test]
+fn test_matches_32() {
+    let regex = Regex::xpath("(?:abra(?:cad)?)*", "q").unwrap();
+    assert!(!regex.is_match("abracadabra"));
+}
 
-// <test-case name="fn-matches-33" covers-30="regex-q-flag">
-// <description> Evaluation of matches function with "q" flag (allowed in XQuery 3.0) </description>
-// <created by="Michael Kay" on="2009-10-23"/>
-// <modified by="Michael Kay" on="2011-09-05" change="remove option of returning error code"/>
-// <dependency type="spec" value="XP30+ XQ30+"/>
-// <test>fn:matches("x[y-z]", "x[y-z]", "q")</test>
-// <result>
-//     <assert-true/>
-// </result>
-// </test-case>
+// Evaluation of matches function with "q" flag (allowed in XQuery 3.0)
+#[test]
+fn test_matches_33() {
+    let regex = Regex::xpath("x[y-z]", "q").unwrap();
+    assert!(regex.is_match("x[y-z]"));
+}
 
-// <test-case name="fn-matches-34" covers-30="regex-q-flag">
-// <description> Evaluation of matches function with "q" and "i" flags (allowed in XQuery 3.0) </description>
-// <created by="Michael Kay" on="2009-10-23"/>
-// <modified by="Michael Kay" on="2011-09-05" change="remove option of returning error code"/>
-// <dependency type="spec" value="XP30+ XQ30+"/>
-// <test>fn:matches("x[Y-z]", "X[y-Z]", "qi")</test>
-// <result>
-//     <assert-true/>
-// </result>
-// </test-case>
+// Evaluation of matches function with "q" and "i" flags (allowed in XQuery 3.0)
+#[test]
+fn test_matches_34() {
+    let regex = Regex::xpath("x[y-z]", "qi").unwrap();
+    assert!(regex.is_match("X[y-Z]"));
+}
 
-// <test-case name="fn-matches-35">
-// <description> Test for bug fix of 5348 in Errata for F+O. Expect FORX0002 err because \99 is an invalid reference as 99th subexpression does not exist </description>
-// <created by="Zhen Hua  Liu" on="2009-11-15"/>
-// <test>fn:matches('aA', '(a)\99')</test>
-// <result>
-//     <error code="FORX0002"/>
-// </result>
-// </test-case>
+// Test for bug fix of 5348 in Errata for F+O. Expect FORX0002 err because \99
+// is an invalid reference as 99th subexpression does not exist
+#[test]
+fn test_matches_35() {
+    let regex = Regex::xpath("(a)\\99", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("invalid backreference \\9 (no such group)".to_string())
+    );
+}
 
-// <test-case name="fn-matches-36">
-// <description> Test for bug fix of 5348 in Errata for F+O. ok match here </description>
-// <created by="Zhen Hua  Liu" on="2009-11-15"/>
-// <test>fn:matches('abcdefghijj', '(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)\10')</test>
-// <result>
-//     <assert-true/>
-// </result>
-// </test-case>
+// Test for bug fix of 5348 in Errata for F+O. ok match here
+#[test]
+fn test_matches_36() {
+    let regex = Regex::xpath("(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)\\10", "").unwrap();
+    assert!(regex.is_match("abcdefghijj"));
+}
 
-// <test-case name="fn-matches-37">
-// <description> Test for bug fix of 5348 in Errata for F+O. Expect FORX0002 err because \11 reference is made before the closing right parenthesis of 11th reference </description>
-// <created by="Zhen Hua  Liu" on="2009-11-15"/>
-// <test>fn:matches('abcdefghijk', '(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k\11)')</test>
-// <result>
-//     <error code="FORX0002"/>
-// </result>
-// </test-case>
+// Test for bug fix of 5348 in Errata for F+O. Expect FORX0002 err because \11
+// reference is made before the closing right parenthesis of 11th reference
+#[test]
+fn test_matches_37() {
+    let regex = Regex::xpath("(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k\\11)", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("invalid backreference \\11 (group not yet closed)".to_string())
+    );
+}
 
-// <test-case name="fn-matches-38">
-// <description> Test for bug fix of 5348 in Errata for F+O. Expect FORX0002 err because \10 reference is made before the closing right parenthesis of 10th reference </description>
-// <created by="Andrew Eisenberg" on="2009-12-23"/>
-// <test>fn:matches('abcdefghijj', '(a)(b)(c)(d)(e)(f)(g)(h)(i)(j\10)')</test>
-// <result>
-//     <error code="FORX0002"/>
-// </result>
-// </test-case>
+// Test for bug fix of 5348 in Errata for F+O. Expect FORX0002 err because \10
+// reference is made before the closing right parenthesis of 10th reference
+#[test]
+fn test_matches_38() {
+    let regex = Regex::xpath("(a)(b)(c)(d)(e)(f)(g)(h)(i)(j\\10)", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("invalid backreference \\10 (group not yet closed)".to_string())
+    );
+}
 
-// <test-case name="fn-matches-39">
-// <description> Test for bug fix of 5348 in Errata for F+O. Expect FORX0002 err because \9 reference is made before the closing right parenthesis of 9th reference </description>
-// <created by="Andrew Eisenberg" on="2009-12-23"/>
-// <test>fn:matches('abcdefghii', '(a)(b)(c)(d)(e)(f)(g)(h)(i\9)')</test>
-// <result>
-//     <error code="FORX0002"/>
-// </result>
-// </test-case>
+// Test for bug fix of 5348 in Errata for F+O. Expect FORX0002 err because \9
+// reference is made before the closing right parenthesis of 9th reference
+#[test]
+fn test_matches_39() {
+    let regex = Regex::xpath("(a)(b)(c)(d)(e)(f)(g)(h)(i\\9)", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("invalid backreference \\9 (group not yet closed)".to_string())
+    );
+}
 
-// <test-case name="fn-matches-40">
-// <description> Test for bug fix of 5348 in Errata for F+O. Expect FORX0002 err because \1 reference is made before the closing right parenthesis of 1st reference </description>
-// <created by="Andrew Eisenberg" on="2009-12-23"/>
-// <test>fn:matches('aa', '(a\1)')</test>
-// <result>
-//     <error code="FORX0002"/>
-// </result>
-// </test-case>
+// Test for bug fix of 5348 in Errata for F+O. Expect FORX0002 err because \1
+// reference is made before the closing right parenthesis of 1st reference
+#[test]
+fn test_matches_40() {
+    let regex = Regex::xpath("(a\\1)", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("invalid backreference \\1 (group not yet closed)".to_string())
+    );
+}
 
-// <test-case name="fn-matches-41">
-// <description> Handling of final newline with non-multiline mode </description>
-// <created by="Michael Kay" on="2012-01-13"/>
-// <test>fn:matches(concat('Mary', codepoints-to-string(10)), 'Mary$')</test>
-// <result>
-//     <assert-false/>
-// </result>
-// </test-case>
+// Handling of final newline with non-multiline mode
+#[test]
+fn test_matches_41() {
+    let regex = Regex::xpath("Mary$", "").unwrap();
+    assert!(!regex.is_match("Mary\n"));
+}
 
-// <test-case name="fn-matches-42">
-// <description> Handling of final newline with $ in dot-all mode </description>
-// <created by="Michael Kay" on="2012-01-13"/>
-// <test>fn:matches(concat('Mary', codepoints-to-string(10)), 'Mary$', 's')</test>
-// <result>
-//     <assert-false/>
-// </result>
-// </test-case>
+// Handling of final newline with $ in dot-all mode
+#[test]
+fn test_matches_42() {
+    let regex = Regex::xpath("Mary$", "s").unwrap();
+    assert!(!regex.is_match("Mary\n"));
+}
 
-// <test-case name="fn-matches-43">
-// <description> "." doesn't normally match newline </description>
-// <created by="Michael Kay" on="2012-01-13"/>
-// <test>fn:matches(concat('Mary', codepoints-to-string(10), 'Jones'), 'Mary.Jones')</test>
-// <result>
-//     <assert-false/>
-// </result>
-// </test-case>
+// "." doesn't normally match newline
+#[test]
+fn test_matches_43() {
+    let regex = Regex::xpath("Mary.Jones", "").unwrap();
+    assert!(!regex.is_match("Mary\nJones"));
+}
 
-// <test-case name="fn-matches-44">
-// <description> "." does match newline in dot-all mode</description>
-// <created by="Michael Kay" on="2012-01-13"/>
-// <test>fn:matches(concat('Mary', codepoints-to-string(10), 'Jones'), 'Mary.Jones', 's')</test>
-// <result>
-//     <assert-true/>
-// </result>
-// </test-case>
+// "." does match newline in dot-all mode
+#[test]
+fn test_matches_44() {
+    let regex = Regex::xpath("Mary.Jones", "s").unwrap();
+    assert!(regex.is_match("Mary\nJones"));
+}
 
-// <test-case name="fn-matches-45" covers-30="regex-dot-matching-cr">
-// <description> "." does NOT match CR in default mode</description>
-// <created by="Michael Kay" on="2012-01-13"/>
-// <modified by="Michael Kay" on="2012-03-28" change="See bug 15594. WG agreed that '.' should match everything except CR and NL"/>
-// <test>fn:matches(concat('Mary', codepoints-to-string(13), 'Jones'), 'Mary.Jones')</test>
-// <result>
-//     <assert-false/>
-// </result>
-// </test-case>
+// "." does NOT match CR in default mode
+#[test]
+fn test_matches_45() {
+    let regex = Regex::xpath("Mary.Jones", "").unwrap();
+    assert!(!regex.is_match("Mary\rJones"));
+}
 
-// <test-case name="fn-matches-46" covers-30="regex-dot-matching-cr">
-// <description> "." does match CR in dot-all mode</description>
-// <created by="Michael Kay" on="2012-01-13"/>
-// <test>fn:matches(concat('Mary', codepoints-to-string(13), 'Jones'), 'Mary.Jones', 's')</test>
-// <result>
-//     <assert-true/>
-// </result>
-// </test-case>
+// "." does match CR in dot-all mode
+#[test]
+fn test_matches_46() {
+    let regex = Regex::xpath("Mary.Jones", "s").unwrap();
+    assert!(regex.is_match("Mary\rJones"));
+}
 
-// <test-case name="fn-matches-47">
-// <description> Check for the correct behavior of $ when not in multi-line mode.
-//  The correct answer according to the spec is false; though some regex engines
-//  are known to report true.</description>
-// <created by="Michael Kay" on="2012-04-19"/>
-// <test>fn:matches(concat('abcd', codepoints-to-string(10), 'defg', codepoints-to-string(10)), "g$")</test>
-// <result>
-//     <assert-false/>
-// </result>
-// </test-case>
+// Check for the correct behavior of $ when not in multi-line mode. The correct
+// answer according to the spec is false; though some regex engines are known to
+// report true.
+#[test]
+fn test_matches_47() {
+    let regex = Regex::xpath("g$", "").unwrap();
+    assert!(!regex.is_match("abcd\ndefg\n"));
+}
 
-// <test-case name="fn-matches-48">
-// <description> Edge condition: match occurs at last character. </description>
-// <created by="Michael Kay" on="2012-12-14"/>
-// <test>fn:matches("abracadabra-abracadabra.", "\.")</test>
-// <result>
-//     <assert-true/>
-// </result>
-// </test-case>
+// Edge condition: match occurs at last character.
+#[test]
+fn test_matches_48() {
+    let regex = Regex::xpath("\\.", "").unwrap();
+    assert!(regex.is_match("abracadabra-abracadabra."));
+}
 
-// <test-case name="fn-matches-49">
-// <description> Edge condition: match occurs at last character. </description>
-// <created by="Michael Kay" on="2012-12-14"/>
-// <test>fn:matches("abracadabra-abracadabra-3", "(124|864|377|3)")</test>
-// <result>
-//     <assert-true/>
-// </result>
-// </test-case>
+// Edge condition: match occurs at last character.
+#[test]
+fn test_matches_49() {
+    let regex = Regex::xpath("(124|864|377|3)", "").unwrap();
+    assert!(regex.is_match("abracadabra-abracadabra-3"));
+}
 
-// <test-case name="fn-matches-50">
-// <description>Composite test executing regular expressions from Perl-derived test file </description>
-// <created by="Michael Kay" on="2015-05-20"/>
-// <modified by="Michael Kay" on="2015-12-02" change="Changed p303 and p908 as per bug 29253"/>
-// <modified by="Michael Kay" on="2016-12-03" change="Added XSD 1.0 dependency as per bug 29253"/>
-// <environment>
-//     <source role="." file="matches/perl-tests.xml"/>
-// </environment>
-// <dependency type="spec" value="XQ30+"/>
-// <dependency type="xsd-version" value="1.0"/>
-// <!-- See bug 30029 - four of the subtests assume XSD 1.0 rules on hyphens -->
+// Skip fn-matches-50 for now, which runs regexes in matches/perl-tests.xml for now
 
-// <test><![CDATA[
-// declare namespace err="http://www.w3.org/2005/xqt-errors";
-//   <results>{
-//       for $t in /tests/test
-//       return try {
-//           let $matches := matches($t/@input, $t/@regex, string($t/@flags))
-//           return
-//              if ($matches (:trace($matches, $t/@id):) and $t/@result ne 'y')
-//                then <fail>{$t}</fail>
-//              else if (not($matches) and $t/@result ne 'n')
-//                then <fail>{$t}</fail>
-//              else ()
-//       } catch * {
-//           if ($t/@result = ('y', 'n'))
-//           then <fail error="{$err:code}">{$t}</fail>
-//           else ()
-//       }
-//   }</results>
-// ]]>        </test>
-// <result>
-//     <assert>empty($result//fail)</assert>
-// </result>
-// </test-case>
+// Unescaped left parens inside a charClass are allowed and don't affect the
+// subexpression count
+#[test]
+fn test_matches_51() {
+    let regex = Regex::xpath("^(ab)([()]*)(cd)([)(]*)ef\\4gh$", "").unwrap();
+    assert!(regex.is_match("ab()cd()ef()gh"));
+}
 
-// <test-case name="fn-matches-51">
-// <description> Unescaped left parens inside a charClass are allowed and don't affect the subexpression count</description>
-// <created by="Michael Kay" on="2016-02-09"/>
-// <test>fn:matches("ab()cd()ef()gh", "^(ab)([()]*)(cd)([)(]*)ef\4gh$")</test>
-// <result>
-//     <assert-true/>
-// </result>
-// </test-case>
+// A use case involving backtracking and ambiguity
+#[test]
+fn test_matches_52() {
+    let regex = Regex::xpath("^(a*b?a*){3,3}$", "").unwrap();
+    assert!(regex.is_match("aaababaaabaa"));
+}
 
-// <test-case name="fn-matches-52">
-// <description> A use case involving backtracking and ambiguity</description>
-// <created by="Michael Kay" on="2016-12-03"/>
-// <test>fn:matches("aaababaaabaa", "^(a*b?a*){3,3}$")</test>
-// <result>
-//     <assert-true/>
-// </result>
-// </test-case>
+// A use case involving repetition of a back-reference. Saxon bug 3712.
+#[test]
+fn test_matches_53() {
+    let regex = Regex::xpath("([A-Z])\\1*", "").unwrap();
+    assert!(regex.is_match("A"));
+}
 
-// <test-case name="fn-matches-53">
-// <description> A use case involving repetition of a back-reference. Saxon bug 3712.</description>
-// <created by="Michael Kay" on="2018-03-06"/>
-// <test>fn:matches("A", "([A-Z])\1*")</test>
-// <result>
-//     <assert-true/>
-// </result>
-// </test-case>
+// A use case involving optional matching of start-of-string. Saxon bug 3782.
+#[test]
+fn test_matches_54() {
+    let regex = Regex::xpath("(^|:)?Z", "").unwrap();
+    assert!(regex.is_match("kZ"));
+}
 
-// <test-case name="fn-matches-54">
-// <description> A use case involving optional matching of start-of-string. Saxon bug 3782.</description>
-// <created by="Michael Kay" on="2018-05-15"/>
-// <test>fn:matches("kZ", "(^|:)?Z")</test>
-// <result>
-//     <assert-true/>
-// </result>
-// </test-case>
+// Matching reluctant quantifier with min cardinality. See Saxon bug 3902
+#[test]
+fn test_matches_55() {
+    let regex = Regex::xpath("^(a{3,}?)b", "").unwrap();
+    let found: Vec<bool> = ["b", "ab", "aab", "aaab", "aaaab", "aaaaab"]
+        .iter()
+        .map(|s| regex.is_match(s))
+        .collect();
+    assert_eq!(found, [false, false, false, true, true, true]);
+}
 
-// <test-case name="fn-matches-55">
-// <description> Matching reluctant quantifier with min cardinality. See Saxon bug 3902</description>
-// <created by="Michael Kay" on="2018-09-13"/>
-// <modified by="Michael Kay" on="2018-09-26" change="Requires XP30+|XQ30+" />
-// <dependency type="spec" value="XP30+ XQ30+"/>
-// <test>("b", "ab", "aab", "aaab", "aaaab", "aaaaab") ! fn:matches(., "^(a{3,}?)b")</test>
-// <result>
-//     <assert-deep-eq>false(), false(), false(), true(), true(), true()</assert-deep-eq>
-// </result>
-// </test-case>
+// Matching reluctant quantifier with max cardinality. See Saxon bug 3902
+#[test]
+fn test_matches_56() {
+    let regex = Regex::xpath("^(a{0,3}?)b", "").unwrap();
+    let found: Vec<bool> = ["b", "ab", "aab", "aaab", "aaaab", "aaaaab"]
+        .iter()
+        .map(|s| regex.is_match(s))
+        .collect();
+    assert_eq!(found, [true, true, true, true, false, false]);
+}
 
-// <test-case name="fn-matches-56">
-// <description> Matching reluctant quantifier with max cardinality. See Saxon bug 3902</description>
-// <created by="Michael Kay" on="2018-09-13"/>
-// <modified by="Michael Kay" on="2018-09-26" change="Requires XP30+|XQ30+" />
-// <dependency type="spec" value="XP30+ XQ30+"/>
-// <test>("b", "ab", "aab", "aaab", "aaaab", "aaaaab") ! fn:matches(., "^(a{0,3}?)b")</test>
-// <result>
-//     <assert-deep-eq>true(), true(), true(), true(), false(), false()</assert-deep-eq>
-// </result>
-// </test-case>
+// Matching reluctant quantifier with min and max cardinality. See Saxon bug 3902
+#[test]
+fn test_matches_57() {
+    let regex = Regex::xpath("^(a{2,3}?)b", "").unwrap();
+    let found: Vec<bool> = ["b", "ab", "aab", "aaab", "aaaab", "aaaaab"]
+        .iter()
+        .map(|s| regex.is_match(s))
+        .collect();
+    assert_eq!(found, [false, false, true, true, false, false]);
+}
 
-// <test-case name="fn-matches-57">
-// <description> Matching reluctant quantifier with min and max cardinality. See Saxon bug 3902</description>
-// <created by="Michael Kay" on="2018-09-13"/>
-// <modified by="Michael Kay" on="2018-09-26" change="Requires XP30+|XQ30+" />
-// <dependency type="spec" value="XP30+ XQ30+"/>
-// <test>("b", "ab", "aab", "aaab", "aaaab", "aaaaab") ! fn:matches(., "^(a{2,3}?)b")</test>
-// <result>
-//     <assert-deep-eq>false(), false(), true(), true(), false(), false()</assert-deep-eq>
-// </result>
-// </test-case>
+// Matching reluctant quantifier with min cardinality, variable length item
+// that repeats. See Saxon bug 3902
+#[test]
+fn test_matches_58() {
+    let regex = Regex::xpath("^((az?){3,}?)b", "").unwrap();
+    dbg!(&regex);
+    let found: Vec<bool> = ["b", "ab", "aab", "aaab", "aaazab", "aaaaab"]
+        .iter()
+        .map(|s| {
+            dbg!(s);
+            regex.is_match(s)
+        })
+        .collect();
+    assert_eq!(found, [false, false, false, true, true, true]);
+}
 
 // <test-case name="fn-matches-58">
 // <description> Matching reluctant quantifier with min cardinality, variable length item that repeats. See Saxon bug 3902</description>

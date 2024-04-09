@@ -1,8 +1,8 @@
-use std::fmt;
+use std::{fmt, rc::Rc};
 
 use ahash::{HashSet, HashSetExt};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) enum CharacterClass {
     Empty,
     Inverse(Box<CharacterClass>),
@@ -11,11 +11,12 @@ pub(crate) enum CharacterClass {
     CharSet(HashSet<char>),
 }
 
-pub(crate) struct PredicateFn(Box<dyn Fn(char) -> bool>);
+#[derive(Clone)]
+pub(crate) struct PredicateFn(Rc<dyn Fn(char) -> bool>);
 
 impl PredicateFn {
     pub(crate) fn new(f: impl Fn(char) -> bool + 'static) -> Self {
-        Self(Box::new(f))
+        Self(Rc::new(f))
     }
 
     fn call(&self, c: char) -> bool {

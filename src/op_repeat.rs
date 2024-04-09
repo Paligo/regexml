@@ -105,9 +105,9 @@ impl OperationControl for Repeat {
                 ReluctantRepeatIterator::new(
                     matcher,
                     self.operation.clone(),
+                    position,
                     self.min,
                     self.max,
-                    position,
                 ),
             )))
         }
@@ -239,11 +239,12 @@ impl<'a> Iterator for ReluctantRepeatIterator<'a> {
             loop {
                 let mut it = self.operation.matches_iter(self.matcher, position);
                 if let Some(position) = it.next() {
-                    self.position = Some(position);
                     self.counter += 1;
                     if self.counter > self.max {
                         self.position = None;
                         break;
+                    } else {
+                        self.position = Some(position);
                     }
                 } else if self.min == 0 && self.counter == 0 {
                     self.counter += 1;
