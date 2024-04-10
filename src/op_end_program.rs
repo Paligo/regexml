@@ -22,7 +22,7 @@ impl OperationControl for EndProgram {
     ) -> Box<dyn Iterator<Item = usize>> {
         // An anchored match is successful only if we are at the end of the
         // string. Otherwise, match has succeeded unconditionally
-        if matcher.state.borrow().anchored_match {
+        if matcher.anchored_match() {
             if position >= matcher.search.len() {
                 Box::new(std::iter::once(position))
             } else {

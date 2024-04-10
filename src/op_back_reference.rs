@@ -23,8 +23,8 @@ impl OperationControl for BackReference {
         position: usize,
     ) -> Box<dyn Iterator<Item = usize> + 'a> {
         // Get the start and end of the backref
-        let s = matcher.state.borrow().start_backref[self.group_nr];
-        let e = matcher.state.borrow().end_backref[self.group_nr];
+        let s = matcher.start_backref(self.group_nr);
+        let e = matcher.end_backref(self.group_nr);
 
         if let (Some(s), Some(e)) = (s, e) {
             // The backref is the empty size

@@ -66,11 +66,7 @@ impl OperationControl for Repeat {
         if self.greedy {
             // Prime the arrays first with iterators up to the maximum length, stopping if there is no match
             if self.min == 0
-                && !matcher
-                    .state
-                    .borrow_mut()
-                    .history
-                    .is_duplicate_zero_length_match(Operation::from(self.clone()), position)
+                && !matcher.is_duplicate_zero_length_match(Operation::from(self.clone()), position)
             {
                 // add a match at the current position if zero occurrences are allowed
                 iterators.push(Box::new(std::iter::once(position)));

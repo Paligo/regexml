@@ -118,7 +118,7 @@ impl<'a> SequenceIterator<'a> {
         contains_capturing_expressions: bool,
     ) -> Self {
         let saved_state = if contains_capturing_expressions {
-            Some(matcher.state.borrow().capture_state.clone())
+            Some(matcher.capture_state())
         } else {
             None
         };

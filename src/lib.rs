@@ -143,7 +143,7 @@ impl<'a> AnalyzeIter<'a> {
         &mut self,
         current: &'a [char],
     ) -> Result<Vec<MatchEntry>, Error> {
-        let c = self.matcher.get_paren_count() - 1;
+        let c = self.matcher.paren_count() - 1;
         if c == 0 {
             Ok(vec![MatchEntry::String(current.iter().collect())])
         } else {

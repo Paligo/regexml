@@ -41,7 +41,7 @@ impl OperationControl for Capture {
         position: usize,
     ) -> Box<dyn Iterator<Item = usize> + 'a> {
         if (matcher.program.optimization_flags & OPT_HASBACKREFS) != 0 {
-            matcher.state.borrow_mut().start_backref[self.group_nr] = Some(position);
+            matcher.set_start_backref(self.group_nr, Some(position));
         }
         let basis = self.child_op.matches_iter(matcher, position);
 
@@ -88,17 +88,17 @@ impl<'a> Iterator for CaptureGroupIterator<'a> {
         let next = self.basis.next()?;
 
         // Increase valid paren count
-        if self.group_nr >= self.matcher.state.borrow().capture_state.paren_count {
-            self.matcher.state.borrow_mut().capture_state.paren_count = self.group_nr + 1;
+        if self.group_nr >= self.matcher.paren_count() {
+            self.matcher.set_paren_count(self.group_nr + 1);
         }
 
         self.matcher.set_paren_start(self.group_nr, self.position);
         self.matcher.set_paren_end(self.group_nr, next);
 
         if (self.matcher.program.optimization_flags & OPT_HASBACKREFS) != 0 {
-            let mut state = self.matcher.state.borrow_mut();
-            state.start_backref[self.group_nr] = Some(self.position);
-            state.end_backref[self.group_nr] = Some(next);
+            self.matcher
+                .set_start_backref(self.group_nr, Some(self.position));
+            self.matcher.set_end_backref(self.group_nr, Some(next));
         }
         Some(next)
     }

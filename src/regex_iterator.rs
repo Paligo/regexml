@@ -62,7 +62,7 @@ impl<'a> RegexIterator<'a> {
             return None;
         }
         if let Some(number) = number {
-            if number >= self.matcher.get_paren_count() {
+            if number >= self.matcher.paren_count() {
                 None
             } else {
                 self.matcher.get_paren(number)
@@ -73,11 +73,11 @@ impl<'a> RegexIterator<'a> {
     }
 
     fn get_number_of_groups(&self) -> usize {
-        self.matcher.get_paren_count()
+        self.matcher.paren_count()
     }
 
     fn process_matching_substring(&mut self, action: &mut Action) {
-        let c = self.matcher.get_paren_count() - 1;
+        let c = self.matcher.paren_count() - 1;
         if c == 0 {
             action.characters(self.current.unwrap());
         } else {

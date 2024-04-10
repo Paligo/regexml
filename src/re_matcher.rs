@@ -15,7 +15,7 @@ pub(crate) struct ReMatcher<'a> {
     pub(crate) search: &'a [char],
     pub(crate) max_paren: Option<usize>,
     // parenthesized subexpressions
-    pub(crate) state: RefCell<State>,
+    state: RefCell<State>,
 }
 
 pub(crate) struct History {
@@ -86,12 +86,8 @@ impl<'a> ReMatcher<'a> {
         }
     }
 
-    pub(crate) fn get_paren_count(&self) -> usize {
-        self.state.borrow().capture_state.paren_count
-    }
-
     pub(crate) fn get_paren(&self, which: usize) -> Option<&[char]> {
-        if which < self.get_paren_count() {
+        if which < self.paren_count() {
             if let (Some(start), Some(end)) =
                 (self.get_paren_start(which), self.get_paren_end(which))
             {
@@ -116,8 +112,8 @@ impl<'a> ReMatcher<'a> {
     }
 
     pub(crate) fn set_paren_start(&self, which: usize, i: usize) {
-        while which > self.start_len() - 1 {
-            let start_len = self.start_len();
+        while which > self.startn_len() - 1 {
+            let start_len = self.startn_len();
             let mut s2 = vec![Some(0); start_len * 2];
             dbg!(&s2, start_len);
             s2[..start_len].copy_from_slice(&self.state.borrow().capture_state.startn[..start_len]);
@@ -129,8 +125,12 @@ impl<'a> ReMatcher<'a> {
         self.state.borrow_mut().capture_state.startn[which] = Some(i);
     }
 
-    fn start_len(&self) -> usize {
+    fn startn_len(&self) -> usize {
         self.state.borrow().capture_state.startn.len()
+    }
+
+    fn start_backref_len(&self) -> usize {
+        self.state.borrow().start_backref.len()
     }
 
     pub(crate) fn set_paren_end(&self, which: usize, i: usize) {
@@ -155,18 +155,26 @@ impl<'a> ReMatcher<'a> {
     }
 
     pub(crate) fn clear_captured_groups_beyond(&self, pos: usize) {
-        for i in 0..self.start_len() {
-            let start = self.state.borrow().capture_state.startn[i];
+        for i in 0..self.startn_len() {
+            let start = self.capture_state_startn(i);
             if start >= Some(pos) {
-                self.state.borrow_mut().capture_state.endn[i] = start;
+                self.set_capture_state_endn(i, start);
             }
         }
-        for i in 0..self.state.borrow().start_backref.len() {
-            let start = self.state.borrow().start_backref[i];
+        for i in 0..self.start_backref_len() {
+            let start = self.start_backref(i);
             if start >= Some(pos) {
-                self.state.borrow_mut().end_backref[i] = start;
+                self.set_end_backref(i, start);
             }
         }
+    }
+
+    fn capture_state_startn(&self, i: usize) -> Option<usize> {
+        self.state.borrow().capture_state.startn[i]
+    }
+
+    fn set_capture_state_endn(&self, i: usize, value: Option<usize>) {
+        self.state.borrow_mut().capture_state.endn[i] = value;
     }
 
     pub(crate) fn match_at(&self, i: usize, anchored: bool) -> bool {
@@ -491,6 +499,49 @@ impl<'a> ReMatcher<'a> {
             return lowercase[0] == b;
         }
         false
+    }
+
+    pub(crate) fn start_backref(&self, i: usize) -> Option<usize> {
+        self.state.borrow().start_backref[i]
+    }
+
+    pub(crate) fn set_start_backref(&self, i: usize, value: Option<usize>) {
+        self.state.borrow_mut().start_backref[i] = value;
+    }
+
+    pub(crate) fn end_backref(&self, i: usize) -> Option<usize> {
+        self.state.borrow().end_backref[i]
+    }
+
+    pub(crate) fn set_end_backref(&self, i: usize, value: Option<usize>) {
+        self.state.borrow_mut().end_backref[i] = value;
+    }
+
+    pub(crate) fn paren_count(&self) -> usize {
+        self.state.borrow().capture_state.paren_count
+    }
+
+    pub(crate) fn set_paren_count(&self, count: usize) {
+        self.state.borrow_mut().capture_state.paren_count = count;
+    }
+
+    pub(crate) fn anchored_match(&self) -> bool {
+        self.state.borrow().anchored_match
+    }
+
+    pub(crate) fn is_duplicate_zero_length_match(
+        &self,
+        operation: Operation,
+        position: usize,
+    ) -> bool {
+        self.state
+            .borrow_mut()
+            .history
+            .is_duplicate_zero_length_match(operation, position)
+    }
+
+    pub(crate) fn capture_state(&self) -> CaptureState {
+        self.state.borrow().capture_state.clone()
     }
 }
 
