@@ -136,6 +136,7 @@ impl CharacterClass {
         }
     }
 
+    // TODO: is a difference the same as a union with the complement of the other?
     pub(crate) fn difference(self, other: CharacterClass) -> Self {
         match (self, other) {
             // substract anything from empty is empty
@@ -143,10 +144,61 @@ impl CharacterClass {
             // anything substracting empty is the original thing
             (a, CharacterClass::Empty) => a,
             // if we substract something from all, we get the inverse of that thing
-            (CharacterClass::All, b) => CharacterClass::Inverse(Box::new(b)),
+            (CharacterClass::All, b) => b.complement(),
             // if we substract all from something, we get the empty
-            (a, CharacterClass::All) => CharacterClass::Empty,
-            // if we substract a character from the inverse set, we need to add it back
+            (_, CharacterClass::All) => CharacterClass::Empty,
+            // anything but what's in a, without b too
+            (ref original @ CharacterClass::Inverse(ref a), CharacterClass::Char(b)) => {
+                match a.as_ref() {
+                    // we can't construct the inverse of all; it's empty
+                    CharacterClass::All => unreachable!(),
+                    // we can't construct the inverse of empty, it's all
+                    CharacterClass::Empty => unreachable!(),
+                    // we can't construct the inverse of an inverse, as it's the thing itself
+                    CharacterClass::Inverse(_) => unreachable!(),
+                    CharacterClass::CharSet(set) => {
+                        if !set.contains(&b) {
+                            // if we don't have b yet, we need to add it to the charset
+                            let mut set = set.clone();
+                            set.insert(b);
+                            CharacterClass::Inverse(Box::new(CharacterClass::from_set(set)))
+                        } else {
+                            // otherwise it was already there, so we're fine already
+                            original.clone()
+                        }
+                    }
+                    CharacterClass::Char(a) => {
+                        if *a != b {
+                            // we need to remove both a and b
+                            CharacterClass::from_chars(&[*a, b]).complement()
+                        } else {
+                            // if was the same character, so we're fine already
+                            original.clone()
+                        }
+                    }
+                }
+            }
+            (
+                ref original @ CharacterClass::Char(ref a),
+                ref inverse @ CharacterClass::Inverse(ref b),
+            ) => {
+                match b.as_ref() {
+                    // we can't construct the inverse of all; it's empty
+                    CharacterClass::All => unreachable!(),
+                    // we can't construct the invers    e of empty, it's all
+                    CharacterClass::Empty => unreachable!(),
+                    // we can't construct the inverse of an inverse, as it's the thing itself
+                    CharacterClass::Inverse(_) => unreachable!(),
+                    CharacterClass::CharSet(set) => {
+                        if !set.contains(a) {
+                            todo!()
+                        } else {
+                            todo!()
+                        }
+                    }
+                    CharacterClass::Char(c) => todo!(),
+                }
+            }
             _ => todo!(),
         }
     }
@@ -429,5 +481,93 @@ mod tests {
         // we now want a and b too
         let second = CharacterClass::from_chars(&['a', 'b']);
         assert_eq!(first.union(second), CharacterClass::All);
+    }
+
+    #[test]
+    fn test_difference_empty_with_char() {
+        let first = CharacterClass::Empty;
+        let second = CharacterClass::Char('a');
+        assert_eq!(first.difference(second), CharacterClass::Empty);
+    }
+
+    #[test]
+    fn test_difference_char_with_empty() {
+        let first = CharacterClass::Char('a');
+        let second = CharacterClass::Empty;
+        assert_eq!(first.difference(second), CharacterClass::Char('a'));
+    }
+
+    #[test]
+    fn test_difference_all_with_char() {
+        let first = CharacterClass::All;
+        let second = CharacterClass::Char('a');
+        assert_eq!(
+            first.difference(second),
+            CharacterClass::Inverse(Box::new(CharacterClass::Char('a')))
+        );
+    }
+
+    #[test]
+    fn test_difference_all_with_charset() {
+        let first = CharacterClass::All;
+        let second = CharacterClass::from_chars(&['a', 'b']);
+        assert_eq!(
+            first.difference(second),
+            CharacterClass::Inverse(Box::new(CharacterClass::from_chars(&['a', 'b'])))
+        );
+    }
+
+    #[test]
+    fn test_difference_char_with_all() {
+        let first = CharacterClass::Char('a');
+        let second = CharacterClass::All;
+        assert_eq!(first.difference(second), CharacterClass::Empty);
+    }
+
+    #[test]
+    fn test_difference_inverse_char_with_char() {
+        let first = CharacterClass::Char('a').complement();
+        let second = CharacterClass::Char('b');
+        assert_eq!(
+            first.difference(second),
+            CharacterClass::from_chars(&['a', 'b']).complement()
+        );
+    }
+
+    #[test]
+    fn test_difference_inverse_char_with_char_overlap() {
+        let first = CharacterClass::Char('a').complement();
+        let second = CharacterClass::Char('a');
+        assert_eq!(
+            first.difference(second),
+            CharacterClass::Char('a').complement()
+        );
+    }
+
+    #[test]
+    fn test_difference_inverse_charset_with_char() {
+        let first = CharacterClass::from_chars(&['a', 'b']).complement();
+        let second = CharacterClass::Char('c');
+        assert_eq!(
+            first.difference(second),
+            CharacterClass::from_chars(&['a', 'b', 'c']).complement()
+        );
+    }
+
+    #[test]
+    fn test_difference_inverse_charset_with_char_overlap() {
+        let first = CharacterClass::from_chars(&['a', 'b']).complement();
+        let second = CharacterClass::Char('a');
+        assert_eq!(
+            first.difference(second),
+            CharacterClass::from_chars(&['a', 'b']).complement()
+        );
+    }
+
+    #[test]
+    fn test_difference_char_with_inverse_char() {
+        let first = CharacterClass::Char('a');
+        let second = CharacterClass::Char('b').complement();
+        assert_eq!(first.difference(second), CharacterClass::Empty);
     }
 }
