@@ -3,11 +3,10 @@ name = "regexml"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 ahash = "0.8.3"
 enum_dispatch = "0.3.12"
+icu_properties = "1.4.0"
 
 [dev-dependencies]
 insta = { version = "1.29.0", features = ["yaml", "glob"] }

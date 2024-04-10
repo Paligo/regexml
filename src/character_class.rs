@@ -1,6 +1,7 @@
 use std::{fmt, rc::Rc};
 
 use ahash::{HashSet, HashSetExt};
+// use icu_properties::GeneralCategory;
 
 #[derive(Debug, Clone)]
 pub(crate) enum CharacterClass {
@@ -9,6 +10,7 @@ pub(crate) enum CharacterClass {
     All,
     Char(char),
     CharSet(HashSet<char>),
+    // IcuGeneralCategory(GeneralCategory),
 }
 
 #[derive(Clone)]
@@ -98,6 +100,12 @@ impl CharacterClass {
             CharacterClass::All => true,
             CharacterClass::Char(c) => value == *c,
             CharacterClass::CharSet(set) => set.contains(&value),
+            // CharacterClass::IcuGeneralCategory(general_category) => {
+            //     icu_properties::maps::general_category()
+            //         .get_set_for_value(*general_category)
+            //         .as_borrowed()
+            //         .contains(value)
+            // }
         }
     }
 
