@@ -1,6 +1,6 @@
 use crate::{
+    character_class::CharacterClass,
     operation::{OperationControl, MATCHES_ZLS_NEVER},
-    re_compiler::CharacterClass,
 };
 
 #[derive(Debug, Clone)]

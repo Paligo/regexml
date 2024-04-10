@@ -4,6 +4,7 @@ use ahash::{HashSet, HashSetExt};
 use icu_collections::codepointinvlist::{CodePointInversionList, CodePointInversionListBuilder};
 
 use crate::{
+    character_class::{CharacterClass, CharacterClassBuilder},
     op_atom::Atom,
     op_back_reference::BackReference,
     op_bol::Bol,
@@ -81,137 +82,6 @@ enum CharacterClassOrBackReference {
 impl From<CharacterClassBuilder> for CharacterClassOrBackReference {
     fn from(cc: CharacterClassBuilder) -> Self {
         Self::CharacterClass(cc)
-    }
-}
-
-#[derive(Debug, Clone)]
-pub(crate) struct CharacterClass(CodePointInversionList<'static>);
-
-impl CharacterClass {
-    fn all() -> Self {
-        Self(CodePointInversionList::all())
-    }
-
-    pub(crate) fn contains(&self, c: char) -> bool {
-        self.0.contains(c)
-    }
-}
-
-enum CharacterClassBuilder {
-    Char(char),
-    CodePointInversionListBuilder(CodePointInversionListBuilder),
-}
-
-impl From<CodePointInversionListBuilder> for CharacterClassBuilder {
-    fn from(builder: CodePointInversionListBuilder) -> Self {
-        Self::CodePointInversionListBuilder(builder)
-    }
-}
-
-impl CharacterClassBuilder {
-    fn from_char(c: char) -> Self {
-        CharacterClassBuilder::Char(c)
-    }
-
-    fn from_str(s: &str) -> Self {
-        let mut builder = CodePointInversionListBuilder::new();
-        for c in s.chars() {
-            builder.add_char(c);
-        }
-        Self::CodePointInversionListBuilder(builder)
-    }
-
-    fn complement(mut self) -> Self {
-        match self {
-            CharacterClassBuilder::Char(c) => {
-                let builder = Self::from_char(c);
-                builder.complement()
-            }
-            CharacterClassBuilder::CodePointInversionListBuilder(mut builder) => {
-                builder.complement();
-                CharacterClassBuilder::CodePointInversionListBuilder(builder)
-            }
-        }
-    }
-
-    fn union(mut self, other: Self) -> Self {
-        match (self, other) {
-            (CharacterClassBuilder::Char(a), CharacterClassBuilder::Char(b)) => {
-                let mut builder = CodePointInversionListBuilder::new();
-                builder.add_char(a);
-                builder.add_char(b);
-                CharacterClassBuilder::CodePointInversionListBuilder(builder)
-            }
-            (
-                CharacterClassBuilder::Char(a),
-                CharacterClassBuilder::CodePointInversionListBuilder(mut b),
-            ) => {
-                b.add_char(a);
-                CharacterClassBuilder::CodePointInversionListBuilder(b)
-            }
-            (
-                CharacterClassBuilder::Char(a),
-                CharacterClassBuilder::CodePointInversionListBuilder(b),
-            )
-            | (
-                CharacterClassBuilder::CodePointInversionListBuilder(b),
-                CharacterClassBuilder::Char(a),
-            ) => {
-                let a = Self::from_char(a);
-                a.union(CharacterClassBuilder::CodePointInversionListBuilder(b))
-            }
-            (
-                CharacterClassBuilder::CodePointInversionListBuilder(mut a),
-                CharacterClassBuilder::CodePointInversionListBuilder(b),
-            ) => {
-                a.add_set(&b.build());
-                CharacterClassBuilder::CodePointInversionListBuilder(a)
-            }
-        }
-    }
-
-    fn difference(self, other: Self) -> Self {
-        match (self, other) {
-            (CharacterClassBuilder::Char(a), CharacterClassBuilder::Char(b)) => {
-                if a == b {
-                    CharacterClassBuilder::from_str("")
-                } else {
-                    CharacterClassBuilder::from_char(a)
-                }
-            }
-            (
-                CharacterClassBuilder::Char(a),
-                CharacterClassBuilder::CodePointInversionListBuilder(mut b),
-            ) => {
-                let mut builder = CodePointInversionListBuilder::new();
-                builder.add_char(a);
-                builder.remove_set(&b.build());
-                CharacterClassBuilder::CodePointInversionListBuilder(builder)
-            }
-            (
-                CharacterClassBuilder::CodePointInversionListBuilder(mut a),
-                CharacterClassBuilder::Char(b),
-            ) => {
-                a.remove_char(b);
-                CharacterClassBuilder::CodePointInversionListBuilder(a)
-            }
-            (
-                CharacterClassBuilder::CodePointInversionListBuilder(mut a),
-                CharacterClassBuilder::CodePointInversionListBuilder(b),
-            ) => {
-                a.remove_set(&b.build());
-                CharacterClassBuilder::CodePointInversionListBuilder(a)
-            }
-        }
-    }
-
-    fn build(self) -> CharacterClass {
-        match self {
-            CharacterClassBuilder::Char(c) => CharacterClassBuilder::from_char(c).build(),
-            CharacterClassBuilder::CodePointInversionListBuilder(builder) => {
-                CharacterClass(builder.build())
-            }
-        }
     }
 }
 
@@ -737,7 +607,7 @@ impl ReCompiler {
                     inv_list.add_char('\r');
                     inv_list.complement();
                     let inv_list = inv_list.build();
-                    CharClass::new(CharacterClass(inv_list))
+                    CharClass::new(CharacterClass::new(inv_list))
                 }));
             }
             '[' => {
