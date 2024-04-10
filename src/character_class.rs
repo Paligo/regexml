@@ -6,7 +6,7 @@ use ahash::{HashSet, HashSetExt};
 pub(crate) enum CharacterClass {
     Empty,
     Inverse(Box<CharacterClass>),
-    Predicate(PredicateFn),
+    All,
     Char(char),
     CharSet(HashSet<char>),
 }
@@ -43,18 +43,17 @@ impl CharacterClass {
         match (self, other) {
             (CharacterClass::Empty, other) => other,
             (s, CharacterClass::Empty) => s,
+            (CharacterClass::All, _) => CharacterClass::All,
+            (_, CharacterClass::All) => CharacterClass::All,
             (a, b) => {
-                let is_a = a.charset();
-                let is_b = b.charset();
-                if let (Some(is_a), Some(is_b)) = (is_a, is_b) {
-                    match is_a.union(is_b) {
-                        InvertibleCharSet::Normal(a) => CharacterClass::CharSet(a),
-                        InvertibleCharSet::Inverse(a) => {
-                            CharacterClass::Inverse(Box::new(CharacterClass::CharSet(a)))
-                        }
+                let a_charset = a.charset();
+                let b_charset = b.charset();
+
+                match a_charset.union(b_charset) {
+                    InvertibleCharSet::Normal(a) => CharacterClass::CharSet(a),
+                    InvertibleCharSet::Inverse(a) => {
+                        CharacterClass::Inverse(Box::new(CharacterClass::CharSet(a)))
                     }
-                } else {
-                    CharacterClass::Predicate(PredicateFn::new(move |c| a.test(c) || b.test(c)))
                 }
             }
         }
@@ -72,17 +71,13 @@ impl CharacterClass {
             (CharacterClass::Empty, _) => CharacterClass::Empty,
             (a, CharacterClass::Empty) => a,
             (a, b) => {
-                let is_a = a.charset();
-                let is_b = b.charset();
-                if let (Some(is_a), Some(is_b)) = (is_a, is_b) {
-                    match is_a.difference(is_b) {
-                        InvertibleCharSet::Normal(a) => CharacterClass::CharSet(a),
-                        InvertibleCharSet::Inverse(a) => {
-                            CharacterClass::Inverse(Box::new(CharacterClass::CharSet(a)))
-                        }
+                let a_charset = a.charset();
+                let b_charset = b.charset();
+                match a_charset.difference(b_charset) {
+                    InvertibleCharSet::Normal(a) => CharacterClass::CharSet(a),
+                    InvertibleCharSet::Inverse(a) => {
+                        CharacterClass::Inverse(Box::new(CharacterClass::CharSet(a)))
                     }
-                } else {
-                    CharacterClass::Predicate(PredicateFn::new(move |c| a.test(c) && !b.test(c)))
                 }
             }
         }
@@ -99,8 +94,8 @@ impl CharacterClass {
     pub(crate) fn test(&self, value: char) -> bool {
         match self {
             CharacterClass::Empty => false,
-            CharacterClass::Inverse(complement) => complement.test(value),
-            CharacterClass::Predicate(predicate) => predicate.call(value),
+            CharacterClass::Inverse(complement) => !complement.test(value),
+            CharacterClass::All => true,
             CharacterClass::Char(c) => value == *c,
             CharacterClass::CharSet(set) => set.contains(&value),
         }
@@ -110,6 +105,8 @@ impl CharacterClass {
         match (self, other) {
             (CharacterClass::Empty, _) => true,
             (_, CharacterClass::Empty) => true,
+            (CharacterClass::All, _) => false,
+            (_, CharacterClass::All) => false,
             (CharacterClass::Inverse(complement), other) => other == complement.as_ref(),
             (self_, CharacterClass::Inverse(complement)) => complement.is_disjoint(self_),
             (CharacterClass::Char(c), other) => !other.test(*c),
@@ -120,20 +117,20 @@ impl CharacterClass {
         }
     }
 
-    pub(crate) fn charset(&self) -> Option<InvertibleCharSet> {
+    pub(crate) fn charset(&self) -> InvertibleCharSet {
         match self {
-            CharacterClass::Empty => Some(InvertibleCharSet::Normal(HashSet::new())),
+            CharacterClass::Empty => InvertibleCharSet::Normal(HashSet::new()),
             CharacterClass::Inverse(complement) => {
-                let charset = complement.charset()?;
-                Some(charset.complement())
+                let charset = complement.charset();
+                charset.complement()
             }
-            CharacterClass::Predicate(_) => None,
+            CharacterClass::All => InvertibleCharSet::Normal(HashSet::new()).complement(),
             CharacterClass::Char(c) => {
                 let mut set = HashSet::new();
                 set.insert(*c);
-                Some(InvertibleCharSet::Normal(set))
+                InvertibleCharSet::Normal(set)
             }
-            CharacterClass::CharSet(set) => Some(InvertibleCharSet::Normal(set.clone())),
+            CharacterClass::CharSet(set) => InvertibleCharSet::Normal(set.clone()),
         }
     }
 
@@ -202,7 +199,7 @@ impl PartialEq for CharacterClass {
         match (self, other) {
             (CharacterClass::Empty, CharacterClass::Empty) => true,
             (CharacterClass::Inverse(a), CharacterClass::Inverse(b)) => a == b,
-            (CharacterClass::Predicate(a), CharacterClass::Predicate(b)) => todo!(),
+            (CharacterClass::All, CharacterClass::All) => true,
             (CharacterClass::Char(a), CharacterClass::Char(b)) => a == b,
             (CharacterClass::CharSet(a), CharacterClass::CharSet(b)) => a == b,
             _ => false,

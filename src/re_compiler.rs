@@ -591,18 +591,14 @@ impl ReCompiler {
             }
             '.' => {
                 self.idx += 1;
-                let predicate = if self.re_flags.is_single_line() {
+                return Ok(Operation::from(if self.re_flags.is_single_line() {
                     // in XPath with the 's' flag, '.' matches everything
-                    |_| true
+                    CharClass::new(CharacterClass::All)
                 } else {
-                    // Don't we have enough information to create a non-predicate
-                    // character class?
-                    // in XSD, "." matches everything except \n and \r
-                    |c| c != '\n' && c != '\r'
-                };
-                return Ok(Operation::from(CharClass::new(CharacterClass::Predicate(
-                    PredicateFn::new(predicate),
-                ))));
+                    CharClass::new(CharacterClass::Inverse(Box::new(CharacterClass::CharSet(
+                        vec!['\n', '\r'].into_iter().collect(),
+                    ))))
+                }));
             }
             '[' => {
                 let range = self.parse_character_class()?;
