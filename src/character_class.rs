@@ -54,7 +54,7 @@ impl CharacterClassBuilder {
         }
     }
 
-    pub(crate) fn union(mut self, other: Self) -> Self {
+    pub(crate) fn union(self, other: Self) -> Self {
         match (self, other) {
             (CharacterClassBuilder::Char(a), CharacterClassBuilder::Char(b)) => {
                 let mut builder = CodePointInversionListBuilder::new();
@@ -70,10 +70,6 @@ impl CharacterClassBuilder {
                 CharacterClassBuilder::CodePointInversionListBuilder(b)
             }
             (
-                CharacterClassBuilder::Char(a),
-                CharacterClassBuilder::CodePointInversionListBuilder(b),
-            )
-            | (
                 CharacterClassBuilder::CodePointInversionListBuilder(b),
                 CharacterClassBuilder::Char(a),
             ) => {
