@@ -41,7 +41,7 @@ impl CharacterClassBuilder {
         Self::CodePointInversionListBuilder(builder)
     }
 
-    pub(crate) fn complement(mut self) -> Self {
+    pub(crate) fn complement(self) -> Self {
         match self {
             CharacterClassBuilder::Char(c) => {
                 let builder = Self::from_char(c);
@@ -97,7 +97,7 @@ impl CharacterClassBuilder {
             }
             (
                 CharacterClassBuilder::Char(a),
-                CharacterClassBuilder::CodePointInversionListBuilder(mut b),
+                CharacterClassBuilder::CodePointInversionListBuilder(b),
             ) => {
                 let mut builder = CodePointInversionListBuilder::new();
                 builder.add_char(a);
