@@ -1,9 +1,9 @@
 use std::rc::Rc;
 
 use ahash::{HashSet, HashSetExt};
+use icu_collections::codepointinvlist::{CodePointInversionList, CodePointInversionListBuilder};
 
 use crate::{
-    character_class::CharacterClass,
     op_atom::Atom,
     op_back_reference::BackReference,
     op_bol::Bol,
@@ -74,13 +74,144 @@ impl Error {
 }
 
 enum CharacterClassOrBackReference {
-    CharacterClass(CharacterClass),
+    CharacterClass(CharacterClassBuilder),
     BackReference(usize),
 }
 
-impl From<CharacterClass> for CharacterClassOrBackReference {
-    fn from(cc: CharacterClass) -> Self {
+impl From<CharacterClassBuilder> for CharacterClassOrBackReference {
+    fn from(cc: CharacterClassBuilder) -> Self {
         Self::CharacterClass(cc)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub(crate) struct CharacterClass(CodePointInversionList<'static>);
+
+impl CharacterClass {
+    fn all() -> Self {
+        Self(CodePointInversionList::all())
+    }
+
+    pub(crate) fn contains(&self, c: char) -> bool {
+        self.0.contains(c)
+    }
+}
+
+enum CharacterClassBuilder {
+    Char(char),
+    CodePointInversionListBuilder(CodePointInversionListBuilder),
+}
+
+impl From<CodePointInversionListBuilder> for CharacterClassBuilder {
+    fn from(builder: CodePointInversionListBuilder) -> Self {
+        Self::CodePointInversionListBuilder(builder)
+    }
+}
+
+impl CharacterClassBuilder {
+    fn from_char(c: char) -> Self {
+        CharacterClassBuilder::Char(c)
+    }
+
+    fn from_str(s: &str) -> Self {
+        let mut builder = CodePointInversionListBuilder::new();
+        for c in s.chars() {
+            builder.add_char(c);
+        }
+        Self::CodePointInversionListBuilder(builder)
+    }
+
+    fn complement(mut self) -> Self {
+        match self {
+            CharacterClassBuilder::Char(c) => {
+                let builder = Self::from_char(c);
+                builder.complement()
+            }
+            CharacterClassBuilder::CodePointInversionListBuilder(mut builder) => {
+                builder.complement();
+                CharacterClassBuilder::CodePointInversionListBuilder(builder)
+            }
+        }
+    }
+
+    fn union(mut self, other: Self) -> Self {
+        match (self, other) {
+            (CharacterClassBuilder::Char(a), CharacterClassBuilder::Char(b)) => {
+                let mut builder = CodePointInversionListBuilder::new();
+                builder.add_char(a);
+                builder.add_char(b);
+                CharacterClassBuilder::CodePointInversionListBuilder(builder)
+            }
+            (
+                CharacterClassBuilder::Char(a),
+                CharacterClassBuilder::CodePointInversionListBuilder(mut b),
+            ) => {
+                b.add_char(a);
+                CharacterClassBuilder::CodePointInversionListBuilder(b)
+            }
+            (
+                CharacterClassBuilder::Char(a),
+                CharacterClassBuilder::CodePointInversionListBuilder(b),
+            )
+            | (
+                CharacterClassBuilder::CodePointInversionListBuilder(b),
+                CharacterClassBuilder::Char(a),
+            ) => {
+                let a = Self::from_char(a);
+                a.union(CharacterClassBuilder::CodePointInversionListBuilder(b))
+            }
+            (
+                CharacterClassBuilder::CodePointInversionListBuilder(mut a),
+                CharacterClassBuilder::CodePointInversionListBuilder(b),
+            ) => {
+                a.add_set(&b.build());
+                CharacterClassBuilder::CodePointInversionListBuilder(a)
+            }
+        }
+    }
+
+    fn difference(self, other: Self) -> Self {
+        match (self, other) {
+            (CharacterClassBuilder::Char(a), CharacterClassBuilder::Char(b)) => {
+                if a == b {
+                    CharacterClassBuilder::from_str("")
+                } else {
+                    CharacterClassBuilder::from_char(a)
+                }
+            }
+            (
+                CharacterClassBuilder::Char(a),
+                CharacterClassBuilder::CodePointInversionListBuilder(mut b),
+            ) => {
+                let mut builder = CodePointInversionListBuilder::new();
+                builder.add_char(a);
+                builder.remove_set(&b.build());
+                CharacterClassBuilder::CodePointInversionListBuilder(builder)
+            }
+            (
+                CharacterClassBuilder::CodePointInversionListBuilder(mut a),
+                CharacterClassBuilder::Char(b),
+            ) => {
+                a.remove_char(b);
+                CharacterClassBuilder::CodePointInversionListBuilder(a)
+            }
+            (
+                CharacterClassBuilder::CodePointInversionListBuilder(mut a),
+                CharacterClassBuilder::CodePointInversionListBuilder(b),
+            ) => {
+                a.remove_set(&b.build());
+                CharacterClassBuilder::CodePointInversionListBuilder(a)
+            }
+        }
+    }
+
+    fn build(self) -> CharacterClass {
+        match self {
+            CharacterClassBuilder::Char(c) => CharacterClassBuilder::from_char(c).build(),
+            CharacterClassBuilder::CodePointInversionListBuilder(builder) => {
+                CharacterClass(builder.build())
+            }
+        }
     }
 }
 
@@ -199,19 +330,22 @@ impl ReCompiler {
         // switch on character after backslash
         self.idx += 2;
         let escape_char = self.pattern[self.idx - 1];
+
+        let escape_s = CharacterClassBuilder::from_str("\t\n\r ");
+
         match escape_char {
-            'n' => Ok(CharacterClass::Char('\n').into()),
-            'r' => Ok(CharacterClass::Char('\r').into()),
-            't' => Ok(CharacterClass::Char('\t').into()),
+            'n' => Ok(CharacterClassBuilder::from_char('\n').into()),
+            'r' => Ok(CharacterClassBuilder::from_char('\r').into()),
+            't' => Ok(CharacterClassBuilder::from_char('\t').into()),
             '\\' | '|' | '.' | '-' | '^' | '?' | '*' | '+' | '{' | '}' | '(' | ')' | '[' | ']' => {
-                Ok(CharacterClass::Char(escape_char).into())
+                Ok(CharacterClassBuilder::from_char(escape_char).into())
             }
             '$' => match self.re_flags.language() {
-                Language::XPath => Ok(CharacterClass::Char('$').into()),
+                Language::XPath => Ok(CharacterClassBuilder::from_char('$').into()),
                 Language::XSD => Err(Error::syntax("In XSD, '$' must not be escaped")),
             },
-            's' => Ok(CharacterClass::escape_s_lower().into()),
-            'S' => Ok(CharacterClass::escape_s_upper().into()),
+            's' => Ok(escape_s.into()),
+            'S' => Ok(escape_s.complement().into()),
             // TODO: i, I, c, C, d, D, w, W
             'p' | 'P' => {
                 if self.idx == self.len {
@@ -289,7 +423,7 @@ impl ReCompiler {
         }
     }
 
-    fn parse_character_class(&mut self) -> Result<CharacterClass, Error> {
+    fn parse_character_class(&mut self) -> Result<CharacterClassBuilder, Error> {
         // check for bac calling or empty class
         if self.pattern[self.idx] != '[' {
             return Err(Error::Internal);
@@ -309,8 +443,8 @@ impl ReCompiler {
         let mut range_start = None;
         let mut range_end;
 
-        let mut range = HashSet::new();
-        let mut addend: Option<CharacterClass> = None;
+        let mut builder = CodePointInversionListBuilder::new();
+        let mut addend: Option<CharacterClassBuilder> = None;
         let mut subtrahend = None;
 
         if self.there_follows("^") {
@@ -335,24 +469,28 @@ impl ReCompiler {
                 }
                 '\\' => {
                     // escape always advances the stream
-                    let cc = self.escape(true)?;
-                    match cc {
-                        CharacterClassOrBackReference::CharacterClass(CharacterClass::Char(c)) => {
-                            simple_char = Some(c);
-                        }
-                        CharacterClassOrBackReference::CharacterClass(cc) => {
-                            if defining_range {
-                                return Err(Error::syntax(
-                                    "Multi-character escape cannot follow '-'",
-                                ));
-                            } else if let Some(a) = addend {
-                                addend = Some(a.union(cc));
-                            } else {
-                                addend = Some(cc);
+                    let builder = self.escape(true)?;
+
+                    if let CharacterClassOrBackReference::CharacterClass(builder) = builder {
+                        match builder {
+                            CharacterClassBuilder::Char(c) => {
+                                simple_char = Some(c);
                             }
-                            continue;
+                            builder @ CharacterClassBuilder::CodePointInversionListBuilder(_) => {
+                                if defining_range {
+                                    return Err(Error::syntax(
+                                        "Multi-character escape cannot follow '-'",
+                                    ));
+                                } else if let Some(a) = addend {
+                                    addend = Some(a.union(builder));
+                                } else {
+                                    addend = Some(builder);
+                                }
+                                continue;
+                            }
                         }
-                        _ => unreachable!(),
+                    } else {
+                        unreachable!();
                     }
                 }
                 '-' => {
@@ -398,9 +536,7 @@ impl ReCompiler {
                         // almost certainly a mistake; and we have no way of
                         // indicating warnings.
                     }
-                    for c in start..=end {
-                        range.insert(c);
-                    }
+                    builder.add_range(&(start..=end));
                     if self.re_flags.is_case_independent() {
                         for c in start..=end {
                             let chars = c.to_uppercase().collect::<Vec<_>>();
@@ -408,11 +544,11 @@ impl ReCompiler {
                             // lower case version is multiple characters is
                             // ignored
                             if chars.len() == 1 {
-                                range.insert(chars[0]);
+                                builder.add_char(chars[0]);
                             }
                             let chars = c.to_lowercase().collect::<Vec<_>>();
                             if chars.len() == 1 {
-                                range.insert(chars[0]);
+                                builder.add_char(chars[0]);
                             }
                         }
                         // // special case A-Z and a-z
@@ -448,7 +584,7 @@ impl ReCompiler {
                         || self.there_follows("--[")
                     {
                         if let Some(simple_char) = simple_char {
-                            range.insert(simple_char);
+                            builder.add_char(simple_char);
                         }
                     } else if self.there_follows("--") {
                         return Err(Error::syntax("Unescaped hyphen cannot act as end of range"));
@@ -457,7 +593,7 @@ impl ReCompiler {
                     }
                 } else {
                     if let Some(simple_char) = simple_char {
-                        range.insert(simple_char);
+                        builder.add_char(simple_char);
                     }
                     if self.re_flags.is_case_independent() {
                         // TODO
@@ -477,7 +613,7 @@ impl ReCompiler {
 
         // absorb the ']' end of class marker
         self.idx += 1;
-        let mut result = CharacterClass::CharSet(range);
+        let mut result: CharacterClassBuilder = builder.into();
         if let Some(addend) = addend {
             result = result.union(addend);
         }
@@ -545,8 +681,9 @@ impl ReCompiler {
                     let character_class = self.escape(false)?;
 
                     // check if it's a simple escape (as opposed to, say, a backreference)
-                    if let CharacterClassOrBackReference::CharacterClass(CharacterClass::Char(ch)) =
-                        character_class
+                    if let CharacterClassOrBackReference::CharacterClass(
+                        CharacterClassBuilder::Char(ch),
+                    ) = character_class
                     {
                         ub.push(ch);
                         len_atom += 1;
@@ -593,16 +730,19 @@ impl ReCompiler {
                 self.idx += 1;
                 return Ok(Operation::from(if self.re_flags.is_single_line() {
                     // in XPath with the 's' flag, '.' matches everything
-                    CharClass::new(CharacterClass::All)
+                    CharClass::new(CharacterClass::all())
                 } else {
-                    CharClass::new(CharacterClass::Inverse(Box::new(CharacterClass::CharSet(
-                        vec!['\n', '\r'].into_iter().collect(),
-                    ))))
+                    let mut inv_list = CodePointInversionListBuilder::new();
+                    inv_list.add_char('\n');
+                    inv_list.add_char('\r');
+                    inv_list.complement();
+                    let inv_list = inv_list.build();
+                    CharClass::new(CharacterClass(inv_list))
                 }));
             }
             '[' => {
-                let range = self.parse_character_class()?;
-                return Ok(Operation::from(CharClass::new(range)));
+                let builder = self.parse_character_class()?;
+                return Ok(Operation::from(CharClass::new(builder.build())));
             }
             '(' => return self.parse_expr(flags),
             ')' => return Err(Error::syntax("Unescaped closing ')'")),
@@ -623,13 +763,15 @@ impl ReCompiler {
                         }
                         return Ok(Operation::from(BackReference::new(back_ref)));
                     }
-                    CharacterClassOrBackReference::CharacterClass(CharacterClass::Char(c)) => {
+                    CharacterClassOrBackReference::CharacterClass(CharacterClassBuilder::Char(
+                        c,
+                    )) => {
                         // we had a simple escape and we want to have it end up in an atom,
                         // so we back up and fall through to the default handling
                         self.idx = idx_before_escape;
                     }
-                    CharacterClassOrBackReference::CharacterClass(character_class) => {
-                        return Ok(Operation::from(CharClass::new(character_class)))
+                    CharacterClassOrBackReference::CharacterClass(builder) => {
+                        return Ok(Operation::from(CharClass::new(builder.build())))
                     }
                 }
             }

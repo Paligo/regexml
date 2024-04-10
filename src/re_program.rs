@@ -1,9 +1,11 @@
 use std::rc::Rc;
 
+use icu_collections::codepointinvlist::CodePointInversionList;
+
 use crate::{
-    character_class::CharacterClass,
     op_repeat::Repeat,
     operation::{Operation, OperationControl, RepeatOperation},
+    re_compiler::CharacterClass,
     re_flags::ReFlags,
 };
 

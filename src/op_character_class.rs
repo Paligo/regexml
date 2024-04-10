@@ -1,9 +1,9 @@
 use crate::{
-    character_class::CharacterClass,
     operation::{OperationControl, MATCHES_ZLS_NEVER},
+    re_compiler::CharacterClass,
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct CharClass {
     pub(crate) character_class: CharacterClass,
 }
@@ -23,13 +23,13 @@ impl OperationControl for CharClass {
         MATCHES_ZLS_NEVER
     }
 
-    fn matches_iter<'a>(
+    fn matches_iter<'b>(
         &self,
-        matcher: &'a crate::re_matcher::ReMatcher,
+        matcher: &'b crate::re_matcher::ReMatcher,
         position: usize,
-    ) -> Box<dyn Iterator<Item = usize> + 'a> {
+    ) -> Box<dyn Iterator<Item = usize> + 'b> {
         let search = matcher.search;
-        if position < search.len() && self.character_class.test(search[position]) {
+        if position < search.len() && self.character_class.contains(search[position]) {
             Box::new(std::iter::once(position + 1))
         } else {
             Box::new(std::iter::empty())

@@ -288,9 +288,9 @@ impl<'a> ReMatcher<'a> {
             false
         } else {
             // no prefix known; but the first character must match a predicate
-            if let Some(pred) = self.program.initial_character_class() {
+            if let Some(inv_list) = self.program.initial_character_class() {
                 for j in i..self.search.len() {
-                    if pred.test(self.search[j]) && self.match_at(j, false) {
+                    if inv_list.contains(self.search[j]) && self.match_at(j, false) {
                         return true;
                     }
                 }
