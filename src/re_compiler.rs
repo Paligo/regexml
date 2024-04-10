@@ -3,7 +3,7 @@ use std::rc::Rc;
 use ahash::{HashSet, HashSetExt};
 
 use crate::{
-    character_class::{CharacterClass, PredicateFn},
+    character_class::CharacterClass,
     op_atom::Atom,
     op_back_reference::BackReference,
     op_bol::Bol,
