@@ -25,7 +25,7 @@ impl CharacterClass {
     pub(crate) fn from_set(set: HashSet<char>) -> Self {
         match set.len() {
             0 => CharacterClass::Empty,
-            1 => CharacterClass::Char(set.iter().next().unwrap().clone()),
+            1 => CharacterClass::Char(*set.iter().next().unwrap()),
             _ => CharacterClass::CharSet(set),
         }
     }
@@ -107,11 +107,16 @@ impl CharacterClass {
                         // as it turns out we do want them
                         let mut set = set.clone();
                         let mut any_removed = false;
+                        let mut all_removed = true;
                         for c in b {
                             let removed = set.remove(&c);
                             any_removed |= removed;
+                            all_removed &= removed;
                         }
-                        if any_removed {
+                        if all_removed {
+                            // we've removed all characters, so the set now matches all
+                            CharacterClass::All
+                        } else if any_removed {
                             CharacterClass::Inverse(Box::new(CharacterClass::from_set(set)))
                         } else {
                             original.clone()
@@ -415,5 +420,14 @@ mod tests {
         // we now want a too
         let second = CharacterClass::Char('a');
         assert_eq!(first.union(second), CharacterClass::Char('b').complement());
+    }
+
+    #[test]
+    fn test_union_inverse_charset_with_chars_all_overlap() {
+        // we want all characters except a and b
+        let first = CharacterClass::from_chars(&['a', 'b']).complement();
+        // we now want a and b too
+        let second = CharacterClass::from_chars(&['a', 'b']);
+        assert_eq!(first.union(second), CharacterClass::All);
     }
 }
