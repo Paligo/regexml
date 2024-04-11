@@ -1,11 +1,10 @@
 use std::rc::Rc;
 
 use ahash::{HashSet, HashSetExt};
-use icu_collections::codepointinvlist::{CodePointInversionList, CodePointInversionListBuilder};
-use icu_properties::{maps, sets};
+use icu_collections::codepointinvlist::CodePointInversionListBuilder;
 
 use crate::{
-    category::{block_lookup, category_group},
+    category,
     character_class::{CharacterClass, CharacterClassBuilder},
     op_atom::Atom,
     op_back_reference::BackReference,
@@ -218,7 +217,32 @@ impl ReCompiler {
             },
             's' => Ok(escape_s.into()),
             'S' => Ok(escape_s.complement().into()),
-            // TODO: i, I, c, C, d, D, w, W
+            'i' => Ok(CharacterClassBuilder::CodePointInversionListBuilder(
+                category::name_start_char(),
+            )
+            .into()),
+            'I' => Ok(CharacterClassBuilder::CodePointInversionListBuilder(
+                category::name_start_char(),
+            )
+            .complement()
+            .into()),
+            'c' => Ok(
+                CharacterClassBuilder::CodePointInversionListBuilder(category::name_char()).into(),
+            ),
+            'C' => Ok(
+                CharacterClassBuilder::CodePointInversionListBuilder(category::name_char())
+                    .complement()
+                    .into(),
+            ),
+            'd' => Ok(CharacterClassBuilder::CodePointInversionListBuilder(
+                category::decimal_number(),
+            )
+            .into()),
+            'D' => Ok(CharacterClassBuilder::CodePointInversionListBuilder(
+                category::decimal_number(),
+            )
+            .complement()
+            .into()),
             'p' | 'P' => {
                 if self.idx == self.len {
                     return Err(Error::syntax(format!(
@@ -245,19 +269,18 @@ impl ReCompiler {
                 let block = &self.pattern[self.idx..close];
 
                 if block.len() == 1 || block.len() == 2 {
-                    let group = category_group(&block.iter().collect::<String>())?;
-                    let set = sets::for_general_category_group(group);
-                    let inv_list = set.to_code_point_inversion_list();
-                    let mut builder = CodePointInversionListBuilder::new();
-                    builder.add_set(&inv_list);
-                    Ok(CharacterClassBuilder::CodePointInversionListBuilder(builder).into())
+                    Ok(CharacterClassBuilder::CodePointInversionListBuilder(
+                        category::category_group(&block.iter().collect::<String>())?,
+                    )
+                    .into())
                 } else if block.starts_with(&['I', 's']) {
-                    let name = &block[2..].iter().collect::<String>();
-                    let lookup = block_lookup();
-                    let block = lookup.lookup(name)?;
-                    let mut builder = CodePointInversionListBuilder::new();
-                    builder.add_range_u32(&(block.start..=block.end));
-                    Ok(CharacterClassBuilder::CodePointInversionListBuilder(builder).into())
+                    let name = block[2..].iter().collect::<String>();
+                    Ok(
+                        CharacterClassBuilder::CodePointInversionListBuilder(category::block(
+                            &name,
+                        )?)
+                        .into(),
+                    )
                 } else {
                     Err(Error::syntax(format!(
                         "Unknown character category: {}",
@@ -265,6 +288,14 @@ impl ReCompiler {
                     )))
                 }
             }
+            'w' => Ok(
+                CharacterClassBuilder::CodePointInversionListBuilder(category::word_char()).into(),
+            ),
+            'W' => Ok(
+                CharacterClassBuilder::CodePointInversionListBuilder(category::word_char())
+                    .complement()
+                    .into(),
+            ),
             '0' => Err(Error::syntax("Octal escapes are not allowed")),
             '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
                 if in_square_brackets {
@@ -656,7 +687,7 @@ impl ReCompiler {
                         return Ok(Operation::from(BackReference::new(back_ref)));
                     }
                     CharacterClassOrBackReference::CharacterClass(CharacterClassBuilder::Char(
-                        c,
+                        _c,
                     )) => {
                         // we had a simple escape and we want to have it end up in an atom,
                         // so we back up and fall through to the default handling
