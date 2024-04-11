@@ -18,6 +18,10 @@ impl CharacterClass {
 }
 
 pub(crate) enum CharacterClassBuilder {
+    // We could simply use the CodeInversionListBuilder everywhere, but the
+    // regex compiler needs single character information, so we handle it
+    // separately. Refactoring the regex compiler may allow us to remove this
+    // wrinkle.
     Char(char),
     CodePointInversionListBuilder(CodePointInversionListBuilder),
 }

@@ -1,3 +1,5 @@
+mod block;
+mod category;
 mod character_class;
 mod op_atom;
 mod op_back_reference;

@@ -241,7 +241,14 @@ impl ReCompiler {
                         escape_char
                     )))?;
                 let block = &self.pattern[self.idx..close];
-                todo!()
+                // let lookup = GeneralCategory::name_to_enum_mapper();
+                if block.len() == 1 || block.len() == 2 {
+                    todo!()
+                } else if block.starts_with(&['I', 's']) {
+                    todo!();
+                } else {
+                    todo!();
+                }
             }
             '0' => Err(Error::syntax("Octal escapes are not allowed")),
             '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
