@@ -1,14 +1,13 @@
-use std::cell::OnceCell;
 use std::sync::OnceLock;
 
 use ahash::HashMap;
 use ahash::HashMapExt;
-use icu_properties::{script, GeneralCategoryGroup, Script};
+use icu_properties::GeneralCategoryGroup;
 
 use crate::block;
 use crate::Error;
 
-fn category_group(property: &str) -> Result<GeneralCategoryGroup, Error> {
+pub(crate) fn category_group(property: &str) -> Result<GeneralCategoryGroup, Error> {
     // Based on character class escapes in https://www.w3.org/TR/xmlschema-2/#regexs
     Ok(match property {
         // Letters
@@ -65,6 +64,7 @@ fn category_group(property: &str) -> Result<GeneralCategoryGroup, Error> {
     })
 }
 
+#[derive(Debug)]
 pub(crate) struct BlockLookup {
     blocks: HashMap<String, &'static block::Block>,
 }
@@ -92,7 +92,7 @@ impl BlockLookup {
     pub(crate) fn lookup(&self, name: &str) -> Result<&'static block::Block, Error> {
         match self.blocks.get(name) {
             Some(block) => Ok(block),
-            None => Err(Error::syntax(format!("Unknown block {}", name))),
+            None => Err(Error::syntax(format!("Unknown Unicode block: {}", name))),
         }
     }
 }

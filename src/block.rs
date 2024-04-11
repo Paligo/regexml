@@ -9,6 +9,8 @@
 
 // I considered the `unicode_blocks` module but it doesn't allow iteration
 // through the blocks which is what I require to do the name-based lookup.
+
+#[derive(Debug)]
 pub(crate) struct Block {
     pub(crate) name: &'static str,
     pub(crate) start: u32,

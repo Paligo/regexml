@@ -2,8 +2,10 @@ use std::rc::Rc;
 
 use ahash::{HashSet, HashSetExt};
 use icu_collections::codepointinvlist::{CodePointInversionList, CodePointInversionListBuilder};
+use icu_properties::{maps, sets};
 
 use crate::{
+    category::{block_lookup, category_group},
     character_class::{CharacterClass, CharacterClassBuilder},
     op_atom::Atom,
     op_back_reference::BackReference,
@@ -241,13 +243,26 @@ impl ReCompiler {
                         escape_char
                     )))?;
                 let block = &self.pattern[self.idx..close];
-                // let lookup = GeneralCategory::name_to_enum_mapper();
+
                 if block.len() == 1 || block.len() == 2 {
-                    todo!()
+                    let group = category_group(&block.iter().collect::<String>())?;
+                    let set = sets::for_general_category_group(group);
+                    let inv_list = set.to_code_point_inversion_list();
+                    let mut builder = CodePointInversionListBuilder::new();
+                    builder.add_set(&inv_list);
+                    Ok(CharacterClassBuilder::CodePointInversionListBuilder(builder).into())
                 } else if block.starts_with(&['I', 's']) {
-                    todo!();
+                    let name = &block[2..].iter().collect::<String>();
+                    let lookup = block_lookup();
+                    let block = lookup.lookup(name)?;
+                    let mut builder = CodePointInversionListBuilder::new();
+                    builder.add_range_u32(&(block.start..=block.end));
+                    Ok(CharacterClassBuilder::CodePointInversionListBuilder(builder).into())
                 } else {
-                    todo!();
+                    Err(Error::syntax(format!(
+                        "Unknown character category: {}",
+                        block.iter().collect::<String>()
+                    )))
                 }
             }
             '0' => Err(Error::syntax("Octal escapes are not allowed")),

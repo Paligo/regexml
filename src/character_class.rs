@@ -1,4 +1,5 @@
 use icu_collections::codepointinvlist::{CodePointInversionList, CodePointInversionListBuilder};
+use icu_properties::{sets, GeneralCategoryGroup};
 
 #[derive(Debug, Clone)]
 pub(crate) struct CharacterClass(CodePointInversionList<'static>);
@@ -20,8 +21,10 @@ impl CharacterClass {
 pub(crate) enum CharacterClassBuilder {
     // We could simply use the CodeInversionListBuilder everywhere, but the
     // regex compiler needs single character information, so we handle it
-    // separately. Refactoring the regex compiler may allow us to remove this
-    // wrinkle.
+    // separately.
+
+    // Refactoring the regex compiler may allow us to remove this
+    // wrinkle
     Char(char),
     CodePointInversionListBuilder(CodePointInversionListBuilder),
 }
@@ -51,6 +54,7 @@ impl CharacterClassBuilder {
                 let builder = Self::from_char(c);
                 builder.complement()
             }
+
             CharacterClassBuilder::CodePointInversionListBuilder(mut builder) => {
                 builder.complement();
                 CharacterClassBuilder::CodePointInversionListBuilder(builder)
