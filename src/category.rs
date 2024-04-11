@@ -1,3 +1,6 @@
+use std::cell::OnceCell;
+use std::sync::OnceLock;
+
 use ahash::HashMap;
 use ahash::HashMapExt;
 use icu_properties::{script, GeneralCategoryGroup, Script};
@@ -62,7 +65,7 @@ fn category_group(property: &str) -> Result<GeneralCategoryGroup, Error> {
     })
 }
 
-struct BlockLookup {
+pub(crate) struct BlockLookup {
     blocks: HashMap<String, &'static block::Block>,
 }
 
@@ -70,16 +73,32 @@ impl BlockLookup {
     fn new() -> Self {
         let mut blocks = HashMap::new();
         for block in block::ALL_BLOCKS {
+            //  As per spec, we exclude th eHighSurrogates, LowSurrogates and
+            //  HighPrivateUseSurrogates blocks. These blocks identify
+            //  "surrogate" characters, which do not occur at the level of the
+            //  "character abstraction" that XML instance documents operate on.
+            if block.name == "High Surrogates"
+                || block.name == "Low Surrogates"
+                || block.name == "High Private Use Surrogates"
+            {
+                continue;
+            }
             let lookup_name = block.name.replace(' ', "");
             blocks.insert(lookup_name, block);
         }
         Self { blocks }
     }
 
-    fn lookup(&self, name: &str) -> Result<&'static block::Block, Error> {
+    pub(crate) fn lookup(&self, name: &str) -> Result<&'static block::Block, Error> {
         match self.blocks.get(name) {
             Some(block) => Ok(block),
             None => Err(Error::syntax(format!("Unknown block {}", name))),
         }
     }
+}
+
+static BLOCK_LOOKUP: OnceLock<BlockLookup> = OnceLock::new();
+
+pub(crate) fn block_lookup() -> &'static BlockLookup {
+    BLOCK_LOOKUP.get_or_init(BlockLookup::new)
 }
