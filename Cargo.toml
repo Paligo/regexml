@@ -1,13 +1,8 @@
-[package]
-name = "regexml"
-version = "0.1.0"
-edition = "2021"
+[workspace]
+members = ["regexml"]
+# even if all crates are set to edition 2021, we still need to force the
+# resolver to 2
+# https://github.com/gfx-rs/wgpu/issues/2356#issuecomment-1005134986
+resolver = "2"
 
-[dependencies]
-ahash = "0.8.3"
-enum_dispatch = "0.3.12"
-icu_collections = "1.4.0"
-icu_properties = "1.4.0"
-
-[dev-dependencies]
-insta = { version = "1.29.0", features = ["yaml", "glob"] }
+[workspace.dependencies]
