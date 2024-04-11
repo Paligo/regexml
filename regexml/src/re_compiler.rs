@@ -807,12 +807,17 @@ impl ReCompiler {
         } else if greedy {
             // actually do the quantifier now
             if let Some(match_length) = ret.get_match_length() {
-                Ok(Operation::from(GreedyFixed::new(
-                    Rc::new(ret),
-                    min,
-                    max,
-                    match_length,
-                )))
+                if match_length > 0 {
+                    Ok(Operation::from(GreedyFixed::new(
+                        Rc::new(ret),
+                        min,
+                        max,
+                        match_length,
+                    )))
+                } else {
+                    // otherwise need to match with nothing
+                    Ok(Operation::from(Nothing))
+                }
             } else {
                 Ok(Operation::from(Repeat::new(Rc::new(ret), min, max, true)))
             }

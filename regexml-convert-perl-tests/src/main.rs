@@ -59,6 +59,23 @@ fn main() {
     writeln!(stdout, "use regexml::Regex;").unwrap();
     writeln!(stdout).unwrap();
     for test in &tests {
+        // There are a bunch of weirdo expected results in the original XML file, which
+        // are unexplained
+        // 'c', 'p', 'sc', 'Sc', 'Sy', 'yB', 'yM', 'Sn'
+        // The QT3 tests do the following:
+        // * if we have a match, the status must be 'y' or it's a failure
+        // * if we have a non-match, the status must be 'n' or it's a failure
+        // * if we have another status and not an error, it's silently ignored
+        // * if there is an error but we expect 'y' or n', that's an error
+        // * if there is an error but we expect something else, it's silently ignored.
+        // This means that we can silently ignore these special statuses, and only
+        // care about unexpected errors. We can do that with the unwrap.
+        if matches!(
+            test.result.as_str(),
+            "c" | "p" | "sc" | "Sc" | "Sy" | "yB" | "yM" | "Sn"
+        ) {
+            continue;
+        }
         generate_test_case(&mut stdout, test);
     }
 }
@@ -74,17 +91,7 @@ fn generate_test_case(w: &mut impl Write, test: &Test) {
     .unwrap();
 
     writeln!(w, "    // {}", test.result).unwrap();
-    // There are a bunch of weirdo statuses in the original XML file, which
-    // are unexplained
-    // 'c', 'p', 'sc', 'Sc', 'Sy', 'yB', 'yM', 'Sn'
-    // The QT3 tests do the following:
-    // * if we have a match, the status must be 'y' or it's a failure
-    // * if we have a non-match, the status must be 'n' or it's a failure
-    // * if we have another status and not an error, it's silently ignored
-    // * if there is an error but we expect 'y' or n', that's an error
-    // * if there is an error but we expect something else, it's silently ignored.
-    // This means that we can silently ignore these special statuses, and only
-    // care about unexpected errors. We can do that with the unwrap.
+
     match test.result.as_str() {
         "y" => {
             writeln!(w, "    let regex = regex.unwrap();").unwrap();
@@ -94,7 +101,6 @@ fn generate_test_case(w: &mut impl Write, test: &Test) {
             writeln!(w, "    let regex = regex.unwrap();").unwrap();
             writeln!(w, "    assert!(!regex.is_match(r#\"{}\"#));", test.input).unwrap();
         }
-        "c" | "p" | "sc" | "Sc" | "Sy" | "yB" | "yM" | "Sn" => {}
         _ => {
             panic!("unexpected result {}", test.result)
         }

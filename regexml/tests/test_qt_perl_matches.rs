@@ -244,78 +244,6 @@ fn test_p39() {
 }
 
 #[test]
-fn test_p40() {
-    let regex = Regex::xpath(r#"\N{1}"#, "");
-    // p
-}
-
-#[test]
-fn test_p41() {
-    let regex = Regex::xpath(r#"\N{1}"#, "");
-    // p
-}
-
-#[test]
-fn test_p42() {
-    let regex = Regex::xpath(r#"\N{1}"#, "");
-    // p
-}
-
-#[test]
-fn test_p43() {
-    let regex = Regex::xpath(r#"/\N {1}/x"#, "");
-    // p
-}
-
-#[test]
-fn test_p44() {
-    let regex = Regex::xpath(r#"/\N {1}/x"#, "");
-    // p
-}
-
-#[test]
-fn test_p45() {
-    let regex = Regex::xpath(r#"/\N {1}/x"#, "");
-    // p
-}
-
-#[test]
-fn test_p46() {
-    let regex = Regex::xpath(r#"\N{3,4}"#, "");
-    // p
-}
-
-#[test]
-fn test_p47() {
-    let regex = Regex::xpath(r#"\N{3,4}"#, "");
-    // p
-}
-
-#[test]
-fn test_p48() {
-    let regex = Regex::xpath(r#"\N{3,4}"#, "");
-    // p
-}
-
-#[test]
-fn test_p49() {
-    let regex = Regex::xpath(r#"/\N {3,4}/x"#, "");
-    // p
-}
-
-#[test]
-fn test_p50() {
-    let regex = Regex::xpath(r#"/\N {3,4}/x"#, "");
-    // p
-}
-
-#[test]
-fn test_p51() {
-    let regex = Regex::xpath(r#"/\N {3,4}/x"#, "");
-    // p
-}
-
-#[test]
 fn test_p52() {
     let regex = Regex::xpath(r#"ab{0,}bc"#, "");
     // y
@@ -620,18 +548,6 @@ fn test_p89() {
 }
 
 #[test]
-fn test_p90() {
-    let regex = Regex::xpath(r#"a\Nc"#, "");
-    // p
-}
-
-#[test]
-fn test_p91() {
-    let regex = Regex::xpath(r#"/a\N c/x"#, "");
-    // p
-}
-
-#[test]
 fn test_p92() {
     let regex = Regex::xpath(r#"a.*c"#, "");
     // y
@@ -640,35 +556,11 @@ fn test_p92() {
 }
 
 #[test]
-fn test_p93() {
-    let regex = Regex::xpath(r#"a\N*c"#, "");
-    // p
-}
-
-#[test]
-fn test_p94() {
-    let regex = Regex::xpath(r#"/a\N *c/x"#, "");
-    // p
-}
-
-#[test]
 fn test_p95() {
     let regex = Regex::xpath(r#"a.*c"#, "");
     // n
     let regex = regex.unwrap();
     assert!(!regex.is_match(r#"axyzd"#));
-}
-
-#[test]
-fn test_p96() {
-    let regex = Regex::xpath(r#"a\N*c"#, "");
-    // p
-}
-
-#[test]
-fn test_p97() {
-    let regex = Regex::xpath(r#"/a\N *c/x"#, "");
-    // p
 }
 
 #[test]
@@ -720,18 +612,6 @@ fn test_p103() {
 }
 
 #[test]
-fn test_p104() {
-    let regex = Regex::xpath(r#"(?i:.[b].)"#, "");
-    // p
-}
-
-#[test]
-fn test_p105() {
-    let regex = Regex::xpath(r#"(?i:\N[b]\N)"#, "");
-    // p
-}
-
-#[test]
 fn test_p106() {
     let regex = Regex::xpath(r#"a[b-d]e"#, "");
     // n
@@ -772,36 +652,6 @@ fn test_p110() {
 }
 
 #[test]
-fn test_p111() {
-    let regex = Regex::xpath(r#"a[b-a]"#, "");
-    // c
-}
-
-#[test]
-fn test_p112() {
-    let regex = Regex::xpath(r#"a[]b"#, "");
-    // c
-}
-
-#[test]
-fn test_p113() {
-    let regex = Regex::xpath(r#"a["#, "");
-    // c
-}
-
-#[test]
-fn test_p114() {
-    let regex = Regex::xpath(r#"a]"#, "");
-    // p
-}
-
-#[test]
-fn test_p115() {
-    let regex = Regex::xpath(r#"a[]]b"#, "");
-    // p
-}
-
-#[test]
 fn test_p116() {
     let regex = Regex::xpath(r#"a[^bc]d"#, "");
     // y
@@ -831,108 +681,6 @@ fn test_p119() {
     // n
     let regex = regex.unwrap();
     assert!(!regex.is_match(r#"a-c"#));
-}
-
-#[test]
-fn test_p120() {
-    let regex = Regex::xpath(r#"a[^]b]c"#, "");
-    // p
-}
-
-#[test]
-fn test_p121() {
-    let regex = Regex::xpath(r#"a[^]b]c"#, "");
-    // p
-}
-
-#[test]
-fn test_p122() {
-    let regex = Regex::xpath(r#"\ba\b"#, "");
-    // p
-}
-
-#[test]
-fn test_p123() {
-    let regex = Regex::xpath(r#"\ba\b"#, "");
-    // p
-}
-
-#[test]
-fn test_p124() {
-    let regex = Regex::xpath(r#"\ba\b"#, "");
-    // p
-}
-
-#[test]
-fn test_p125() {
-    let regex = Regex::xpath(r#"\by\b"#, "");
-    // p
-}
-
-#[test]
-fn test_p126() {
-    let regex = Regex::xpath(r#"\by\b"#, "");
-    // p
-}
-
-#[test]
-fn test_p127() {
-    let regex = Regex::xpath(r#"\by\b"#, "");
-    // p
-}
-
-#[test]
-fn test_p128() {
-    let regex = Regex::xpath(r#"\Ba\B"#, "");
-    // p
-}
-
-#[test]
-fn test_p129() {
-    let regex = Regex::xpath(r#"\Ba\B"#, "");
-    // p
-}
-
-#[test]
-fn test_p130() {
-    let regex = Regex::xpath(r#"\Ba\B"#, "");
-    // p
-}
-
-#[test]
-fn test_p131() {
-    let regex = Regex::xpath(r#"\By\b"#, "");
-    // p
-}
-
-#[test]
-fn test_p132() {
-    let regex = Regex::xpath(r#"\By\b"#, "");
-    // p
-}
-
-#[test]
-fn test_p133() {
-    let regex = Regex::xpath(r#"\By\b"#, "");
-    // p
-}
-
-#[test]
-fn test_p134() {
-    let regex = Regex::xpath(r#"\By\b"#, "");
-    // p
-}
-
-#[test]
-fn test_p135() {
-    let regex = Regex::xpath(r#"\by\B"#, "");
-    // p
-}
-
-#[test]
-fn test_p136() {
-    let regex = Regex::xpath(r#"\By\B"#, "");
-    // p
 }
 
 #[test]
@@ -1168,12 +916,6 @@ fn test_p165() {
 }
 
 #[test]
-fn test_p166() {
-    let regex = Regex::xpath(r#"()\x{100}\x{1000}"#, "");
-    // p
-}
-
-#[test]
 fn test_p167() {
     let regex = Regex::xpath(r#"()ef"#, "");
     // y
@@ -1190,35 +932,11 @@ fn test_p168() {
 }
 
 #[test]
-fn test_p169() {
-    let regex = Regex::xpath(r#"*a"#, "");
-    // c
-}
-
-#[test]
-fn test_p170() {
-    let regex = Regex::xpath(r#"(|*)b"#, "");
-    // c
-}
-
-#[test]
-fn test_p171() {
-    let regex = Regex::xpath(r#"(*)b"#, "");
-    // c
-}
-
-#[test]
 fn test_p172() {
     let regex = Regex::xpath(r#"$b"#, "");
     // n
     let regex = regex.unwrap();
     assert!(!regex.is_match(r#"b"#));
-}
-
-#[test]
-fn test_p173() {
-    let regex = Regex::xpath(r#"a\"#, "");
-    // c
 }
 
 #[test]
@@ -1251,18 +969,6 @@ fn test_p177() {
     // y
     let regex = regex.unwrap();
     assert!(regex.is_match(r#"a\b"#));
-}
-
-#[test]
-fn test_p178() {
-    let regex = Regex::xpath(r#"abc)"#, "");
-    // c
-}
-
-#[test]
-fn test_p179() {
-    let regex = Regex::xpath(r#"(abc"#, "");
-    // c
 }
 
 #[test]
@@ -1319,12 +1025,6 @@ fn test_p189() {
     // y
     let regex = regex.unwrap();
     assert!(regex.is_match(r#"aabbabc"#));
-}
-
-#[test]
-fn test_p190() {
-    let regex = Regex::xpath(r#"a**"#, "");
-    // c
 }
 
 #[test]
@@ -1413,12 +1113,6 @@ fn test_p201() {
     // y
     let regex = regex.unwrap();
     assert!(regex.is_match(r#"ab"#));
-}
-
-#[test]
-fn test_p202() {
-    let regex = Regex::xpath(r#")("#, "");
-    // c
 }
 
 #[test]
@@ -1958,18 +1652,6 @@ fn test_p269() {
 }
 
 #[test]
-fn test_p270() {
-    let regex = Regex::xpath(r#"((((((((((a))))))))))${bang}"#, "");
-    // p
-}
-
-#[test]
-fn test_p271() {
-    let regex = Regex::xpath(r#"((((((((((a))))))))))${bang}"#, "");
-    // p
-}
-
-#[test]
 fn test_p272() {
     let regex = Regex::xpath(r#"(((((((((a)))))))))"#, "");
     // y
@@ -2058,66 +1740,6 @@ fn test_p282() {
 }
 
 #[test]
-fn test_p283() {
-    let regex = Regex::xpath(r#"\1"#, "");
-    // c
-}
-
-#[test]
-fn test_p284() {
-    let regex = Regex::xpath(r#"\2"#, "");
-    // c
-}
-
-#[test]
-fn test_p285() {
-    let regex = Regex::xpath(r#"\g1"#, "");
-    // c
-}
-
-#[test]
-fn test_p286() {
-    let regex = Regex::xpath(r#"\g-1"#, "");
-    // c
-}
-
-#[test]
-fn test_p287() {
-    let regex = Regex::xpath(r#"\g{1}"#, "");
-    // c
-}
-
-#[test]
-fn test_p288() {
-    let regex = Regex::xpath(r#"\g{-1}"#, "");
-    // c
-}
-
-#[test]
-fn test_p289() {
-    let regex = Regex::xpath(r#"\g0"#, "");
-    // c
-}
-
-#[test]
-fn test_p290() {
-    let regex = Regex::xpath(r#"\g-0"#, "");
-    // c
-}
-
-#[test]
-fn test_p291() {
-    let regex = Regex::xpath(r#"\g{0}"#, "");
-    // c
-}
-
-#[test]
-fn test_p292() {
-    let regex = Regex::xpath(r#"\g{-0}"#, "");
-    // c
-}
-
-#[test]
 fn test_p293() {
     let regex = Regex::xpath(r#"(a)|\1"#, "");
     // y
@@ -2142,12 +1764,6 @@ fn test_p295() {
 }
 
 #[test]
-fn test_p296() {
-    let regex = Regex::xpath(r#"(a)|\2"#, "");
-    // c
-}
-
-#[test]
 fn test_p297() {
     let regex = Regex::xpath(r#"(([a-c])b*?\2)*"#, "");
     // y
@@ -2161,24 +1777,6 @@ fn test_p298() {
     // y
     let regex = regex.unwrap();
     assert!(regex.is_match(r#"ababbbcbc"#));
-}
-
-#[test]
-fn test_p299() {
-    let regex = Regex::xpath(r#"((\3|b)\2(a)x)+"#, "");
-    // p
-}
-
-#[test]
-fn test_p300() {
-    let regex = Regex::xpath(r#"((\3|b)\2(a)x)+"#, "");
-    // p
-}
-
-#[test]
-fn test_p301() {
-    let regex = Regex::xpath(r#"((\3|b)\2(a)){2,}"#, "");
-    // p
 }
 
 #[test]
@@ -2518,12 +2116,6 @@ fn test_p344() {
 }
 
 #[test]
-fn test_p345() {
-    let regex = Regex::xpath(r#"a\Nc"#, "i");
-    // p
-}
-
-#[test]
 fn test_p346() {
     let regex = Regex::xpath(r#"a.*?c"#, "i");
     // y
@@ -2596,36 +2188,6 @@ fn test_p354() {
 }
 
 #[test]
-fn test_p355() {
-    let regex = Regex::xpath(r#"a[b-a]"#, "i");
-    // c
-}
-
-#[test]
-fn test_p356() {
-    let regex = Regex::xpath(r#"a[]b"#, "i");
-    // c
-}
-
-#[test]
-fn test_p357() {
-    let regex = Regex::xpath(r#"a["#, "i");
-    // c
-}
-
-#[test]
-fn test_p358() {
-    let regex = Regex::xpath(r#"a]"#, "i");
-    // p
-}
-
-#[test]
-fn test_p359() {
-    let regex = Regex::xpath(r#"a[]]b"#, "i");
-    // p
-}
-
-#[test]
 fn test_p360() {
     let regex = Regex::xpath(r#"a[^bc]d"#, "i");
     // y
@@ -2658,18 +2220,6 @@ fn test_p363() {
 }
 
 #[test]
-fn test_p364() {
-    let regex = Regex::xpath(r#"a[^]b]c"#, "i");
-    // p
-}
-
-#[test]
-fn test_p365() {
-    let regex = Regex::xpath(r#"a[^]b]c"#, "i");
-    // p
-}
-
-#[test]
 fn test_p366() {
     let regex = Regex::xpath(r#"ab|cd"#, "i");
     // y
@@ -2694,35 +2244,11 @@ fn test_p368() {
 }
 
 #[test]
-fn test_p369() {
-    let regex = Regex::xpath(r#"*a"#, "i");
-    // c
-}
-
-#[test]
-fn test_p370() {
-    let regex = Regex::xpath(r#"(|*)b"#, "i");
-    // c
-}
-
-#[test]
-fn test_p371() {
-    let regex = Regex::xpath(r#"(*)b"#, "i");
-    // c
-}
-
-#[test]
 fn test_p372() {
     let regex = Regex::xpath(r#"$b"#, "i");
     // n
     let regex = regex.unwrap();
     assert!(!regex.is_match(r#"B"#));
-}
-
-#[test]
-fn test_p373() {
-    let regex = Regex::xpath(r#"a\"#, "i");
-    // c
 }
 
 #[test]
@@ -2758,18 +2284,6 @@ fn test_p377() {
 }
 
 #[test]
-fn test_p378() {
-    let regex = Regex::xpath(r#"abc)"#, "i");
-    // c
-}
-
-#[test]
-fn test_p379() {
-    let regex = Regex::xpath(r#"(abc"#, "i");
-    // c
-}
-
-#[test]
 fn test_p380() {
     let regex = Regex::xpath(r#"((a))"#, "i");
     // y
@@ -2799,12 +2313,6 @@ fn test_p383() {
     // y
     let regex = regex.unwrap();
     assert!(regex.is_match(r#"AABBABC"#));
-}
-
-#[test]
-fn test_p384() {
-    let regex = Regex::xpath(r#"a**"#, "i");
-    // c
 }
 
 #[test]
@@ -2885,12 +2393,6 @@ fn test_p394() {
     // y
     let regex = regex.unwrap();
     assert!(regex.is_match(r#"AB"#));
-}
-
-#[test]
-fn test_p395() {
-    let regex = Regex::xpath(r#")("#, "i");
-    // c
 }
 
 #[test]
@@ -3158,18 +2660,6 @@ fn test_p428() {
 }
 
 #[test]
-fn test_p429() {
-    let regex = Regex::xpath(r#"((((((((((a))))))))))${bang}"#, "i");
-    // p
-}
-
-#[test]
-fn test_p430() {
-    let regex = Regex::xpath(r#"((((((((((a))))))))))${bang}"#, "i");
-    // p
-}
-
-#[test]
 fn test_p431() {
     let regex = Regex::xpath(r#"(((((((((a)))))))))"#, "i");
     // y
@@ -3274,30 +2764,6 @@ fn test_p443() {
 }
 
 #[test]
-fn test_p444() {
-    let regex = Regex::xpath(r#"a(?!b)."#, "");
-    // p
-}
-
-#[test]
-fn test_p445() {
-    let regex = Regex::xpath(r#"(?=)a"#, "");
-    // p
-}
-
-#[test]
-fn test_p446() {
-    let regex = Regex::xpath(r#"a(?=d)."#, "");
-    // p
-}
-
-#[test]
-fn test_p447() {
-    let regex = Regex::xpath(r#"a(?=c|d)."#, "");
-    // p
-}
-
-#[test]
 fn test_p448() {
     let regex = Regex::xpath(r#"a(?:b|c|d)(.)"#, "");
     // y
@@ -3367,12 +2833,6 @@ fn test_p456() {
     // y
     let regex = regex.unwrap();
     assert!(regex.is_match(r#"foobar"#));
-}
-
-#[test]
-fn test_p457() {
-    let regex = Regex::xpath(r#":(?:"#, "");
-    // c
 }
 
 #[test]
@@ -3456,42 +2916,6 @@ fn test_p467() {
 }
 
 #[test]
-fn test_p468() {
-    let regex = Regex::xpath(r#"^(a\1?){4}$"#, "");
-    // p
-}
-
-#[test]
-fn test_p469() {
-    let regex = Regex::xpath(r#"^(a\1?){4}$"#, "");
-    // p
-}
-
-#[test]
-fn test_p470() {
-    let regex = Regex::xpath(r#"^(a\1?){4}$"#, "");
-    // p
-}
-
-#[test]
-fn test_p471() {
-    let regex = Regex::xpath(r#"^(a(?(1)\1)){4}$"#, "");
-    // p
-}
-
-#[test]
-fn test_p472() {
-    let regex = Regex::xpath(r#"^(a(?(1)\1)){4}$"#, "");
-    // p
-}
-
-#[test]
-fn test_p473() {
-    let regex = Regex::xpath(r#"^(a(?(1)\1)){4}$"#, "");
-    // p
-}
-
-#[test]
 fn test_p474() {
     let regex = Regex::xpath(r#"((a{4})+)"#, "");
     // y
@@ -3524,54 +2948,6 @@ fn test_p477() {
 }
 
 #[test]
-fn test_p478() {
-    let regex = Regex::xpath(r#"(?<=a)b"#, "");
-    // p
-}
-
-#[test]
-fn test_p479() {
-    let regex = Regex::xpath(r#"(?<=a)b"#, "");
-    // p
-}
-
-#[test]
-fn test_p480() {
-    let regex = Regex::xpath(r#"(?<=a)b"#, "");
-    // p
-}
-
-#[test]
-fn test_p481() {
-    let regex = Regex::xpath(r#"(?<!c)b"#, "");
-    // p
-}
-
-#[test]
-fn test_p482() {
-    let regex = Regex::xpath(r#"(?<!c)b"#, "");
-    // p
-}
-
-#[test]
-fn test_p483() {
-    let regex = Regex::xpath(r#"(?<!c)b"#, "");
-    // p
-}
-
-#[test]
-fn test_p484() {
-    let regex = Regex::xpath(r#"(?<!c)b"#, "");
-    // p
-}
-
-#[test]
-fn test_p485() {
-    let regex = Regex::xpath(r#"(?<%)b"#, "");
-    // p
-}
-
-#[test]
 fn test_p486() {
     let regex = Regex::xpath(r#"(?:..)*a"#, "");
     // y
@@ -3585,12 +2961,6 @@ fn test_p487() {
     // y
     let regex = regex.unwrap();
     assert!(regex.is_match(r#"aba"#));
-}
-
-#[test]
-fn test_p488() {
-    let regex = Regex::xpath(r#"^(?:b|a(?=(.)))*\1"#, "");
-    // p
 }
 
 #[test]
@@ -3642,234 +3012,6 @@ fn test_p494() {
 }
 
 #[test]
-fn test_p495() {
-    let regex = Regex::xpath(r#"(?:(?i)a)b"#, "");
-    // p
-}
-
-#[test]
-fn test_p496() {
-    let regex = Regex::xpath(r#"((?i)a)b"#, "");
-    // p
-}
-
-#[test]
-fn test_p497() {
-    let regex = Regex::xpath(r#"(?:(?i)a)b"#, "");
-    // p
-}
-
-#[test]
-fn test_p498() {
-    let regex = Regex::xpath(r#"((?i)a)b"#, "");
-    // p
-}
-
-#[test]
-fn test_p499() {
-    let regex = Regex::xpath(r#"(?:(?i)a)b"#, "");
-    // p
-}
-
-#[test]
-fn test_p500() {
-    let regex = Regex::xpath(r#"((?i)a)b"#, "");
-    // p
-}
-
-#[test]
-fn test_p501() {
-    let regex = Regex::xpath(r#"(?i:a)b"#, "");
-    // p
-}
-
-#[test]
-fn test_p502() {
-    let regex = Regex::xpath(r#"((?i:a))b"#, "");
-    // p
-}
-
-#[test]
-fn test_p503() {
-    let regex = Regex::xpath(r#"(?i:a)b"#, "");
-    // p
-}
-
-#[test]
-fn test_p504() {
-    let regex = Regex::xpath(r#"((?i:a))b"#, "");
-    // p
-}
-
-#[test]
-fn test_p505() {
-    let regex = Regex::xpath(r#"(?i:a)b"#, "");
-    // p
-}
-
-#[test]
-fn test_p506() {
-    let regex = Regex::xpath(r#"((?i:a))b"#, "");
-    // p
-}
-
-#[test]
-fn test_p507() {
-    let regex = Regex::xpath(r#"(?:(?-i)a)b"#, "i");
-    // p
-}
-
-#[test]
-fn test_p508() {
-    let regex = Regex::xpath(r#"((?-i)a)b"#, "i");
-    // p
-}
-
-#[test]
-fn test_p509() {
-    let regex = Regex::xpath(r#"(?:(?-i)a)b"#, "i");
-    // p
-}
-
-#[test]
-fn test_p510() {
-    let regex = Regex::xpath(r#"((?-i)a)b"#, "i");
-    // p
-}
-
-#[test]
-fn test_p511() {
-    let regex = Regex::xpath(r#"(?:(?-i)a)b"#, "i");
-    // p
-}
-
-#[test]
-fn test_p512() {
-    let regex = Regex::xpath(r#"((?-i)a)b"#, "i");
-    // p
-}
-
-#[test]
-fn test_p513() {
-    let regex = Regex::xpath(r#"(?:(?-i)a)b"#, "i");
-    // p
-}
-
-#[test]
-fn test_p514() {
-    let regex = Regex::xpath(r#"((?-i)a)b"#, "i");
-    // p
-}
-
-#[test]
-fn test_p515() {
-    let regex = Regex::xpath(r#"(?:(?-i)a)b"#, "i");
-    // p
-}
-
-#[test]
-fn test_p516() {
-    let regex = Regex::xpath(r#"((?-i)a)b"#, "i");
-    // p
-}
-
-#[test]
-fn test_p517() {
-    let regex = Regex::xpath(r#"(?-i:a)b"#, "i");
-    // p
-}
-
-#[test]
-fn test_p518() {
-    let regex = Regex::xpath(r#"((?-i:a))b"#, "i");
-    // p
-}
-
-#[test]
-fn test_p519() {
-    let regex = Regex::xpath(r#"(?-i:a)b"#, "i");
-    // p
-}
-
-#[test]
-fn test_p520() {
-    let regex = Regex::xpath(r#"((?-i:a))b"#, "i");
-    // p
-}
-
-#[test]
-fn test_p521() {
-    let regex = Regex::xpath(r#"(?-i:a)b"#, "i");
-    // p
-}
-
-#[test]
-fn test_p522() {
-    let regex = Regex::xpath(r#"((?-i:a))b"#, "i");
-    // p
-}
-
-#[test]
-fn test_p523() {
-    let regex = Regex::xpath(r#"(?-i:a)b"#, "i");
-    // p
-}
-
-#[test]
-fn test_p524() {
-    let regex = Regex::xpath(r#"((?-i:a))b"#, "i");
-    // p
-}
-
-#[test]
-fn test_p525() {
-    let regex = Regex::xpath(r#"(?-i:a)b"#, "i");
-    // p
-}
-
-#[test]
-fn test_p526() {
-    let regex = Regex::xpath(r#"((?-i:a))b"#, "i");
-    // p
-}
-
-#[test]
-fn test_p527() {
-    let regex = Regex::xpath(r#"((?-i:a.))b"#, "i");
-    // p
-}
-
-#[test]
-fn test_p528() {
-    let regex = Regex::xpath(r#"((?-i:a\N))b"#, "i");
-    // p
-}
-
-#[test]
-fn test_p529() {
-    let regex = Regex::xpath(r#"((?s-i:a.))b"#, "i");
-    // p
-}
-
-#[test]
-fn test_p530() {
-    let regex = Regex::xpath(r#"((?s-i:a\N))b"#, "i");
-    // p
-}
-
-#[test]
-fn test_p531() {
-    let regex = Regex::xpath(r#"((?s-i:a.))b"#, "i");
-    // p
-}
-
-#[test]
-fn test_p532() {
-    let regex = Regex::xpath(r#"((?s-i:a\N))b"#, "i");
-    // p
-}
-
-#[test]
 fn test_p533() {
     let regex = Regex::xpath(r#"(?:c|d)(?:)(?:a(?:)(?:b)(?:b(?:))(?:b(?:)(?:b)))"#, "");
     // y
@@ -3913,54 +3055,6 @@ fn test_p537() {
 }
 
 #[test]
-fn test_p538() {
-    let regex = Regex::xpath(r#"a(?{})b"#, "");
-    // p
-}
-
-#[test]
-fn test_p539() {
-    let regex = Regex::xpath(r#"a(?{f()+"#, "");
-    // c
-}
-
-#[test]
-fn test_p540() {
-    let regex = Regex::xpath(r#"a(?{{1}+"#, "");
-    // c
-}
-
-#[test]
-fn test_p541() {
-    let regex = Regex::xpath(r#"a(?{}})b"#, "");
-    // c
-}
-
-#[test]
-fn test_p542() {
-    let regex = Regex::xpath(r#"a(?{"{"})b"#, "");
-    // p
-}
-
-#[test]
-fn test_p543() {
-    let regex = Regex::xpath(r#"a(?{"\{"})b"#, "");
-    // p
-}
-
-#[test]
-fn test_p544() {
-    let regex = Regex::xpath(r#"a(?{"{"}})b"#, "");
-    // c
-}
-
-#[test]
-fn test_p545() {
-    let regex = Regex::xpath(r#"a(?{$::bl="\{"}).b"#, "");
-    // p
-}
-
-#[test]
 fn test_p546() {
     let regex = Regex::xpath(r#"x(~~)*(?:(?:F)?)?"#, "");
     // y
@@ -3969,125 +3063,11 @@ fn test_p546() {
 }
 
 #[test]
-fn test_p547() {
-    let regex = Regex::xpath(r#"^a(?#xxx){3}c"#, "");
-    // p
-}
-
-#[test]
-fn test_p548() {
-    let regex = Regex::xpath(r#"^a (?#xxx) (?#yyy) {3}c"#, "x");
-    // p
-}
-
-#[test]
-fn test_p549() {
-    let regex = Regex::xpath(r#"(?<![cd])b"#, "");
-    // p
-}
-
-#[test]
-fn test_p550() {
-    let regex = Regex::xpath(r#"(?<![cd])[ab]"#, "");
-    // p
-}
-
-#[test]
-fn test_p551() {
-    let regex = Regex::xpath(r#"(?<!(c|d))b"#, "");
-    // p
-}
-
-#[test]
-fn test_p552() {
-    let regex = Regex::xpath(r#"(?<!(c|d))[ab]"#, "");
-    // p
-}
-
-#[test]
-fn test_p553() {
-    let regex = Regex::xpath(r#"(?<!cd)[ab]"#, "");
-    // p
-}
-
-#[test]
 fn test_p554() {
     let regex = Regex::xpath(r#"^(?:a?b?)*$"#, "");
     // n
     let regex = regex.unwrap();
     assert!(!regex.is_match(r#"a--"#));
-}
-
-#[test]
-fn test_p555() {
-    let regex = Regex::xpath(r#"((?s)^a(.))((?m)^b$)"#, "");
-    // p
-}
-
-#[test]
-fn test_p556() {
-    let regex = Regex::xpath(r#"((?m)^b$)"#, "");
-    // p
-}
-
-#[test]
-fn test_p557() {
-    let regex = Regex::xpath(r#"(?m)^b"#, "");
-    // p
-}
-
-#[test]
-fn test_p558() {
-    let regex = Regex::xpath(r#"(?m)^(b)"#, "");
-    // p
-}
-
-#[test]
-fn test_p559() {
-    let regex = Regex::xpath(r#"((?m)^b)"#, "");
-    // p
-}
-
-#[test]
-fn test_p560() {
-    let regex = Regex::xpath(r#"\n((?m)^b)"#, "");
-    // p
-}
-
-#[test]
-fn test_p561() {
-    let regex = Regex::xpath(r#"((?s).)c(?!.)"#, "");
-    // p
-}
-
-#[test]
-fn test_p562() {
-    let regex = Regex::xpath(r#"((?s).)c(?!.)"#, "");
-    // p
-}
-
-#[test]
-fn test_p563() {
-    let regex = Regex::xpath(r#"((?s)b.)c(?!.)"#, "");
-    // p
-}
-
-#[test]
-fn test_p564() {
-    let regex = Regex::xpath(r#"((?s)b.)c(?!.)"#, "");
-    // p
-}
-
-#[test]
-fn test_p565() {
-    let regex = Regex::xpath(r#"((?s)b.)c(?!\N)"#, "");
-    // p
-}
-
-#[test]
-fn test_p566() {
-    let regex = Regex::xpath(r#"(b.)c(?!\N)"#, "s");
-    // p
 }
 
 #[test]
@@ -4107,221 +3087,11 @@ fn test_p568() {
 }
 
 #[test]
-fn test_p569() {
-    let regex = Regex::xpath(r#"((?m)^b)"#, "");
-    // p
-}
-
-#[test]
-fn test_p570() {
-    let regex = Regex::xpath(r#"(?(1)a|b)"#, "");
-    // p
-}
-
-#[test]
-fn test_p571() {
-    let regex = Regex::xpath(r#"(?(1)b|a)"#, "");
-    // p
-}
-
-#[test]
-fn test_p572() {
-    let regex = Regex::xpath(r#"(x)?(?(1)a|b)"#, "");
-    // p
-}
-
-#[test]
-fn test_p573() {
-    let regex = Regex::xpath(r#"(x)?(?(1)b|a)"#, "");
-    // p
-}
-
-#[test]
-fn test_p574() {
-    let regex = Regex::xpath(r#"()?(?(1)b|a)"#, "");
-    // p
-}
-
-#[test]
-fn test_p575() {
-    let regex = Regex::xpath(r#"()(?(1)b|a)"#, "");
-    // p
-}
-
-#[test]
-fn test_p576() {
-    let regex = Regex::xpath(r#"()?(?(1)a|b)"#, "");
-    // p
-}
-
-#[test]
-fn test_p577() {
-    let regex = Regex::xpath(r#"^(\()?blah(?(1)(\)))$"#, "");
-    // p
-}
-
-#[test]
-fn test_p578() {
-    let regex = Regex::xpath(r#"^(\()?blah(?(1)(\)))$"#, "");
-    // p
-}
-
-#[test]
-fn test_p579() {
-    let regex = Regex::xpath(r#"^(\()?blah(?(1)(\)))$"#, "");
-    // p
-}
-
-#[test]
-fn test_p580() {
-    let regex = Regex::xpath(r#"^(\()?blah(?(1)(\)))$"#, "");
-    // p
-}
-
-#[test]
-fn test_p581() {
-    let regex = Regex::xpath(r#"^(\(+)?blah(?(1)(\)))$"#, "");
-    // p
-}
-
-#[test]
-fn test_p582() {
-    let regex = Regex::xpath(r#"^(\(+)?blah(?(1)(\)))$"#, "");
-    // p
-}
-
-#[test]
-fn test_p583() {
-    let regex = Regex::xpath(r#"^(\(+)?blah(?(1)(\)))$"#, "");
-    // p
-}
-
-#[test]
-fn test_p584() {
-    let regex = Regex::xpath(r#"^(\(+)?blah(?(1)(\)))$"#, "");
-    // p
-}
-
-#[test]
-fn test_p585() {
-    let regex = Regex::xpath(r#"(?(1?)a|b)"#, "");
-    // c
-}
-
-#[test]
-fn test_p586() {
-    let regex = Regex::xpath(r#"(?(1)a|b|c)"#, "");
-    // c
-}
-
-#[test]
-fn test_p587() {
-    let regex = Regex::xpath(r#"(?(?{0})a|b)"#, "");
-    // p
-}
-
-#[test]
-fn test_p588() {
-    let regex = Regex::xpath(r#"(?(?{0})b|a)"#, "");
-    // p
-}
-
-#[test]
-fn test_p589() {
-    let regex = Regex::xpath(r#"(?(?{1})b|a)"#, "");
-    // p
-}
-
-#[test]
-fn test_p590() {
-    let regex = Regex::xpath(r#"(?(?{1})a|b)"#, "");
-    // p
-}
-
-#[test]
-fn test_p591() {
-    let regex = Regex::xpath(r#"(?(?!a)a|b)"#, "");
-    // p
-}
-
-#[test]
-fn test_p592() {
-    let regex = Regex::xpath(r#"(?(?!a)b|a)"#, "");
-    // p
-}
-
-#[test]
-fn test_p593() {
-    let regex = Regex::xpath(r#"(?(?=a)b|a)"#, "");
-    // p
-}
-
-#[test]
-fn test_p594() {
-    let regex = Regex::xpath(r#"(?(?=a)a|b)"#, "");
-    // p
-}
-
-#[test]
-fn test_p595() {
-    let regex = Regex::xpath(r#"(?(?!\x{100})\x{100}|b)"#, "");
-    // p
-}
-
-#[test]
-fn test_p596() {
-    let regex = Regex::xpath(r#"(?(?!\x{100})b|\x{100})"#, "");
-    // p
-}
-
-#[test]
-fn test_p597() {
-    let regex = Regex::xpath(r#"(?(?=\x{100})b|\x{100})"#, "");
-    // p
-}
-
-#[test]
-fn test_p598() {
-    let regex = Regex::xpath(r#"(?(?=\x{100})\x{100}|b)"#, "");
-    // p
-}
-
-#[test]
-fn test_p599() {
-    let regex = Regex::xpath(r#"(?=(a+?))(\1ab)"#, "");
-    // p
-}
-
-#[test]
-fn test_p600() {
-    let regex = Regex::xpath(r#"^(?=(a+?))\1ab"#, "");
-    // p
-}
-
-#[test]
 fn test_p601() {
     let regex = Regex::xpath(r#"(\w+:)+"#, "");
     // y
     let regex = regex.unwrap();
     assert!(regex.is_match(r#"one:"#));
-}
-
-#[test]
-fn test_p602() {
-    let regex = Regex::xpath(r#"$(?<=^(a))"#, "");
-    // p
-}
-
-#[test]
-fn test_p603() {
-    let regex = Regex::xpath(r#"(?=(a+?))(\1ab)"#, "");
-    // p
-}
-
-#[test]
-fn test_p604() {
-    let regex = Regex::xpath(r#"^(?=(a+?))\1ab"#, "");
-    // p
 }
 
 #[test]
@@ -4397,131 +3167,11 @@ fn test_p613() {
 }
 
 #[test]
-fn test_p614() {
-    let regex = Regex::xpath(r#"(?{$a=2})a*aa(?{local$a=$a+1})k*c(?{$b=$a})"#, "");
-    // p
-}
-
-#[test]
-fn test_p615() {
-    let regex = Regex::xpath(r#"(?{$a=2})(a(?{local$a=$a+1}))*aak*c(?{$b=$a})"#, "");
-    // p
-}
-
-#[test]
-fn test_p617() {
-    let regex = Regex::xpath(r#"^(a(?{ "x" =~ m{x}})b)(??{ $1 })"#, "");
-    // p
-}
-
-#[test]
 fn test_p618() {
     let regex = Regex::xpath(r#"(>a+)ab"#, "");
     // n
     let regex = regex.unwrap();
     assert!(!regex.is_match(r#"aaab"#));
-}
-
-#[test]
-fn test_p619() {
-    let regex = Regex::xpath(r#"(?>a+)b"#, "");
-    // p
-}
-
-#[test]
-fn test_p620() {
-    let regex = Regex::xpath(r#"([[:]+)"#, "");
-    // p
-}
-
-#[test]
-fn test_p621() {
-    let regex = Regex::xpath(r#"([[=]+)"#, "");
-    // p
-}
-
-#[test]
-fn test_p622() {
-    let regex = Regex::xpath(r#"([[.]+)"#, "");
-    // p
-}
-
-#[test]
-fn test_p623() {
-    let regex = Regex::xpath(r#"[a[:xyz:"#, "");
-    // c
-}
-
-#[test]
-fn test_p624() {
-    let regex = Regex::xpath(r#"[a[:xyz:]"#, "");
-    // c
-}
-
-#[test]
-fn test_p625() {
-    let regex = Regex::xpath(r#"[a[:]b[:c]"#, "");
-    // p
-}
-
-#[test]
-fn test_p626() {
-    let regex = Regex::xpath(r#"([a[:xyz:]b]+)"#, "");
-    // c
-}
-
-#[test]
-fn test_p653() {
-    let regex = Regex::xpath(r#"[[:foo:]]"#, "");
-    // c
-}
-
-#[test]
-fn test_p654() {
-    let regex = Regex::xpath(r#"[[:^foo:]]"#, "");
-    // c
-}
-
-#[test]
-fn test_p655() {
-    let regex = Regex::xpath(r#"((?>a+)b)"#, "");
-    // p
-}
-
-#[test]
-fn test_p656() {
-    let regex = Regex::xpath(r#"(?>(a+))b"#, "");
-    // p
-}
-
-#[test]
-fn test_p657() {
-    let regex = Regex::xpath(r#"((?>[^()]+)|\([^()]*\))+"#, "");
-    // p
-}
-
-#[test]
-fn test_p658() {
-    let regex = Regex::xpath(r#"(?<=x+)y"#, "");
-    // c
-}
-
-#[test]
-fn test_p659() {
-    let regex = Regex::xpath(r#"((def){37,17})?ABC"#, "");
-    // p
-}
-
-#[test]
-fn test_p660() {
-    let regex = Regex::xpath(r#"\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p661() {
-    let regex = Regex::xpath(r#"\z"#, "");
-    // p
 }
 
 #[test]
@@ -4533,18 +3183,6 @@ fn test_p662() {
 }
 
 #[test]
-fn test_p663() {
-    let regex = Regex::xpath(r#"\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p664() {
-    let regex = Regex::xpath(r#"\z"#, "");
-    // p
-}
-
-#[test]
 fn test_p665() {
     let regex = Regex::xpath(r#"$"#, "");
     // y
@@ -4553,35 +3191,11 @@ fn test_p665() {
 }
 
 #[test]
-fn test_p666() {
-    let regex = Regex::xpath(r#"\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p667() {
-    let regex = Regex::xpath(r#"\z"#, "");
-    // p
-}
-
-#[test]
 fn test_p668() {
     let regex = Regex::xpath(r#"$"#, "");
     // y
     let regex = regex.unwrap();
     assert!(regex.is_match(r#"b\na"#));
-}
-
-#[test]
-fn test_p669() {
-    let regex = Regex::xpath(r#"\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p670() {
-    let regex = Regex::xpath(r#"\z"#, "m");
-    // p
 }
 
 #[test]
@@ -4597,18 +3211,6 @@ b
 }
 
 #[test]
-fn test_p672() {
-    let regex = Regex::xpath(r#"\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p673() {
-    let regex = Regex::xpath(r#"\z"#, "m");
-    // p
-}
-
-#[test]
 fn test_p674() {
     let regex = Regex::xpath(r#"$"#, "m");
     // y
@@ -4621,18 +3223,6 @@ a
 }
 
 #[test]
-fn test_p675() {
-    let regex = Regex::xpath(r#"\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p676() {
-    let regex = Regex::xpath(r#"\z"#, "m");
-    // p
-}
-
-#[test]
 fn test_p677() {
     let regex = Regex::xpath(r#"$"#, "m");
     // y
@@ -4641,18 +3231,6 @@ fn test_p677() {
         r#"b
 a"#
     ));
-}
-
-#[test]
-fn test_p678() {
-    let regex = Regex::xpath(r#"a\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p679() {
-    let regex = Regex::xpath(r#"a\z"#, "");
-    // p
 }
 
 #[test]
@@ -4668,18 +3246,6 @@ b
 }
 
 #[test]
-fn test_p681() {
-    let regex = Regex::xpath(r#"a\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p682() {
-    let regex = Regex::xpath(r#"a\z"#, "");
-    // p
-}
-
-#[test]
 fn test_p683() {
     let regex = Regex::xpath(r#"a$"#, "");
     // n
@@ -4692,18 +3258,6 @@ a
 }
 
 #[test]
-fn test_p684() {
-    let regex = Regex::xpath(r#"a\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p685() {
-    let regex = Regex::xpath(r#"a\z"#, "");
-    // p
-}
-
-#[test]
 fn test_p686() {
     let regex = Regex::xpath(r#"a$"#, "");
     // y
@@ -4712,18 +3266,6 @@ fn test_p686() {
         r#"b
 a"#
     ));
-}
-
-#[test]
-fn test_p687() {
-    let regex = Regex::xpath(r#"a\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p688() {
-    let regex = Regex::xpath(r#"a\z"#, "m");
-    // p
 }
 
 #[test]
@@ -4739,18 +3281,6 @@ b
 }
 
 #[test]
-fn test_p690() {
-    let regex = Regex::xpath(r#"a\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p691() {
-    let regex = Regex::xpath(r#"a\z"#, "m");
-    // p
-}
-
-#[test]
 fn test_p692() {
     let regex = Regex::xpath(r#"a$"#, "m");
     // y
@@ -4763,18 +3293,6 @@ a
 }
 
 #[test]
-fn test_p693() {
-    let regex = Regex::xpath(r#"a\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p694() {
-    let regex = Regex::xpath(r#"a\z"#, "m");
-    // p
-}
-
-#[test]
 fn test_p695() {
     let regex = Regex::xpath(r#"a$"#, "m");
     // y
@@ -4783,18 +3301,6 @@ fn test_p695() {
         r#"b
 a"#
     ));
-}
-
-#[test]
-fn test_p696() {
-    let regex = Regex::xpath(r#"aa\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p697() {
-    let regex = Regex::xpath(r#"aa\z"#, "");
-    // p
 }
 
 #[test]
@@ -4810,18 +3316,6 @@ b
 }
 
 #[test]
-fn test_p699() {
-    let regex = Regex::xpath(r#"aa\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p700() {
-    let regex = Regex::xpath(r#"aa\z"#, "");
-    // p
-}
-
-#[test]
 fn test_p701() {
     let regex = Regex::xpath(r#"aa$"#, "");
     // n
@@ -4834,18 +3328,6 @@ aa
 }
 
 #[test]
-fn test_p702() {
-    let regex = Regex::xpath(r#"aa\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p703() {
-    let regex = Regex::xpath(r#"aa\z"#, "");
-    // p
-}
-
-#[test]
 fn test_p704() {
     let regex = Regex::xpath(r#"aa$"#, "");
     // y
@@ -4854,18 +3336,6 @@ fn test_p704() {
         r#"b
 aa"#
     ));
-}
-
-#[test]
-fn test_p705() {
-    let regex = Regex::xpath(r#"aa\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p706() {
-    let regex = Regex::xpath(r#"aa\z"#, "m");
-    // p
 }
 
 #[test]
@@ -4881,18 +3351,6 @@ b
 }
 
 #[test]
-fn test_p708() {
-    let regex = Regex::xpath(r#"aa\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p709() {
-    let regex = Regex::xpath(r#"aa\z"#, "m");
-    // p
-}
-
-#[test]
 fn test_p710() {
     let regex = Regex::xpath(r#"aa$"#, "m");
     // y
@@ -4905,18 +3363,6 @@ aa
 }
 
 #[test]
-fn test_p711() {
-    let regex = Regex::xpath(r#"aa\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p712() {
-    let regex = Regex::xpath(r#"aa\z"#, "m");
-    // p
-}
-
-#[test]
 fn test_p713() {
     let regex = Regex::xpath(r#"aa$"#, "m");
     // y
@@ -4925,18 +3371,6 @@ fn test_p713() {
         r#"b
 aa"#
     ));
-}
-
-#[test]
-fn test_p714() {
-    let regex = Regex::xpath(r#"aa\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p715() {
-    let regex = Regex::xpath(r#"aa\z"#, "");
-    // p
 }
 
 #[test]
@@ -4952,18 +3386,6 @@ b
 }
 
 #[test]
-fn test_p717() {
-    let regex = Regex::xpath(r#"aa\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p718() {
-    let regex = Regex::xpath(r#"aa\z"#, "");
-    // p
-}
-
-#[test]
 fn test_p719() {
     let regex = Regex::xpath(r#"aa$"#, "");
     // n
@@ -4976,18 +3398,6 @@ ac
 }
 
 #[test]
-fn test_p720() {
-    let regex = Regex::xpath(r#"aa\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p721() {
-    let regex = Regex::xpath(r#"aa\z"#, "");
-    // p
-}
-
-#[test]
 fn test_p722() {
     let regex = Regex::xpath(r#"aa$"#, "");
     // n
@@ -4996,18 +3406,6 @@ fn test_p722() {
         r#"b
 ac"#
     ));
-}
-
-#[test]
-fn test_p723() {
-    let regex = Regex::xpath(r#"aa\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p724() {
-    let regex = Regex::xpath(r#"aa\z"#, "m");
-    // p
 }
 
 #[test]
@@ -5023,18 +3421,6 @@ b
 }
 
 #[test]
-fn test_p726() {
-    let regex = Regex::xpath(r#"aa\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p727() {
-    let regex = Regex::xpath(r#"aa\z"#, "m");
-    // p
-}
-
-#[test]
 fn test_p728() {
     let regex = Regex::xpath(r#"aa$"#, "m");
     // n
@@ -5047,18 +3433,6 @@ ac
 }
 
 #[test]
-fn test_p729() {
-    let regex = Regex::xpath(r#"aa\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p730() {
-    let regex = Regex::xpath(r#"aa\z"#, "m");
-    // p
-}
-
-#[test]
 fn test_p731() {
     let regex = Regex::xpath(r#"aa$"#, "m");
     // n
@@ -5067,18 +3441,6 @@ fn test_p731() {
         r#"b
 ac"#
     ));
-}
-
-#[test]
-fn test_p732() {
-    let regex = Regex::xpath(r#"aa\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p733() {
-    let regex = Regex::xpath(r#"aa\z"#, "");
-    // p
 }
 
 #[test]
@@ -5094,18 +3456,6 @@ b
 }
 
 #[test]
-fn test_p735() {
-    let regex = Regex::xpath(r#"aa\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p736() {
-    let regex = Regex::xpath(r#"aa\z"#, "");
-    // p
-}
-
-#[test]
 fn test_p737() {
     let regex = Regex::xpath(r#"aa$"#, "");
     // n
@@ -5118,18 +3468,6 @@ ca
 }
 
 #[test]
-fn test_p738() {
-    let regex = Regex::xpath(r#"aa\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p739() {
-    let regex = Regex::xpath(r#"aa\z"#, "");
-    // p
-}
-
-#[test]
 fn test_p740() {
     let regex = Regex::xpath(r#"aa$"#, "");
     // n
@@ -5138,18 +3476,6 @@ fn test_p740() {
         r#"b
 ca"#
     ));
-}
-
-#[test]
-fn test_p741() {
-    let regex = Regex::xpath(r#"aa\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p742() {
-    let regex = Regex::xpath(r#"aa\z"#, "m");
-    // p
 }
 
 #[test]
@@ -5165,18 +3491,6 @@ b
 }
 
 #[test]
-fn test_p744() {
-    let regex = Regex::xpath(r#"aa\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p745() {
-    let regex = Regex::xpath(r#"aa\z"#, "m");
-    // p
-}
-
-#[test]
 fn test_p746() {
     let regex = Regex::xpath(r#"aa$"#, "m");
     // n
@@ -5189,18 +3503,6 @@ ca
 }
 
 #[test]
-fn test_p747() {
-    let regex = Regex::xpath(r#"aa\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p748() {
-    let regex = Regex::xpath(r#"aa\z"#, "m");
-    // p
-}
-
-#[test]
 fn test_p749() {
     let regex = Regex::xpath(r#"aa$"#, "m");
     // n
@@ -5209,18 +3511,6 @@ fn test_p749() {
         r#"b
 ca"#
     ));
-}
-
-#[test]
-fn test_p750() {
-    let regex = Regex::xpath(r#"ab\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p751() {
-    let regex = Regex::xpath(r#"ab\z"#, "");
-    // p
 }
 
 #[test]
@@ -5236,18 +3526,6 @@ b
 }
 
 #[test]
-fn test_p753() {
-    let regex = Regex::xpath(r#"ab\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p754() {
-    let regex = Regex::xpath(r#"ab\z"#, "");
-    // p
-}
-
-#[test]
 fn test_p755() {
     let regex = Regex::xpath(r#"ab$"#, "");
     // n
@@ -5260,18 +3538,6 @@ ab
 }
 
 #[test]
-fn test_p756() {
-    let regex = Regex::xpath(r#"ab\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p757() {
-    let regex = Regex::xpath(r#"ab\z"#, "");
-    // p
-}
-
-#[test]
 fn test_p758() {
     let regex = Regex::xpath(r#"ab$"#, "");
     // y
@@ -5280,18 +3546,6 @@ fn test_p758() {
         r#"b
 ab"#
     ));
-}
-
-#[test]
-fn test_p759() {
-    let regex = Regex::xpath(r#"ab\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p760() {
-    let regex = Regex::xpath(r#"ab\z"#, "m");
-    // p
 }
 
 #[test]
@@ -5307,18 +3561,6 @@ b
 }
 
 #[test]
-fn test_p762() {
-    let regex = Regex::xpath(r#"ab\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p763() {
-    let regex = Regex::xpath(r#"ab\z"#, "m");
-    // p
-}
-
-#[test]
 fn test_p764() {
     let regex = Regex::xpath(r#"ab$"#, "m");
     // y
@@ -5331,18 +3573,6 @@ ab
 }
 
 #[test]
-fn test_p765() {
-    let regex = Regex::xpath(r#"ab\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p766() {
-    let regex = Regex::xpath(r#"ab\z"#, "m");
-    // p
-}
-
-#[test]
 fn test_p767() {
     let regex = Regex::xpath(r#"ab$"#, "m");
     // y
@@ -5351,18 +3581,6 @@ fn test_p767() {
         r#"b
 ab"#
     ));
-}
-
-#[test]
-fn test_p768() {
-    let regex = Regex::xpath(r#"ab\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p769() {
-    let regex = Regex::xpath(r#"ab\z"#, "");
-    // p
 }
 
 #[test]
@@ -5378,18 +3596,6 @@ b
 }
 
 #[test]
-fn test_p771() {
-    let regex = Regex::xpath(r#"ab\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p772() {
-    let regex = Regex::xpath(r#"ab\z"#, "");
-    // p
-}
-
-#[test]
 fn test_p773() {
     let regex = Regex::xpath(r#"ab$"#, "");
     // n
@@ -5402,18 +3608,6 @@ ac
 }
 
 #[test]
-fn test_p774() {
-    let regex = Regex::xpath(r#"ab\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p775() {
-    let regex = Regex::xpath(r#"ab\z"#, "");
-    // p
-}
-
-#[test]
 fn test_p776() {
     let regex = Regex::xpath(r#"ab$"#, "");
     // n
@@ -5422,18 +3616,6 @@ fn test_p776() {
         r#"b
 ac"#
     ));
-}
-
-#[test]
-fn test_p777() {
-    let regex = Regex::xpath(r#"ab\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p778() {
-    let regex = Regex::xpath(r#"ab\z"#, "m");
-    // p
 }
 
 #[test]
@@ -5449,18 +3631,6 @@ b
 }
 
 #[test]
-fn test_p780() {
-    let regex = Regex::xpath(r#"ab\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p781() {
-    let regex = Regex::xpath(r#"ab\z"#, "m");
-    // p
-}
-
-#[test]
 fn test_p782() {
     let regex = Regex::xpath(r#"ab$"#, "m");
     // n
@@ -5473,18 +3643,6 @@ ac
 }
 
 #[test]
-fn test_p783() {
-    let regex = Regex::xpath(r#"ab\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p784() {
-    let regex = Regex::xpath(r#"ab\z"#, "m");
-    // p
-}
-
-#[test]
 fn test_p785() {
     let regex = Regex::xpath(r#"ab$"#, "m");
     // n
@@ -5493,18 +3651,6 @@ fn test_p785() {
         r#"b
 ac"#
     ));
-}
-
-#[test]
-fn test_p786() {
-    let regex = Regex::xpath(r#"ab\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p787() {
-    let regex = Regex::xpath(r#"ab\z"#, "");
-    // p
 }
 
 #[test]
@@ -5520,18 +3666,6 @@ b
 }
 
 #[test]
-fn test_p789() {
-    let regex = Regex::xpath(r#"ab\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p790() {
-    let regex = Regex::xpath(r#"ab\z"#, "");
-    // p
-}
-
-#[test]
 fn test_p791() {
     let regex = Regex::xpath(r#"ab$"#, "");
     // n
@@ -5544,18 +3678,6 @@ ca
 }
 
 #[test]
-fn test_p792() {
-    let regex = Regex::xpath(r#"ab\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p793() {
-    let regex = Regex::xpath(r#"ab\z"#, "");
-    // p
-}
-
-#[test]
 fn test_p794() {
     let regex = Regex::xpath(r#"ab$"#, "");
     // n
@@ -5564,18 +3686,6 @@ fn test_p794() {
         r#"b
 ca"#
     ));
-}
-
-#[test]
-fn test_p795() {
-    let regex = Regex::xpath(r#"ab\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p796() {
-    let regex = Regex::xpath(r#"ab\z"#, "m");
-    // p
 }
 
 #[test]
@@ -5591,18 +3701,6 @@ b
 }
 
 #[test]
-fn test_p798() {
-    let regex = Regex::xpath(r#"ab\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p799() {
-    let regex = Regex::xpath(r#"ab\z"#, "m");
-    // p
-}
-
-#[test]
 fn test_p800() {
     let regex = Regex::xpath(r#"ab$"#, "m");
     // n
@@ -5615,18 +3713,6 @@ ca
 }
 
 #[test]
-fn test_p801() {
-    let regex = Regex::xpath(r#"ab\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p802() {
-    let regex = Regex::xpath(r#"ab\z"#, "m");
-    // p
-}
-
-#[test]
 fn test_p803() {
     let regex = Regex::xpath(r#"ab$"#, "m");
     // n
@@ -5635,18 +3721,6 @@ fn test_p803() {
         r#"b
 ca"#
     ));
-}
-
-#[test]
-fn test_p804() {
-    let regex = Regex::xpath(r#"abb\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p805() {
-    let regex = Regex::xpath(r#"abb\z"#, "");
-    // p
 }
 
 #[test]
@@ -5662,18 +3736,6 @@ b
 }
 
 #[test]
-fn test_p807() {
-    let regex = Regex::xpath(r#"abb\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p808() {
-    let regex = Regex::xpath(r#"abb\z"#, "");
-    // p
-}
-
-#[test]
 fn test_p809() {
     let regex = Regex::xpath(r#"abb$"#, "");
     // n
@@ -5686,18 +3748,6 @@ abb
 }
 
 #[test]
-fn test_p810() {
-    let regex = Regex::xpath(r#"abb\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p811() {
-    let regex = Regex::xpath(r#"abb\z"#, "");
-    // p
-}
-
-#[test]
 fn test_p812() {
     let regex = Regex::xpath(r#"abb$"#, "");
     // y
@@ -5706,18 +3756,6 @@ fn test_p812() {
         r#"b
 abb"#
     ));
-}
-
-#[test]
-fn test_p813() {
-    let regex = Regex::xpath(r#"abb\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p814() {
-    let regex = Regex::xpath(r#"abb\z"#, "m");
-    // p
 }
 
 #[test]
@@ -5733,18 +3771,6 @@ b
 }
 
 #[test]
-fn test_p816() {
-    let regex = Regex::xpath(r#"abb\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p817() {
-    let regex = Regex::xpath(r#"abb\z"#, "m");
-    // p
-}
-
-#[test]
 fn test_p818() {
     let regex = Regex::xpath(r#"abb$"#, "m");
     // y
@@ -5757,18 +3783,6 @@ abb
 }
 
 #[test]
-fn test_p819() {
-    let regex = Regex::xpath(r#"abb\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p820() {
-    let regex = Regex::xpath(r#"abb\z"#, "m");
-    // p
-}
-
-#[test]
 fn test_p821() {
     let regex = Regex::xpath(r#"abb$"#, "m");
     // y
@@ -5777,18 +3791,6 @@ fn test_p821() {
         r#"b
 abb"#
     ));
-}
-
-#[test]
-fn test_p822() {
-    let regex = Regex::xpath(r#"abb\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p823() {
-    let regex = Regex::xpath(r#"abb\z"#, "");
-    // p
 }
 
 #[test]
@@ -5804,18 +3806,6 @@ b
 }
 
 #[test]
-fn test_p825() {
-    let regex = Regex::xpath(r#"abb\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p826() {
-    let regex = Regex::xpath(r#"abb\z"#, "");
-    // p
-}
-
-#[test]
 fn test_p827() {
     let regex = Regex::xpath(r#"abb$"#, "");
     // n
@@ -5828,18 +3818,6 @@ ac
 }
 
 #[test]
-fn test_p828() {
-    let regex = Regex::xpath(r#"abb\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p829() {
-    let regex = Regex::xpath(r#"abb\z"#, "");
-    // p
-}
-
-#[test]
 fn test_p830() {
     let regex = Regex::xpath(r#"abb$"#, "");
     // n
@@ -5848,18 +3826,6 @@ fn test_p830() {
         r#"b
 ac"#
     ));
-}
-
-#[test]
-fn test_p831() {
-    let regex = Regex::xpath(r#"abb\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p832() {
-    let regex = Regex::xpath(r#"abb\z"#, "m");
-    // p
 }
 
 #[test]
@@ -5875,18 +3841,6 @@ b
 }
 
 #[test]
-fn test_p834() {
-    let regex = Regex::xpath(r#"abb\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p835() {
-    let regex = Regex::xpath(r#"abb\z"#, "m");
-    // p
-}
-
-#[test]
 fn test_p836() {
     let regex = Regex::xpath(r#"abb$"#, "m");
     // n
@@ -5899,18 +3853,6 @@ ac
 }
 
 #[test]
-fn test_p837() {
-    let regex = Regex::xpath(r#"abb\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p838() {
-    let regex = Regex::xpath(r#"abb\z"#, "m");
-    // p
-}
-
-#[test]
 fn test_p839() {
     let regex = Regex::xpath(r#"abb$"#, "m");
     // n
@@ -5919,18 +3861,6 @@ fn test_p839() {
         r#"b
 ac"#
     ));
-}
-
-#[test]
-fn test_p840() {
-    let regex = Regex::xpath(r#"abb\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p841() {
-    let regex = Regex::xpath(r#"abb\z"#, "");
-    // p
 }
 
 #[test]
@@ -5946,18 +3876,6 @@ b
 }
 
 #[test]
-fn test_p843() {
-    let regex = Regex::xpath(r#"abb\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p844() {
-    let regex = Regex::xpath(r#"abb\z"#, "");
-    // p
-}
-
-#[test]
 fn test_p845() {
     let regex = Regex::xpath(r#"abb$"#, "");
     // n
@@ -5970,18 +3888,6 @@ ca
 }
 
 #[test]
-fn test_p846() {
-    let regex = Regex::xpath(r#"abb\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p847() {
-    let regex = Regex::xpath(r#"abb\z"#, "");
-    // p
-}
-
-#[test]
 fn test_p848() {
     let regex = Regex::xpath(r#"abb$"#, "");
     // n
@@ -5990,18 +3896,6 @@ fn test_p848() {
         r#"b
 ca"#
     ));
-}
-
-#[test]
-fn test_p849() {
-    let regex = Regex::xpath(r#"abb\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p850() {
-    let regex = Regex::xpath(r#"abb\z"#, "m");
-    // p
 }
 
 #[test]
@@ -6017,18 +3911,6 @@ b
 }
 
 #[test]
-fn test_p852() {
-    let regex = Regex::xpath(r#"abb\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p853() {
-    let regex = Regex::xpath(r#"abb\z"#, "m");
-    // p
-}
-
-#[test]
 fn test_p854() {
     let regex = Regex::xpath(r#"abb$"#, "m");
     // n
@@ -6041,18 +3923,6 @@ ca
 }
 
 #[test]
-fn test_p855() {
-    let regex = Regex::xpath(r#"abb\Z"#, "m");
-    // p
-}
-
-#[test]
-fn test_p856() {
-    let regex = Regex::xpath(r#"abb\z"#, "m");
-    // p
-}
-
-#[test]
 fn test_p857() {
     let regex = Regex::xpath(r#"abb$"#, "m");
     // n
@@ -6061,12 +3931,6 @@ fn test_p857() {
         r#"b
 ca"#
     ));
-}
-
-#[test]
-fn test_p858() {
-    let regex = Regex::xpath(r#"\Aa$"#, "m");
-    // p
 }
 
 #[test]
@@ -6083,30 +3947,6 @@ fn test_p860() {
     // n
     let regex = regex.unwrap();
     assert!(!regex.is_match(r#"x"#));
-}
-
-#[test]
-fn test_p861() {
-    let regex = Regex::xpath(r#"a(?{$a=2;$b=3;($b)=$a})b"#, "");
-    // p
-}
-
-#[test]
-fn test_p862() {
-    let regex = Regex::xpath(r#"round\(((?>[^()]+))\)"#, "");
-    // p
-}
-
-#[test]
-fn test_p863() {
-    let regex = Regex::xpath(r#"'((?x:.) )'"#, "");
-    // p
-}
-
-#[test]
-fn test_p864() {
-    let regex = Regex::xpath(r#"((?-x:.) )"#, "x");
-    // p
 }
 
 #[test]
@@ -6137,42 +3977,6 @@ fn test_p885() {
 }
 
 #[test]
-fn test_p886() {
-    let regex = Regex::xpath(r#"([a-\d]+)"#, "");
-    // Sy
-}
-
-#[test]
-fn test_p887() {
-    let regex = Regex::xpath(r#"([a-\d]+)"#, "");
-    // sc
-}
-
-#[test]
-fn test_p888() {
-    let regex = Regex::xpath(r#"([\d-z]+)"#, "");
-    // Sy
-}
-
-#[test]
-fn test_p889() {
-    let regex = Regex::xpath(r#"([\d-z]+)"#, "");
-    // sc
-}
-
-#[test]
-fn test_p890() {
-    let regex = Regex::xpath(r#"([\d-\s]+)"#, "");
-    // Sy
-}
-
-#[test]
-fn test_p891() {
-    let regex = Regex::xpath(r#"([\d-\s]+)"#, "");
-    // sc
-}
-
-#[test]
 fn test_p892() {
     let regex = Regex::xpath(r#"([a-[:digit:]]+)"#, "");
     // y
@@ -6189,47 +3993,11 @@ fn test_p893() {
 }
 
 #[test]
-fn test_p894() {
-    let regex = Regex::xpath(r#"([[:digit:]-z]+)"#, "");
-    // Sy
-}
-
-#[test]
-fn test_p895() {
-    let regex = Regex::xpath(r#"([[:digit:]-z]+)"#, "");
-    // sc
-}
-
-#[test]
-fn test_p896() {
-    let regex = Regex::xpath(r#"([[:digit:]-[:alpha:]]+)"#, "");
-    // Sy
-}
-
-#[test]
-fn test_p897() {
-    let regex = Regex::xpath(r#"([[:digit:]-[:alpha:]]+)"#, "");
-    // sc
-}
-
-#[test]
-fn test_p898() {
-    let regex = Regex::xpath(r#"\GX.*X"#, "");
-    // p
-}
-
-#[test]
 fn test_p899() {
     let regex = Regex::xpath(r#"(\d+\.\d+)"#, "");
     // y
     let regex = regex.unwrap();
     assert!(regex.is_match(r#"3.1415926"#));
-}
-
-#[test]
-fn test_p900() {
-    let regex = Regex::xpath(r#"(\ba.{0,10}br)"#, "");
-    // p
 }
 
 #[test]
@@ -6428,24 +4196,6 @@ fn test_p924() {
 }
 
 #[test]
-fn test_p925() {
-    let regex = Regex::xpath(r#"(?i)"#, "");
-    // p
-}
-
-#[test]
-fn test_p926() {
-    let regex = Regex::xpath(r#"(?a:((?u)\w)\W)"#, "");
-    // p
-}
-
-#[test]
-fn test_p927() {
-    let regex = Regex::xpath(r#"(?!\A)x"#, "m");
-    // p
-}
-
-#[test]
 fn test_p928() {
     let regex = Regex::xpath(r#"^(a(b)?)+$"#, "");
     // y
@@ -6479,24 +4229,6 @@ fn test_p931() {
     // y
     let regex = regex.unwrap();
     assert!(regex.is_match(r#"a"#));
-}
-
-#[test]
-fn test_p932() {
-    let regex = Regex::xpath(r#"^(a)?(?(1)a|b)+$"#, "");
-    // p
-}
-
-#[test]
-fn test_p933() {
-    let regex = Regex::xpath(r#"^(a\1?)(a\1?)(a\2?)(a\3?)$"#, "");
-    // p
-}
-
-#[test]
-fn test_p934() {
-    let regex = Regex::xpath(r#"^(a\1?){4}$"#, "");
-    // p
 }
 
 #[test]
@@ -6591,71 +4323,11 @@ fn test_p945() {
 }
 
 #[test]
-fn test_p946() {
-    let regex = Regex::xpath(r#"\ba"#, "");
-    // p
-}
-
-#[test]
-fn test_p947() {
-    let regex = Regex::xpath(r#"^(a(??{"(?!)"})|(a)(?{1}))b"#, "");
-    // p
-}
-
-#[test]
-fn test_p948() {
-    let regex = Regex::xpath(r#"ab(?i)cd"#, "");
-    // p
-}
-
-#[test]
-fn test_p949() {
-    let regex = Regex::xpath(r#"ab(?i)cd"#, "");
-    // p
-}
-
-#[test]
-fn test_p950() {
-    let regex = Regex::xpath(r#"(A|B)*(?(1)(CD)|(CD))"#, "");
-    // p
-}
-
-#[test]
-fn test_p951() {
-    let regex = Regex::xpath(r#"(A|B)*(?(1)(CD)|(CD))"#, "");
-    // p
-}
-
-#[test]
-fn test_p952() {
-    let regex = Regex::xpath(r#"(A|B)*?(?(1)(CD)|(CD))"#, "");
-    // p
-}
-
-#[test]
-fn test_p953() {
-    let regex = Regex::xpath(r#"(A|B)*?(?(1)(CD)|(CD))"#, "");
-    // p
-}
-
-#[test]
-fn test_p954() {
-    let regex = Regex::xpath(r#"^(o)(?!.*\1)"#, "i");
-    // p
-}
-
-#[test]
 fn test_p955() {
     let regex = Regex::xpath(r#"(.*)\d+\1"#, "");
     // y
     let regex = regex.unwrap();
     assert!(regex.is_match(r#"abc12bc"#));
-}
-
-#[test]
-fn test_p956() {
-    let regex = Regex::xpath(r#"(?m:(foo\s*$))"#, "");
-    // p
 }
 
 #[test]
@@ -6667,215 +4339,11 @@ fn test_p957() {
 }
 
 #[test]
-fn test_p958() {
-    let regex = Regex::xpath(r#"(.*)(?=c)"#, "");
-    // p
-}
-
-#[test]
-fn test_p959() {
-    let regex = Regex::xpath(r#"(.*)(?=c)c"#, "");
-    // yB
-}
-
-#[test]
-fn test_p960() {
-    let regex = Regex::xpath(r#"(.*)(?=b|c)"#, "");
-    // p
-}
-
-#[test]
-fn test_p961() {
-    let regex = Regex::xpath(r#"(.*)(?=b|c)c"#, "");
-    // p
-}
-
-#[test]
-fn test_p962() {
-    let regex = Regex::xpath(r#"(.*)(?=c|b)"#, "");
-    // p
-}
-
-#[test]
-fn test_p963() {
-    let regex = Regex::xpath(r#"(.*)(?=c|b)c"#, "");
-    // p
-}
-
-#[test]
-fn test_p964() {
-    let regex = Regex::xpath(r#"(.*)(?=[bc])"#, "");
-    // p
-}
-
-#[test]
-fn test_p965() {
-    let regex = Regex::xpath(r#"(.*)(?=[bc])c"#, "");
-    // yB
-}
-
-#[test]
-fn test_p966() {
-    let regex = Regex::xpath(r#"(.*)(?<=b)"#, "");
-    // p
-}
-
-#[test]
-fn test_p967() {
-    let regex = Regex::xpath(r#"(.*)(?<=b)c"#, "");
-    // p
-}
-
-#[test]
-fn test_p968() {
-    let regex = Regex::xpath(r#"(.*)(?<=b|c)"#, "");
-    // p
-}
-
-#[test]
-fn test_p969() {
-    let regex = Regex::xpath(r#"(.*)(?<=b|c)c"#, "");
-    // p
-}
-
-#[test]
-fn test_p970() {
-    let regex = Regex::xpath(r#"(.*)(?<=c|b)"#, "");
-    // p
-}
-
-#[test]
-fn test_p971() {
-    let regex = Regex::xpath(r#"(.*)(?<=c|b)c"#, "");
-    // p
-}
-
-#[test]
-fn test_p972() {
-    let regex = Regex::xpath(r#"(.*)(?<=[bc])"#, "");
-    // p
-}
-
-#[test]
-fn test_p973() {
-    let regex = Regex::xpath(r#"(.*)(?<=[bc])c"#, "");
-    // p
-}
-
-#[test]
 fn test_p974() {
     let regex = Regex::xpath(r#"(.*?)c"#, "");
     // y
     let regex = regex.unwrap();
     assert!(regex.is_match(r#"abcd"#));
-}
-
-#[test]
-fn test_p975() {
-    let regex = Regex::xpath(r#"(.*?)(?=c)"#, "");
-    // p
-}
-
-#[test]
-fn test_p976() {
-    let regex = Regex::xpath(r#"(.*?)(?=c)c"#, "");
-    // yB
-}
-
-#[test]
-fn test_p977() {
-    let regex = Regex::xpath(r#"(.*?)(?=b|c)"#, "");
-    // p
-}
-
-#[test]
-fn test_p978() {
-    let regex = Regex::xpath(r#"(.*?)(?=b|c)c"#, "");
-    // p
-}
-
-#[test]
-fn test_p979() {
-    let regex = Regex::xpath(r#"(.*?)(?=c|b)"#, "");
-    // p
-}
-
-#[test]
-fn test_p980() {
-    let regex = Regex::xpath(r#"(.*?)(?=c|b)c"#, "");
-    // p
-}
-
-#[test]
-fn test_p981() {
-    let regex = Regex::xpath(r#"(.*?)(?=[bc])"#, "");
-    // p
-}
-
-#[test]
-fn test_p982() {
-    let regex = Regex::xpath(r#"(.*?)(?=[bc])c"#, "");
-    // yB
-}
-
-#[test]
-fn test_p983() {
-    let regex = Regex::xpath(r#"(.*?)(?<=b)"#, "");
-    // p
-}
-
-#[test]
-fn test_p984() {
-    let regex = Regex::xpath(r#"(.*?)(?<=b)c"#, "");
-    // p
-}
-
-#[test]
-fn test_p985() {
-    let regex = Regex::xpath(r#"(.*?)(?<=b|c)"#, "");
-    // p
-}
-
-#[test]
-fn test_p986() {
-    let regex = Regex::xpath(r#"(.*?)(?<=b|c)c"#, "");
-    // p
-}
-
-#[test]
-fn test_p987() {
-    let regex = Regex::xpath(r#"(.*?)(?<=c|b)"#, "");
-    // p
-}
-
-#[test]
-fn test_p988() {
-    let regex = Regex::xpath(r#"(.*?)(?<=c|b)c"#, "");
-    // p
-}
-
-#[test]
-fn test_p989() {
-    let regex = Regex::xpath(r#"(.*?)(?<=[bc])"#, "");
-    // p
-}
-
-#[test]
-fn test_p990() {
-    let regex = Regex::xpath(r#"(.*?)(?<=[bc])c"#, "");
-    // p
-}
-
-#[test]
-fn test_p991() {
-    let regex = Regex::xpath(r#"2(]*)?$\1"#, "");
-    // p
-}
-
-#[test]
-fn test_p992() {
-    let regex = Regex::xpath(r#"(??{})"#, "");
-    // p
 }
 
 #[test]
@@ -7023,24 +4491,6 @@ fn test_p1010() {
 }
 
 #[test]
-fn test_p1011() {
-    let regex = Regex::xpath(r#".*a(?!(b|cd)*e).*f"#, "");
-    // p
-}
-
-#[test]
-fn test_p1012() {
-    let regex = Regex::xpath(r#"x(?#"#, "");
-    // c
-}
-
-#[test]
-fn test_p1013() {
-    let regex = Regex::xpath(r#":x(?#:"#, "");
-    // c
-}
-
-#[test]
 fn test_p1014() {
     let regex = Regex::xpath(r#"(WORDS|WORD)S"#, "");
     // y
@@ -7129,59 +4579,11 @@ fn test_p1024() {
 }
 
 #[test]
-fn test_p1025() {
-    let regex = Regex::xpath(r#"(a|aa|aaa||aaaa|aaaaa|aaaaaa)(??{$1&&""})(b|c)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1026() {
-    let regex = Regex::xpath(r#"(a|aa|aaa|aaaa|aaaaa|aaaaaa)(??{$1&&"foo"})(b|c)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1027() {
-    let regex = Regex::xpath(r#"^(a*?)(?!(aa|aaaa)*$)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1028() {
-    let regex = Regex::xpath(r#"^(a*?)(?!(aa|aaaa)*$)(?=a\z)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1029() {
-    let regex = Regex::xpath(r#"^(.)\s+.$(?(1))"#, "");
-    // p
-}
-
-#[test]
 fn test_p1030() {
     let regex = Regex::xpath(r#"(?:r?)*?r|(.{2,4})"#, "");
     // y
     let regex = regex.unwrap();
     assert!(regex.is_match(r#"abcde"#));
-}
-
-#[test]
-fn test_p1031() {
-    let regex = Regex::xpath(r#"(?!)+?|(.{2,4})"#, "");
-    // p
-}
-
-#[test]
-fn test_p1032() {
-    let regex = Regex::xpath(r#"^(a*?)(?!(a{6}|a{5})*$)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1033() {
-    let regex = Regex::xpath(r#"^((?>(?:aa)?b)?)"#, "");
-    // p
 }
 
 #[test]
@@ -7201,41 +4603,11 @@ fn test_p1035() {
 }
 
 #[test]
-fn test_p1036() {
-    let regex = Regex::xpath(r#"(?i:X([A]|[B]|y[Y]y|[D]|)Y)"#, "");
-    // p
-}
-
-#[test]
 fn test_p1037() {
     let regex = Regex::xpath(r#"^([a]{1})*$"#, "");
     // y
     let regex = regex.unwrap();
     assert!(regex.is_match(r#"aa"#));
-}
-
-#[test]
-fn test_p1038() {
-    let regex = Regex::xpath(r#"a(?!b(?!c))(..)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1039() {
-    let regex = Regex::xpath(r#"a(?!b(?=a))(..)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1040() {
-    let regex = Regex::xpath(r#"a(?!b(?!c(?!d(?!e))))...(.)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1041() {
-    let regex = Regex::xpath(r#"X(?!b+(?!(c+)*(?!(c+)*d))).*X"#, "");
-    // p
 }
 
 #[test]
@@ -7354,990 +4726,6 @@ fn test_p1055() {
     // y
     let regex = regex.unwrap();
     assert!(regex.is_match(r#"ABCFCxxxxxxxxxx:DIM"#));
-}
-
-#[test]
-fn test_p1056() {
-    let regex = Regex::xpath(r#"(?=foo)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1057() {
-    let regex = Regex::xpath(r#"(?=foo)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1058() {
-    let regex = Regex::xpath(r#".*(?=foo)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1059() {
-    let regex = Regex::xpath(r#"(?<=foo)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1060() {
-    let regex = Regex::xpath(r#"(?<=foo)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1061() {
-    let regex = Regex::xpath(r#".*(?<=foo)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1062() {
-    let regex = Regex::xpath(r#".*(?<=foo)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1063() {
-    let regex = Regex::xpath(r#"(?<=foo)Y"#, "");
-    // p
-}
-
-#[test]
-fn test_p1064() {
-    let regex = Regex::xpath(r#"o(?<=foo)Y"#, "");
-    // p
-}
-
-#[test]
-fn test_p1065() {
-    let regex = Regex::xpath(r#"X(?=foo)f"#, "");
-    // p
-}
-
-#[test]
-fn test_p1066() {
-    let regex = Regex::xpath(r#"X(?=foo)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1067() {
-    let regex = Regex::xpath(r#"X(?<=foo.)[YZ]"#, "");
-    // p
-}
-
-#[test]
-fn test_p1068() {
-    let regex = Regex::xpath(r#"(?=XY*foo)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1069() {
-    let regex = Regex::xpath(r#"^(?=XY*foo)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1070() {
-    let regex = Regex::xpath(r#"^(??{"a+"})a"#, "");
-    // p
-}
-
-#[test]
-fn test_p1071() {
-    let regex = Regex::xpath(r#"^(?:(??{"a+"})|b)a"#, "");
-    // p
-}
-
-#[test]
-fn test_p1072() {
-    let regex = Regex::xpath(r#"^(??{chr 0x100}).$"#, "");
-    // p
-}
-
-#[test]
-fn test_p1073() {
-    let regex = Regex::xpath(r#"^(??{q(\x{100})})."#, "");
-    // p
-}
-
-#[test]
-fn test_p1074() {
-    let regex = Regex::xpath(r#"^(??{q(.+)})\x{100}"#, "");
-    // p
-}
-
-#[test]
-fn test_p1075() {
-    let regex = Regex::xpath(r#"^(??{q(.)})\x{100}"#, "");
-    // p
-}
-
-#[test]
-fn test_p1076() {
-    let regex = Regex::xpath(r#"^(??{chr 0x100})\xbb"#, "");
-    // p
-}
-
-#[test]
-fn test_p1077() {
-    let regex = Regex::xpath(r#"^(.)(??{"(.)(.)"})(.)$"#, "");
-    // p
-}
-
-#[test]
-fn test_p1078() {
-    let regex = Regex::xpath(r#"^(.)(??{"(bz+|.)(.)"})(.)$"#, "");
-    // p
-}
-
-#[test]
-fn test_p1079() {
-    let regex = Regex::xpath(r#"^(.)((??{"(.)(cz+)"})|.)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1080() {
-    let regex = Regex::xpath(r#"^a(?>(??{q(b)}))(??{q(c)})d"#, "");
-    // p
-}
-
-#[test]
-fn test_p1081() {
-    let regex = Regex::xpath(r#"^x(??{""})+$"#, "");
-    // p
-}
-
-#[test]
-fn test_p1082() {
-    let regex = Regex::xpath(r#"^(<(?:[^<>]+|(?3)|(?1))*>)()(!>!>!>)$"#, "");
-    // p
-}
-
-#[test]
-fn test_p1083() {
-    let regex = Regex::xpath(r#"^(<(?:[^<>]+|(?1))*>)$"#, "");
-    // p
-}
-
-#[test]
-fn test_p1084() {
-    let regex = Regex::xpath(r#"((?2)*)([fF]o+)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1085() {
-    let regex = Regex::xpath(r#"(<(?:[^<>]+|(?R))*>)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1086() {
-    let regex = Regex::xpath(r#"(?<n>foo|bar|baz)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1087() {
-    let regex = Regex::xpath(r#"(?<n>foo|bar|baz)"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1088() {
-    let regex = Regex::xpath(r#"(?<n>foo|bar|baz)(?<m>[ew]+)"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1089() {
-    let regex = Regex::xpath(r#"(?<n>foo|bar|baz)(?<m>[ew]+)"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1090() {
-    let regex = Regex::xpath(r#"(?<n>foo)|(?<n>bar)|(?<n>baz)"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1091() {
-    let regex = Regex::xpath(r#"(?<n>foo)(??{ $+{n} })"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1092() {
-    let regex = Regex::xpath(r#"(?P<n>foo|bar|baz)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1093() {
-    let regex = Regex::xpath(r#"(?P<n>foo|bar|baz)"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1094() {
-    let regex = Regex::xpath(r#"(?P<n>foo|bar|baz)(?P<m>[ew]+)"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1095() {
-    let regex = Regex::xpath(r#"(?P<n>foo|bar|baz)(?P<m>[ew]+)"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1096() {
-    let regex = Regex::xpath(r#"(?P<n>foo)|(?P<n>bar)|(?P<n>baz)"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1097() {
-    let regex = Regex::xpath(r#"(?P<n>foo)(??{ $+{n} })"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1098() {
-    let regex = Regex::xpath(r#"(?P<=n>foo|bar|baz)"#, "");
-    // c
-}
-
-#[test]
-fn test_p1099() {
-    let regex = Regex::xpath(r#"(?P<!n>foo|bar|baz)"#, "");
-    // c
-}
-
-#[test]
-fn test_p1100() {
-    let regex = Regex::xpath(r#"(?PX<n>foo|bar|baz)"#, "");
-    // c
-}
-
-#[test]
-fn test_p1101() {
-    let regex = Regex::xpath(r#"/(?'n'foo|bar|baz)/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1102() {
-    let regex = Regex::xpath(r#"/(?'n'foo|bar|baz)/"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1103() {
-    let regex = Regex::xpath(r#"/(?n'foo|bar|baz)(?'[ew]+)/"#, "/(?m'[ew]+)/");
-    // yM
-}
-
-#[test]
-fn test_p1104() {
-    let regex = Regex::xpath(r#"/(?n'foo|bar|baz)(?'[ew]+)/"#, "/(?m'[ew]+)/");
-    // yM
-}
-
-#[test]
-fn test_p1105() {
-    let regex = Regex::xpath(r#"/(?'n'foo)|(?'n'bar)|(?<n>baz)/"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1106() {
-    let regex = Regex::xpath(r#"/(?'n'foo)(??{ $+{n} })/"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1107() {
-    let regex = Regex::xpath(r#"/(?'n'foo)\k<n>/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1108() {
-    let regex = Regex::xpath(r#"/(?'n'foo)\k<n>/"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1109() {
-    let regex = Regex::xpath(r#"/(?<n>foo)\k'n'/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1110() {
-    let regex = Regex::xpath(r#"/(?<n>foo)\k'n'/"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1111() {
-    let regex = Regex::xpath(r#"/(?:(?<n>foo)|(?<n>bar))\k<n>/"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1112() {
-    let regex = Regex::xpath(
-        r#"/^(?'main'<(?:[^<>]+|(?&crap)|(?&main))*>)(?'empty')(?'crap'!>!>!>)$/"#,
-        "",
-    );
-    // yM
-}
-
-#[test]
-fn test_p1113() {
-    let regex = Regex::xpath(r#"/^(?'main'<(?:[^<>]+|(?&main))*>)$/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1114() {
-    let regex = Regex::xpath(
-        r#"/(?first'(?&second)*)(?econd'[fF]o+)/"#,
-        "/(?second'[fF]o+)/",
-    );
-    // yM
-}
-
-#[test]
-fn test_p1115() {
-    let regex = Regex::xpath(r#"(?<A>foo)?(?(<A>)bar|nada)"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1116() {
-    let regex = Regex::xpath(r#"(?<A>foo)?(?(<A>)bar|nada)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1117() {
-    let regex = Regex::xpath(r#"(?<A>foo)?(?(1)bar|nada)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1118() {
-    let regex = Regex::xpath(r#"(?<A>foo(?(R)bar))?(?1)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1119() {
-    let regex = Regex::xpath(r#"(?<A>foo(?(R)bar))?(?1)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1120() {
-    let regex = Regex::xpath(r#"(x)(?<A>foo(?(R&A)bar))?(?&A)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1121() {
-    let regex = Regex::xpath(r#"(x)(?<A>foo(?(R&A)bar))?(?&A)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1122() {
-    let regex = Regex::xpath(r#"(x)(?<A>foo(?(R2)bar))?(?&A)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1123() {
-    let regex = Regex::xpath(r#"(x)(?<A>foo(?(R2)bar))?(?&A)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1124() {
-    let regex = Regex::xpath(r#"(?1)(?(DEFINE)(blah))"#, "");
-    // p
-}
-
-#[test]
-fn test_p1125() {
-    let regex = Regex::xpath(r#"/^(?<PAL>(?<CHAR>.)((?&PAL)|.?)\k<CHAR>)$/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1126() {
-    let regex = Regex::xpath(r#"/^(?<PAL>(?<CHAR>.)((?&PAL)|.?)\k<CHAR>)$/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1127() {
-    let regex = Regex::xpath(r#"/(a)?((?1))(fox)/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1128() {
-    let regex = Regex::xpath(r#"/(a)*((?1))(fox)/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1129() {
-    let regex = Regex::xpath(r#"/(a)+((?1))(fox)/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1130() {
-    let regex = Regex::xpath(r#"/(a){1,100}((?1))(fox)/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1131() {
-    let regex = Regex::xpath(r#"/(a){0,100}((?1))(fox)/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1132() {
-    let regex = Regex::xpath(r#"/(ab)?((?1))(fox)/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1133() {
-    let regex = Regex::xpath(r#"/(ab)*((?1))(fox)/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1134() {
-    let regex = Regex::xpath(r#"/(ab)+((?1))(fox)/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1135() {
-    let regex = Regex::xpath(r#"/(ab){1,100}((?1))(fox)/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1136() {
-    let regex = Regex::xpath(r#"/(ab){0,100}((?1))(fox)/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1138() {
-    let regex = Regex::xpath(r#"a++a"#, "");
-    // p
-}
-
-#[test]
-fn test_p1139() {
-    let regex = Regex::xpath(r#"a*+a"#, "");
-    // p
-}
-
-#[test]
-fn test_p1140() {
-    let regex = Regex::xpath(r#"a{1,5}+a"#, "");
-    // p
-}
-
-#[test]
-fn test_p1141() {
-    let regex = Regex::xpath(r#"a?+a"#, "");
-    // p
-}
-
-#[test]
-fn test_p1142() {
-    let regex = Regex::xpath(r#"a++b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1143() {
-    let regex = Regex::xpath(r#"a*+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1144() {
-    let regex = Regex::xpath(r#"a{1,5}+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1145() {
-    let regex = Regex::xpath(r#"a?+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1146() {
-    let regex = Regex::xpath(r#"fooa++a"#, "");
-    // p
-}
-
-#[test]
-fn test_p1147() {
-    let regex = Regex::xpath(r#"fooa*+a"#, "");
-    // p
-}
-
-#[test]
-fn test_p1148() {
-    let regex = Regex::xpath(r#"fooa{1,5}+a"#, "");
-    // p
-}
-
-#[test]
-fn test_p1149() {
-    let regex = Regex::xpath(r#"fooa?+a"#, "");
-    // p
-}
-
-#[test]
-fn test_p1150() {
-    let regex = Regex::xpath(r#"fooa++b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1151() {
-    let regex = Regex::xpath(r#"fooa*+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1152() {
-    let regex = Regex::xpath(r#"fooa{1,5}+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1153() {
-    let regex = Regex::xpath(r#"fooa?+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1154() {
-    let regex = Regex::xpath(r#"(?:aA)++(?:aA)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1155() {
-    let regex = Regex::xpath(r#"(aA)++(aA)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1156() {
-    let regex = Regex::xpath(r#"(aA|bB)++(aA|bB)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1157() {
-    let regex = Regex::xpath(r#"(?:aA|bB)++(?:aA|bB)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1158() {
-    let regex = Regex::xpath(r#"(?:aA)*+(?:aA)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1159() {
-    let regex = Regex::xpath(r#"(aA)*+(aA)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1160() {
-    let regex = Regex::xpath(r#"(aA|bB)*+(aA|bB)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1161() {
-    let regex = Regex::xpath(r#"(?:aA|bB)*+(?:aA|bB)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1162() {
-    let regex = Regex::xpath(r#"(?:aA){1,5}+(?:aA)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1163() {
-    let regex = Regex::xpath(r#"(aA){1,5}+(aA)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1164() {
-    let regex = Regex::xpath(r#"(aA|bB){1,5}+(aA|bB)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1165() {
-    let regex = Regex::xpath(r#"(?:aA|bB){1,5}+(?:aA|bB)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1166() {
-    let regex = Regex::xpath(r#"(?:aA)?+(?:aA)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1167() {
-    let regex = Regex::xpath(r#"(aA)?+(aA)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1168() {
-    let regex = Regex::xpath(r#"(aA|bB)?+(aA|bB)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1169() {
-    let regex = Regex::xpath(r#"(?:aA|bB)?+(?:aA|bB)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1170() {
-    let regex = Regex::xpath(r#"(?:aA)++b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1171() {
-    let regex = Regex::xpath(r#"(aA)++b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1172() {
-    let regex = Regex::xpath(r#"(aA|bB)++b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1173() {
-    let regex = Regex::xpath(r#"(?:aA|bB)++b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1174() {
-    let regex = Regex::xpath(r#"(?:aA)*+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1175() {
-    let regex = Regex::xpath(r#"(aA)*+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1176() {
-    let regex = Regex::xpath(r#"(aA|bB)*+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1177() {
-    let regex = Regex::xpath(r#"(?:aA|bB)*+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1178() {
-    let regex = Regex::xpath(r#"(?:aA){1,5}+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1179() {
-    let regex = Regex::xpath(r#"(aA){1,5}+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1180() {
-    let regex = Regex::xpath(r#"(aA|bB){1,5}+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1181() {
-    let regex = Regex::xpath(r#"(?:aA|bB){1,5}+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1182() {
-    let regex = Regex::xpath(r#"(?:aA)?+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1183() {
-    let regex = Regex::xpath(r#"(aA)?+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1184() {
-    let regex = Regex::xpath(r#"(aA|bB)?+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1185() {
-    let regex = Regex::xpath(r#"(?:aA|bB)?+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1186() {
-    let regex = Regex::xpath(r#"foo(?:aA)++(?:aA)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1187() {
-    let regex = Regex::xpath(r#"foo(aA)++(aA)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1188() {
-    let regex = Regex::xpath(r#"foo(aA|bB)++(aA|bB)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1189() {
-    let regex = Regex::xpath(r#"foo(?:aA|bB)++(?:aA|bB)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1190() {
-    let regex = Regex::xpath(r#"foo(?:aA)*+(?:aA)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1191() {
-    let regex = Regex::xpath(r#"foo(aA)*+(aA)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1192() {
-    let regex = Regex::xpath(r#"foo(aA|bB)*+(aA|bB)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1193() {
-    let regex = Regex::xpath(r#"foo(?:aA|bB)*+(?:aA|bB)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1194() {
-    let regex = Regex::xpath(r#"foo(?:aA){1,5}+(?:aA)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1195() {
-    let regex = Regex::xpath(r#"foo(aA){1,5}+(aA)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1196() {
-    let regex = Regex::xpath(r#"foo(aA|bB){1,5}+(aA|bB)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1197() {
-    let regex = Regex::xpath(r#"foo(?:aA|bB){1,5}+(?:aA|bB)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1198() {
-    let regex = Regex::xpath(r#"foo(?:aA)?+(?:aA)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1199() {
-    let regex = Regex::xpath(r#"foo(aA)?+(aA)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1200() {
-    let regex = Regex::xpath(r#"foo(aA|bB)?+(aA|bB)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1201() {
-    let regex = Regex::xpath(r#"foo(?:aA|bB)?+(?:aA|bB)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1202() {
-    let regex = Regex::xpath(r#"foo(?:aA)++b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1203() {
-    let regex = Regex::xpath(r#"foo(aA)++b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1204() {
-    let regex = Regex::xpath(r#"foo(aA|bB)++b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1205() {
-    let regex = Regex::xpath(r#"foo(?:aA|bB)++b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1206() {
-    let regex = Regex::xpath(r#"foo(?:aA)*+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1207() {
-    let regex = Regex::xpath(r#"foo(aA)*+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1208() {
-    let regex = Regex::xpath(r#"foo(aA|bB)*+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1209() {
-    let regex = Regex::xpath(r#"foo(?:aA|bB)*+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1210() {
-    let regex = Regex::xpath(r#"foo(?:aA){1,5}+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1211() {
-    let regex = Regex::xpath(r#"foo(aA){1,5}+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1212() {
-    let regex = Regex::xpath(r#"foo(aA|bB){1,5}+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1213() {
-    let regex = Regex::xpath(r#"foo(?:aA|bB){1,5}+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1214() {
-    let regex = Regex::xpath(r#"foo(?:aA)?+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1215() {
-    let regex = Regex::xpath(r#"foo(aA)?+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1216() {
-    let regex = Regex::xpath(r#"foo(aA|bB)?+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1217() {
-    let regex = Regex::xpath(r#"foo(?:aA|bB)?+b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1219() {
-    let regex = Regex::xpath(r#"([^()]++|\([^()]*\))+"#, "");
-    // p
-}
-
-#[test]
-fn test_p1220() {
-    let regex = Regex::xpath(r#"round\(([^()]++)\)"#, "");
-    // p
 }
 
 #[test]
@@ -8518,798 +4906,6 @@ fn test_p1245() {
 }
 
 #[test]
-fn test_p1247() {
-    let regex = Regex::xpath(
-        r#"(x|y|z[QW])++(longish|loquatious|excessive|overblown[QW])++"#,
-        "",
-    );
-    // p
-}
-
-#[test]
-fn test_p1248() {
-    let regex = Regex::xpath(
-        r#"(x|y|z[QW])*+(longish|loquatious|excessive|overblown[QW])*+"#,
-        "",
-    );
-    // p
-}
-
-#[test]
-fn test_p1249() {
-    let regex = Regex::xpath(
-        r#"(x|y|z[QW]){1,5}+(longish|loquatious|excessive|overblown[QW]){1,5}+"#,
-        "",
-    );
-    // p
-}
-
-#[test]
-fn test_p1251() {
-    let regex = Regex::xpath(r#"a*(?!)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1252() {
-    let regex = Regex::xpath(r#"a*(*FAIL)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1253() {
-    let regex = Regex::xpath(r#"a*(*F)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1255() {
-    let regex = Regex::xpath(r#"(A(A|B(*ACCEPT)|C)D)(E)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1256() {
-    let regex = Regex::xpath(r#"(A(A|B(*ACCEPT)|C)D)(E)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1258() {
-    let regex = Regex::xpath(r#"(a)(?:(?-1)|(?+1))(b)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1259() {
-    let regex = Regex::xpath(r#"(a)(?:(?-1)|(?+1))(b)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1260() {
-    let regex = Regex::xpath(r#"(a)(?:(?-1)|(?+1))(b)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1262() {
-    let regex = Regex::xpath(r#"(foo)(\g-2)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1263() {
-    let regex = Regex::xpath(r#"(foo)(\g-2)(foo)(\g-2)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1264() {
-    let regex = Regex::xpath(r#"(([abc]+) \g-1)(([abc]+) \g{-1})"#, "");
-    // p
-}
-
-#[test]
-fn test_p1265() {
-    let regex = Regex::xpath(r#"(a)(b)(c)\g1\g2\g3"#, "");
-    // p
-}
-
-#[test]
-fn test_p1268() {
-    let regex = Regex::xpath(r#"/(?'n'foo) \k<n>/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1269() {
-    let regex = Regex::xpath(r#"/(?'n'foo) \k<n>/"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1270() {
-    let regex = Regex::xpath(r#"/(?<n>foo) \k'n'/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1271() {
-    let regex = Regex::xpath(r#"/(?<n>foo) \k'n'/"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1272() {
-    let regex = Regex::xpath(r#"/(?'a1'foo) \k'a1'/"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1273() {
-    let regex = Regex::xpath(r#"/(?<a1>foo) \k<a1>/"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1274() {
-    let regex = Regex::xpath(r#"/(?'_'foo) \k'_'/"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1275() {
-    let regex = Regex::xpath(r#"/(?<_>foo) \k<_>/"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1276() {
-    let regex = Regex::xpath(r#"/(?'_0_'foo) \k'_0_'/"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1277() {
-    let regex = Regex::xpath(r#"/(?<_0_>foo) \k<_0_>/"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1278() {
-    let regex = Regex::xpath(r#"/(?'0'foo) bar/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1279() {
-    let regex = Regex::xpath(r#"/(?<0>foo) bar/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1280() {
-    let regex = Regex::xpath(r#"/(?'12'foo) bar/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1281() {
-    let regex = Regex::xpath(r#"/(?<12>foo) bar/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1282() {
-    let regex = Regex::xpath(r#"/(?'1a'foo) bar/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1283() {
-    let regex = Regex::xpath(r#"/(?<1a>foo) bar/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1284() {
-    let regex = Regex::xpath(r#"/(?''foo) bar/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1285() {
-    let regex = Regex::xpath(r#"/(?<>foo) bar/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1286() {
-    let regex = Regex::xpath(r#"/foo \k'n'/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1287() {
-    let regex = Regex::xpath(r#"/foo \k<n>/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1288() {
-    let regex = Regex::xpath(r#"/foo \k'a1'/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1289() {
-    let regex = Regex::xpath(r#"/foo \k<a1>/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1290() {
-    let regex = Regex::xpath(r#"/foo \k'_'/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1291() {
-    let regex = Regex::xpath(r#"/foo \k<_>/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1292() {
-    let regex = Regex::xpath(r#"/foo \k'_0_'/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1293() {
-    let regex = Regex::xpath(r#"/foo \k<_0_>/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1294() {
-    let regex = Regex::xpath(r#"/foo \k'0'/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1295() {
-    let regex = Regex::xpath(r#"/foo \k<0>/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1296() {
-    let regex = Regex::xpath(r#"/foo \k'12'/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1297() {
-    let regex = Regex::xpath(r#"/foo \k<12>/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1298() {
-    let regex = Regex::xpath(r#"/foo \k'1a'/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1299() {
-    let regex = Regex::xpath(r#"/foo \k<1a>/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1300() {
-    let regex = Regex::xpath(r#"/foo \k''/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1301() {
-    let regex = Regex::xpath(r#"/foo \k<>/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1302() {
-    let regex = Regex::xpath(r#"/(?<as>as) (\w+) \k<as> (\w+)/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1305() {
-    let regex = Regex::xpath(r#"/(?'n'foo) \g{n}/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1306() {
-    let regex = Regex::xpath(r#"/(?'n'foo) \g{n}/"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1307() {
-    let regex = Regex::xpath(r#"/(?<n>foo) \g{n}/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1308() {
-    let regex = Regex::xpath(r#"/(?<n>foo) \g{n}/"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1309() {
-    let regex = Regex::xpath(r#"/(?<as>as) (\w+) \g{as} (\w+)/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1312() {
-    let regex = Regex::xpath(r#"/(?P<n>foo)(?P=n)/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1313() {
-    let regex = Regex::xpath(r#"/(?P<n>foo)(?P=n)/"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1314() {
-    let regex = Regex::xpath(r#"/(?:(?P<n>foo)|(?P<n>bar))(?P=n)/"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1315() {
-    let regex = Regex::xpath(r#"/^(?P<PAL>(?P<CHAR>.)((?P>PAL)|.?)(?P=CHAR))$/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1316() {
-    let regex = Regex::xpath(r#"/^(?P<PAL>(?P<CHAR>.)((?P>PAL)|.?)(?P=CHAR))$/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1317() {
-    let regex = Regex::xpath(r#"/(?P<n>foo) (?P=n)/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1318() {
-    let regex = Regex::xpath(r#"/(?P<n>foo) (?P=n)/"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1319() {
-    let regex = Regex::xpath(r#"/(?P<as>as) (\w+) (?P=as) (\w+)/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1322() {
-    let regex = Regex::xpath(r#"(?<=bar>)foo"#, "");
-    // p
-}
-
-#[test]
-fn test_p1323() {
-    let regex = Regex::xpath(r#"(?<!bar>)foo"#, "");
-    // p
-}
-
-#[test]
-fn test_p1324() {
-    let regex = Regex::xpath(r#"(?<=bar>ABC)foo"#, "");
-    // p
-}
-
-#[test]
-fn test_p1325() {
-    let regex = Regex::xpath(r#"(?<!bar>ABC)foo"#, "");
-    // p
-}
-
-#[test]
-fn test_p1326() {
-    let regex = Regex::xpath(r#"(?<bar>)foo"#, "");
-    // p
-}
-
-#[test]
-fn test_p1327() {
-    let regex = Regex::xpath(r#"(?<bar>ABC)foo"#, "");
-    // p
-}
-
-#[test]
-fn test_p1329() {
-    let regex = Regex::xpath(r#"(?<=abcd(?<=(aaaabcd)))"#, "");
-    // p
-}
-
-#[test]
-fn test_p1330() {
-    let regex = Regex::xpath(r#"(?=xy(?<=(aaxy)))"#, "");
-    // p
-}
-
-#[test]
-fn test_p1332() {
-    let regex = Regex::xpath(r#"X(\w+)(?=\s)|X(\w+)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1335() {
-    let regex = Regex::xpath(r#"(?|(a))"#, "");
-    // p
-}
-
-#[test]
-fn test_p1336() {
-    let regex = Regex::xpath(r#"(?|a(.)b|d(.(o).)d|i(.)(.)j)(.)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1337() {
-    let regex = Regex::xpath(r#"(?|a(.)b|d(.(o).)d|i(.)(.)j)(.)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1338() {
-    let regex = Regex::xpath(r#"(?|a(.)b|d(.(o).)d|i(.)(.)j)(.)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1339() {
-    let regex = Regex::xpath(r#"(?|(?|(a)|(b))|(?|(c)|(d)))"#, "");
-    // p
-}
-
-#[test]
-fn test_p1340() {
-    let regex = Regex::xpath(r#"(?|(?|(a)|(b))|(?|(c)|(d)))"#, "");
-    // p
-}
-
-#[test]
-fn test_p1341() {
-    let regex = Regex::xpath(r#"(?|(?|(a)|(b))|(?|(c)|(d)))"#, "");
-    // p
-}
-
-#[test]
-fn test_p1342() {
-    let regex = Regex::xpath(r#"(?|(?|(a)|(b))|(?|(c)|(d)))"#, "");
-    // p
-}
-
-#[test]
-fn test_p1343() {
-    let regex = Regex::xpath(r#"(.)(?|(.)(.)x|(.)d)(.)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1344() {
-    let regex = Regex::xpath(r#"(\N)(?|(\N)(\N)x|(\N)d)(\N)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1345() {
-    let regex = Regex::xpath(r#"(?|(?<foo>x))"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1346() {
-    let regex = Regex::xpath(r#"(?|(?<foo>x)|(?<bar>y))"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1347() {
-    let regex = Regex::xpath(r#"(?|(?<bar>y)|(?<foo>x))"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1348() {
-    let regex = Regex::xpath(r#"(?<bar>)(?|(?<foo>x))"#, "");
-    // yM
-}
-
-#[test]
-fn test_p1351() {
-    let regex = Regex::xpath(
-        r#"(?|(b)|()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()(a))"#,
-        "",
-    );
-    // p
-}
-
-#[test]
-fn test_p1354() {
-    let regex = Regex::xpath(r#"(?(DEFINE)(?<A>(?&B)+)(?<B>a))(?&A)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1355() {
-    let regex = Regex::xpath(r#"(?(DEFINE)(?<A>(?&B)+)(?<B>a))(?&A)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1356() {
-    let regex = Regex::xpath(r#"\x{100}?(??{""})xxx"#, "");
-    // p
-}
-
-#[test]
-fn test_p1358() {
-    let regex = Regex::xpath(r#"foo(\R)bar"#, "");
-    // p
-}
-
-#[test]
-fn test_p1359() {
-    let regex = Regex::xpath(r#"foo(\R)bar"#, "");
-    // p
-}
-
-#[test]
-fn test_p1360() {
-    let regex = Regex::xpath(r#"foo(\R)bar"#, "");
-    // p
-}
-
-#[test]
-fn test_p1362() {
-    let regex = Regex::xpath(r#"foo(\R+)bar"#, "");
-    // p
-}
-
-#[test]
-fn test_p1363() {
-    let regex = Regex::xpath(r#"(\V+)(\R)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1364() {
-    let regex = Regex::xpath(r#"(\R+)(\V)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1365() {
-    let regex = Regex::xpath(r#"foo(\R)bar"#, "");
-    // p
-}
-
-#[test]
-fn test_p1366() {
-    let regex = Regex::xpath(r#"(\V)(\R)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1367() {
-    let regex = Regex::xpath(r#"(\R)(\V)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1368() {
-    let regex = Regex::xpath(r#"foo(\R)bar"#, "");
-    // p
-}
-
-#[test]
-fn test_p1369() {
-    let regex = Regex::xpath(r#"(\V)(\R)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1370() {
-    let regex = Regex::xpath(r#"(\R)(\V)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1371() {
-    let regex = Regex::xpath(r#"foo(\R)bar"#, "");
-    // p
-}
-
-#[test]
-fn test_p1372() {
-    let regex = Regex::xpath(r#"(\V)(\R)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1373() {
-    let regex = Regex::xpath(r#"(\R)(\V)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1374() {
-    let regex = Regex::xpath(r#"foo(\R)bar"#, "");
-    // p
-}
-
-#[test]
-fn test_p1375() {
-    let regex = Regex::xpath(r#"(\V)(\R)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1376() {
-    let regex = Regex::xpath(r#"(\R)(\V)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1378() {
-    let regex = Regex::xpath(r#"foo(\v+)bar"#, "");
-    // p
-}
-
-#[test]
-fn test_p1379() {
-    let regex = Regex::xpath(r#"(\V+)(\v)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1380() {
-    let regex = Regex::xpath(r#"(\v+)(\V)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1381() {
-    let regex = Regex::xpath(r#"foo(\v)bar"#, "");
-    // p
-}
-
-#[test]
-fn test_p1382() {
-    let regex = Regex::xpath(r#"(\V)(\v)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1383() {
-    let regex = Regex::xpath(r#"(\v)(\V)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1384() {
-    let regex = Regex::xpath(r#"foo(\v)bar"#, "");
-    // p
-}
-
-#[test]
-fn test_p1385() {
-    let regex = Regex::xpath(r#"(\V)(\v)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1386() {
-    let regex = Regex::xpath(r#"(\v)(\V)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1389() {
-    let regex = Regex::xpath(r#"foo(\h+)bar"#, "");
-    // p
-}
-
-#[test]
-fn test_p1390() {
-    let regex = Regex::xpath(r#"(\H+)(\h)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1391() {
-    let regex = Regex::xpath(r#"(\h+)(\H)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1392() {
-    let regex = Regex::xpath(r#"foo(\h)bar"#, "");
-    // p
-}
-
-#[test]
-fn test_p1393() {
-    let regex = Regex::xpath(r#"(\H)(\h)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1394() {
-    let regex = Regex::xpath(r#"(\h)(\H)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1395() {
-    let regex = Regex::xpath(r#"foo(\h)bar"#, "");
-    // p
-}
-
-#[test]
-fn test_p1396() {
-    let regex = Regex::xpath(r#"(\H)(\h)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1397() {
-    let regex = Regex::xpath(r#"(\h)(\H)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1399() {
-    let regex = Regex::xpath(r#".*\z"#, "");
-    // p
-}
-
-#[test]
-fn test_p1400() {
-    let regex = Regex::xpath(r#"\N*\z"#, "");
-    // p
-}
-
-#[test]
-fn test_p1401() {
-    let regex = Regex::xpath(r#".*\Z"#, "");
-    // p
-}
-
-#[test]
-fn test_p1402() {
-    let regex = Regex::xpath(r#"\N*\Z"#, "");
-    // p
-}
-
-#[test]
 fn test_p1403() {
     let regex = Regex::xpath(r#"^(?:(\d)x)?\d$"#, "");
     // y
@@ -9331,18 +4927,6 @@ fn test_p1406() {
     // y
     let regex = regex.unwrap();
     assert!(regex.is_match(r#"000000000000000000000000000000000000000000000000000"#));
-}
-
-#[test]
-fn test_p1407() {
-    let regex = Regex::xpath(r#"^a?(?=b)b"#, "");
-    // p
-}
-
-#[test]
-fn test_p1408() {
-    let regex = Regex::xpath(r#"^a*(?=b)b"#, "");
-    // p
 }
 
 #[test]
@@ -9394,191 +4978,11 @@ fn test_p1417() {
 }
 
 #[test]
-fn test_p1419() {
-    let regex = Regex::xpath(r#"/(.*?)a(?!(a+)b\2c)/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1421() {
-    let regex = Regex::xpath(r#"/\A(?(?=db2)db2|\D+)(?<!processed)\.csv\z/xms"#, "");
-    // p
-}
-
-#[test]
-fn test_p1422() {
-    let regex = Regex::xpath(r#"/\N{U+0100}/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1423() {
-    let regex = Regex::xpath(r#"/[a\N{U+0100}]/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1424() {
-    let regex = Regex::xpath(r#"/[a\N{U+0100}]/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1427() {
-    let regex = Regex::xpath(r#"/\N{U+41}\x{c1}/i"#, "");
-    // p
-}
-
-#[test]
-fn test_p1428() {
-    let regex = Regex::xpath(r#"/[\N{U+41}\x{c1}]/i"#, "");
-    // p
-}
-
-#[test]
 fn test_p1430() {
     let regex = Regex::xpath(r#"[\s][\S]"#, "");
     // n
     let regex = regex.unwrap();
     assert!(!regex.is_match(r#"\x{a0}\x{a0}"#));
-}
-
-#[test]
-fn test_p1433() {
-    let regex = Regex::xpath(r#"[\x{100}\xff]"#, "i");
-    // p
-}
-
-#[test]
-fn test_p1435() {
-    let regex = Regex::xpath(r#"((??{ "(?:|)" }))\s"#, "");
-    // p
-}
-
-#[test]
-fn test_p1438() {
-    let regex = Regex::xpath(r#"abc\N\{U+BEEF}"#, "");
-    // p
-}
-
-#[test]
-fn test_p1439() {
-    let regex = Regex::xpath(r#"abc\N\{U+BEEF}"#, "");
-    // p
-}
-
-#[test]
-fn test_p1440() {
-    let regex = Regex::xpath(r#"[abc\N\{U+BEEF}]"#, "");
-    // c
-}
-
-#[test]
-fn test_p1443() {
-    let regex = Regex::xpath(r#"abc\N"#, "");
-    // p
-}
-
-#[test]
-fn test_p1444() {
-    let regex = Regex::xpath(r#"abc\N"#, "");
-    // p
-}
-
-#[test]
-fn test_p1448() {
-    let regex = Regex::xpath(r#"/\N{U+}/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1450() {
-    let regex = Regex::xpath(r#"/[\N{U+}]/"#, "");
-    // Sc
-}
-
-#[test]
-fn test_p1451() {
-    let regex = Regex::xpath(r#"/[\N{U+}]/"#, "");
-    // sc
-}
-
-#[test]
-fn test_p1452() {
-    let regex = Regex::xpath(r#"/abc\N{def/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1453() {
-    let regex = Regex::xpath(r#"/\N{U+4AG3}/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1454() {
-    let regex = Regex::xpath(r#"/[\N{U+4AG3}]/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1458() {
-    let regex = Regex::xpath(r#"\N{U+}"#, "");
-    // c
-}
-
-#[test]
-fn test_p1459() {
-    let regex = Regex::xpath(r#"[\N{U+}]"#, "");
-    // c
-}
-
-#[test]
-fn test_p1460() {
-    let regex = Regex::xpath(r#"\N{U+4AG3}"#, "");
-    // c
-}
-
-#[test]
-fn test_p1461() {
-    let regex = Regex::xpath(r#"[\N{U+4AG3}]"#, "");
-    // c
-}
-
-#[test]
-fn test_p1462() {
-    let regex = Regex::xpath(r#"abc\N{def"#, "");
-    // c
-}
-
-#[test]
-fn test_p1465() {
-    let regex = Regex::xpath(r#"/abc\N {U+41}/x"#, "");
-    // c
-}
-
-#[test]
-fn test_p1466() {
-    let regex = Regex::xpath(r#"/abc\N {SPACE}/x"#, "");
-    // c
-}
-
-#[test]
-fn test_p1469() {
-    let regex = Regex::xpath(r#"/\N{U+0xBEEF}/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1470() {
-    let regex = Regex::xpath(r#"/\N{U+BEEF.BEAD}/"#, "");
-    // c
-}
-
-#[test]
-fn test_p1474() {
-    let regex = Regex::xpath(r#"\N{U+0xBEEF}"#, "");
-    // c
 }
 
 #[test]
@@ -9603,402 +5007,6 @@ fn test_p1477() {
     // n
     let regex = regex.unwrap();
     assert!(!regex.is_match(r#"\001"#));
-}
-
-#[test]
-fn test_p1479() {
-    let regex = Regex::xpath(r#"\400"#, "");
-    // p
-}
-
-#[test]
-fn test_p1480() {
-    let regex = Regex::xpath(r#"\600"#, "");
-    // p
-}
-
-#[test]
-fn test_p1481() {
-    let regex = Regex::xpath(r#"\777"#, "");
-    // p
-}
-
-#[test]
-fn test_p1482() {
-    let regex = Regex::xpath(r#"[a\400]"#, "");
-    // p
-}
-
-#[test]
-fn test_p1483() {
-    let regex = Regex::xpath(r#"[b\600]"#, "");
-    // p
-}
-
-#[test]
-fn test_p1484() {
-    let regex = Regex::xpath(r#"[c\777]"#, "");
-    // p
-}
-
-#[test]
-fn test_p1485() {
-    let regex = Regex::xpath(r#"\o{120}"#, "");
-    // p
-}
-
-#[test]
-fn test_p1486() {
-    let regex = Regex::xpath(r#"\o{400}"#, "");
-    // p
-}
-
-#[test]
-fn test_p1487() {
-    let regex = Regex::xpath(r#"\o{1000}"#, "");
-    // p
-}
-
-#[test]
-fn test_p1488() {
-    let regex = Regex::xpath(r#"[a\o{120}]"#, "");
-    // p
-}
-
-#[test]
-fn test_p1489() {
-    let regex = Regex::xpath(r#"[a\o{400}]"#, "");
-    // p
-}
-
-#[test]
-fn test_p1490() {
-    let regex = Regex::xpath(r#"[a\o{1000}]"#, "");
-    // p
-}
-
-#[test]
-fn test_p1493() {
-    let regex = Regex::xpath(r#"\87"#, "");
-    // p
-}
-
-#[test]
-fn test_p1494() {
-    let regex = Regex::xpath(r#"a\87"#, "");
-    // c
-}
-
-#[test]
-fn test_p1495() {
-    let regex = Regex::xpath(r#"a\97"#, "");
-    // c
-}
-
-#[test]
-fn test_p1499() {
-    let regex = Regex::xpath(r#"(.)\g2147483648}"#, "");
-    // c
-}
-
-#[test]
-fn test_p1500() {
-    let regex = Regex::xpath(r#"(.)\g2147483649}"#, "");
-    // c
-}
-
-#[test]
-fn test_p1501() {
-    let regex = Regex::xpath(r#"(.)\g2147483650}"#, "");
-    // c
-}
-
-#[test]
-fn test_p1502() {
-    let regex = Regex::xpath(r#"(.)\g4294967296}"#, "");
-    // c
-}
-
-#[test]
-fn test_p1503() {
-    let regex = Regex::xpath(r#"(.)\g4294967297}"#, "");
-    // c
-}
-
-#[test]
-fn test_p1504() {
-    let regex = Regex::xpath(r#"(.)\g4294967298}"#, "");
-    // c
-}
-
-#[test]
-fn test_p1505() {
-    let regex = Regex::xpath(r#"a(.)\g2147483648}"#, "");
-    // c
-}
-
-#[test]
-fn test_p1506() {
-    let regex = Regex::xpath(r#"a(.)\g2147483649}"#, "");
-    // c
-}
-
-#[test]
-fn test_p1507() {
-    let regex = Regex::xpath(r#"a(.)\g2147483650}"#, "");
-    // c
-}
-
-#[test]
-fn test_p1508() {
-    let regex = Regex::xpath(r#"a(.)\g4294967296}"#, "");
-    // c
-}
-
-#[test]
-fn test_p1509() {
-    let regex = Regex::xpath(r#"a(.)\g4294967297}"#, "");
-    // c
-}
-
-#[test]
-fn test_p1510() {
-    let regex = Regex::xpath(r#"a(.)\g4294967298}"#, "");
-    // c
-}
-
-#[test]
-fn test_p1512() {
-    let regex = Regex::xpath(r#"(.)\g{2147483648}"#, "");
-    // c
-}
-
-#[test]
-fn test_p1513() {
-    let regex = Regex::xpath(r#"(.)\g{2147483649}"#, "");
-    // c
-}
-
-#[test]
-fn test_p1514() {
-    let regex = Regex::xpath(r#"(.)\g{2147483650}"#, "");
-    // c
-}
-
-#[test]
-fn test_p1515() {
-    let regex = Regex::xpath(r#"(.)\g{4294967296}"#, "");
-    // c
-}
-
-#[test]
-fn test_p1516() {
-    let regex = Regex::xpath(r#"(.)\g{4294967297}"#, "");
-    // c
-}
-
-#[test]
-fn test_p1517() {
-    let regex = Regex::xpath(r#"(.)\g{4294967298}"#, "");
-    // c
-}
-
-#[test]
-fn test_p1518() {
-    let regex = Regex::xpath(r#"a(.)\g{2147483648}"#, "");
-    // c
-}
-
-#[test]
-fn test_p1519() {
-    let regex = Regex::xpath(r#"a(.)\g{2147483649}"#, "");
-    // c
-}
-
-#[test]
-fn test_p1520() {
-    let regex = Regex::xpath(r#"a(.)\g{2147483650}"#, "");
-    // c
-}
-
-#[test]
-fn test_p1521() {
-    let regex = Regex::xpath(r#"a(.)\g{4294967296}"#, "");
-    // c
-}
-
-#[test]
-fn test_p1522() {
-    let regex = Regex::xpath(r#"a(.)\g{4294967297}"#, "");
-    // c
-}
-
-#[test]
-fn test_p1523() {
-    let regex = Regex::xpath(r#"a(.)\g{4294967298}"#, "");
-    // c
-}
-
-#[test]
-fn test_p1525() {
-    let regex = Regex::xpath(r#"(.)\2147483648"#, "");
-    // p
-}
-
-#[test]
-fn test_p1526() {
-    let regex = Regex::xpath(r#"(.)\2147483649"#, "");
-    // p
-}
-
-#[test]
-fn test_p1527() {
-    let regex = Regex::xpath(r#"(.)\2147483650"#, "");
-    // p
-}
-
-#[test]
-fn test_p1528() {
-    let regex = Regex::xpath(r#"(.)\4294967296"#, "");
-    // p
-}
-
-#[test]
-fn test_p1529() {
-    let regex = Regex::xpath(r#"(.)\4294967297"#, "");
-    // p
-}
-
-#[test]
-fn test_p1530() {
-    let regex = Regex::xpath(r#"(.)\4294967298"#, "");
-    // p
-}
-
-#[test]
-fn test_p1531() {
-    let regex = Regex::xpath(r#"a(.)\2147483648"#, "");
-    // p
-}
-
-#[test]
-fn test_p1532() {
-    let regex = Regex::xpath(r#"a(.)\2147483649"#, "");
-    // p
-}
-
-#[test]
-fn test_p1533() {
-    let regex = Regex::xpath(r#"a(.)\2147483650"#, "");
-    // p
-}
-
-#[test]
-fn test_p1534() {
-    let regex = Regex::xpath(r#"a(.)\4294967296"#, "");
-    // p
-}
-
-#[test]
-fn test_p1535() {
-    let regex = Regex::xpath(r#"a(.)\4294967297"#, "");
-    // p
-}
-
-#[test]
-fn test_p1536() {
-    let regex = Regex::xpath(r#"a(.)\4294967298"#, "");
-    // p
-}
-
-#[test]
-fn test_p1539() {
-    let regex = Regex::xpath(r#"[\8\9]"#, "");
-    // Sn
-}
-
-#[test]
-fn test_p1540() {
-    let regex = Regex::xpath(r#"[\8\9]"#, "");
-    // sc
-}
-
-#[test]
-fn test_p1541() {
-    let regex = Regex::xpath(r#"[\8\9]"#, "");
-    // Sy
-}
-
-#[test]
-fn test_p1542() {
-    let regex = Regex::xpath(r#"[\8\9]"#, "");
-    // Sy
-}
-
-#[test]
-fn test_p1545() {
-    let regex = Regex::xpath(r#"[\0]"#, "");
-    // Sy
-}
-
-#[test]
-fn test_p1546() {
-    let regex = Regex::xpath(r#"[\0]"#, "");
-    // sc
-}
-
-#[test]
-fn test_p1547() {
-    let regex = Regex::xpath(r#"[\07]"#, "");
-    // Sy
-}
-
-#[test]
-fn test_p1548() {
-    let regex = Regex::xpath(r#"[\07]"#, "");
-    // sc
-}
-
-#[test]
-fn test_p1549() {
-    let regex = Regex::xpath(r#"[\07]"#, "");
-    // Sn
-}
-
-#[test]
-fn test_p1550() {
-    let regex = Regex::xpath(r#"[\07]"#, "");
-    // sc
-}
-
-#[test]
-fn test_p1551() {
-    let regex = Regex::xpath(r#"[\006]"#, "");
-    // p
-}
-
-#[test]
-fn test_p1552() {
-    let regex = Regex::xpath(r#"[\006]"#, "");
-    // p
-}
-
-#[test]
-fn test_p1553() {
-    let regex = Regex::xpath(r#"[\0005]"#, "");
-    // p
-}
-
-#[test]
-fn test_p1554() {
-    let regex = Regex::xpath(r#"[\0005]"#, "");
-    // p
-}
-
-#[test]
-fn test_p1555() {
-    let regex = Regex::xpath(r#"[\_]"#, "");
-    // p
 }
 
 #[test]
@@ -10031,18 +5039,6 @@ fn test_p1562() {
     // y
     let regex = regex.unwrap();
     assert!(regex.is_match(r#"foo"#));
-}
-
-#[test]
-fn test_p1563() {
-    let regex = Regex::xpath(r#"/\xe0\pL/i"#, "");
-    // p
-}
-
-#[test]
-fn test_p1566() {
-    let regex = Regex::xpath(r#"(?{})[\x{100}]"#, "");
-    // p
 }
 
 #[test]
@@ -10166,65 +5162,11 @@ fn test_p1585() {
 }
 
 #[test]
-fn test_p1586() {
-    let regex = Regex::xpath(r#"(?aia:s)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1587() {
-    let regex = Regex::xpath(r#"(?aia:s)"#, "");
-    // p
-}
-
-#[test]
-fn test_p1592() {
-    let regex = Regex::xpath(r#"[^\x{1E9E}]/i"#, "");
-    // Sn
-}
-
-#[test]
-fn test_p1595() {
-    let regex = Regex::xpath(r#"^.*\d\H"#, "");
-    // p
-}
-
-#[test]
-fn test_p1596() {
-    let regex = Regex::xpath(r#"^.*\d\V"#, "");
-    // p
-}
-
-#[test]
-fn test_p1600() {
-    let regex = Regex::xpath(r#"^\p{L_}"#, "");
-    // p
-}
-
-#[test]
 fn test_p1601() {
     let regex = Regex::xpath(r#"^\p{L}"#, "");
     // y
     let regex = regex.unwrap();
     assert!(regex.is_match(r#"㐀"#));
-}
-
-#[test]
-fn test_p1604() {
-    let regex = Regex::xpath(r#"[s\xDF]a/ui"#, "");
-    // Sy
-}
-
-#[test]
-fn test_p1605() {
-    let regex = Regex::xpath(r#"[s\xDF]a/ui"#, "");
-    // p
-}
-
-#[test]
-fn test_p1608() {
-    let regex = Regex::xpath(r#"^\R\x0A$"#, "");
-    // p
 }
 
 #[test]
@@ -10260,18 +5202,6 @@ fn test_p1613() {
 }
 
 #[test]
-fn test_p1616() {
-    let regex = Regex::xpath(r#"(?#( (?{1+)a"#, "");
-    // p
-}
-
-#[test]
-fn test_p1617() {
-    let regex = Regex::xpath(r#"a# (?{1+"#, "x");
-    // p
-}
-
-#[test]
 fn test_p1618() {
     let regex = Regex::xpath(r#"ab[(?{1]"#, "");
     // y
@@ -10288,24 +5218,6 @@ fn test_p1619() {
 }
 
 #[test]
-fn test_p1620() {
-    let regex = Regex::xpath(r#"ab(?{"["})cd"#, "");
-    // p
-}
-
-#[test]
-fn test_p1621() {
-    let regex = Regex::xpath(r#"ab(??{"[x]"})cd"#, "");
-    // p
-}
-
-#[test]
-fn test_p1622() {
-    let regex = Regex::xpath(r#"ab\[(??{1})c"#, "");
-    // p
-}
-
-#[test]
 fn test_p1623() {
     let regex = Regex::xpath(r#"ab\\[(??{1;})]c"#, "");
     // y
@@ -10314,23 +5226,11 @@ fn test_p1623() {
 }
 
 #[test]
-fn test_p1624() {
-    let regex = Regex::xpath(r#"ab\\\[(??{1})c"#, "");
-    // p
-}
-
-#[test]
 fn test_p1625() {
     let regex = Regex::xpath(r#"ab[c\](??{"]d"#, "");
     // y
     let regex = regex.unwrap();
     assert!(regex.is_match(r#"abcd"#));
-}
-
-#[test]
-fn test_p1626() {
-    let regex = Regex::xpath(r#"ab[c\\](??{"[x]"})d"#, "");
-    // p
 }
 
 #[test]
@@ -10347,12 +5247,6 @@ fn test_p1631() {
     // n
     let regex = regex.unwrap();
     assert!(!regex.is_match(r#"abcdef\x{FB03}\x{FB04}"#));
-}
-
-#[test]
-fn test_p1632() {
-    let regex = Regex::xpath(r#"/\xdf\xdf/ui"#, "");
-    // p
 }
 
 #[test]
@@ -10388,24 +5282,6 @@ fn test_p1637() {
 }
 
 #[test]
-fn test_p1640() {
-    let regex = Regex::xpath(r#"/[[:lower:]]/i"#, "");
-    // p
-}
-
-#[test]
-fn test_p1641() {
-    let regex = Regex::xpath(r#"/[[:upper:]]/i"#, "");
-    // p
-}
-
-#[test]
-fn test_p1645() {
-    let regex = Regex::xpath(r#"/s\xDF/ui"#, "");
-    // p
-}
-
-#[test]
 fn test_p1646() {
     let regex = Regex::xpath(r#"/sst/ui"#, "");
     // n
@@ -10419,150 +5295,6 @@ fn test_p1647() {
     // n
     let regex = regex.unwrap();
     assert!(!regex.is_match(r#"s\N{LATIN SMALL LIGATURE LONG S T}"#));
-}
-
-#[test]
-fn test_p1650() {
-    let regex = Regex::xpath(r#"/[[:ascii:]]/i"#, "");
-    // p
-}
-
-#[test]
-fn test_p1654() {
-    let regex = Regex::xpath(r#"/[[:lower:]]/i"#, "");
-    // p
-}
-
-#[test]
-fn test_p1655() {
-    let regex = Regex::xpath(r#"/[[:upper:]]/i"#, "");
-    // p
-}
-
-#[test]
-fn test_p1658() {
-    let regex = Regex::xpath(r#"[^\p{Alphabetic}]"#, "");
-    // p
-}
-
-#[test]
-fn test_p1661() {
-    let regex = Regex::xpath(r#"/[[:alnum:]]/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1662() {
-    let regex = Regex::xpath(r#"/[[:alnum:]]/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1663() {
-    let regex = Regex::xpath(r#"/[[:alpha:]]/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1664() {
-    let regex = Regex::xpath(r#"/[[:alpha:]]/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1665() {
-    let regex = Regex::xpath(r#"/[[:graph:]]/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1666() {
-    let regex = Regex::xpath(r#"/[[:graph:]]/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1667() {
-    let regex = Regex::xpath(r#"/[[:lower:]]/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1668() {
-    let regex = Regex::xpath(r#"/[[:lower:]]/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1669() {
-    let regex = Regex::xpath(r#"/[[:lower:]]/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1670() {
-    let regex = Regex::xpath(r#"/[[:print:]]/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1671() {
-    let regex = Regex::xpath(r#"/[[:print:]]/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1672() {
-    let regex = Regex::xpath(r#"/[[:punct:]]/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1673() {
-    let regex = Regex::xpath(r#"/[[:punct:]]/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1674() {
-    let regex = Regex::xpath(r#"/[[:punct:]]/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1675() {
-    let regex = Regex::xpath(r#"/[[:upper:]]/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1676() {
-    let regex = Regex::xpath(r#"/[[:upper:]]/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1677() {
-    let regex = Regex::xpath(r#"/[[:word:]]/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1678() {
-    let regex = Regex::xpath(r#"/[[:word:]]/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1681() {
-    let regex = Regex::xpath(r#"/syntax OK\s+\z/si"#, "");
-    // p
-}
-
-#[test]
-fn test_p1683() {
-    let regex = Regex::xpath(r#"^(.*?)\s*\|\s*(?:\/\s*|)'(.+)'$"#, "");
-    // p
 }
 
 #[test]
@@ -10630,30 +5362,6 @@ fn test_p1692() {
 }
 
 #[test]
-fn test_p1694() {
-    let regex = Regex::xpath(r#"^(?i:foo|)bar$"#, "");
-    // p
-}
-
-#[test]
-fn test_p1695() {
-    let regex = Regex::xpath(r#"^(?i:foo||baz)bar$"#, "");
-    // p
-}
-
-#[test]
-fn test_p1696() {
-    let regex = Regex::xpath(r#"^(?i:foo||baz)bar$"#, "");
-    // p
-}
-
-#[test]
-fn test_p1697() {
-    let regex = Regex::xpath(r#"^(?i:foo||baz)bar$"#, "");
-    // p
-}
-
-#[test]
 fn test_p1701() {
     let regex = Regex::xpath(r#"^(.)(?:(..)|B)[CX]"#, "");
     // y
@@ -10710,108 +5418,6 @@ fn test_p1711() {
 }
 
 #[test]
-fn test_p1714() {
-    let regex = Regex::xpath(r#"^(A)(?{"xyz"})B$"#, "");
-    // p
-}
-
-#[test]
-fn test_p1715() {
-    let regex = Regex::xpath(r#"^(A)(?{return "xyz"})B$"#, "");
-    // p
-}
-
-#[test]
-fn test_p1716() {
-    let regex = Regex::xpath(r#"^(A)((??{"xyz"}))$"#, "");
-    // p
-}
-
-#[test]
-fn test_p1717() {
-    let regex = Regex::xpath(r#"^(A)((??{return "xyz"}))$"#, "");
-    // p
-}
-
-#[test]
-fn test_p1718() {
-    let regex = Regex::xpath(r#"^(A)((?(?{1})abc|xyz))$"#, "");
-    // p
-}
-
-#[test]
-fn test_p1719() {
-    let regex = Regex::xpath(r#"^(A)((?(?{0})abc|xyz))$"#, "");
-    // p
-}
-
-#[test]
-fn test_p1720() {
-    let regex = Regex::xpath(r#"^(A)((?(?{return 1})abc|xyz))$"#, "");
-    // p
-}
-
-#[test]
-fn test_p1721() {
-    let regex = Regex::xpath(r#"^(A)((?(?{return 0})abc|xyz))$"#, "");
-    // p
-}
-
-#[test]
-fn test_p1726() {
-    let regex = Regex::xpath(r#"/^(a)((??{"b"}))$/i"#, "");
-    // p
-}
-
-#[test]
-fn test_p1727() {
-    let regex = Regex::xpath(r#"/^(A)((??{'B$'}))(\nC)$/m"#, "");
-    // p
-}
-
-#[test]
-fn test_p1728() {
-    let regex = Regex::xpath(r#"/^(A)((??{'.'}))(B)$/s"#, "");
-    // p
-}
-
-#[test]
-fn test_p1729() {
-    let regex = Regex::xpath(r#"/^(A) ((??{' .'}))(B)$/x"#, "");
-    // p
-}
-
-#[test]
-fn test_p1730() {
-    let regex = Regex::xpath(r#"/^((??{'\d'}))$/a"#, "");
-    // p
-}
-
-#[test]
-fn test_p1731() {
-    let regex = Regex::xpath(r#"/^(??{"s"})$/i"#, "");
-    // p
-}
-
-#[test]
-fn test_p1732() {
-    let regex = Regex::xpath(r#"/^(??{"s"})$/ia"#, "");
-    // p
-}
-
-#[test]
-fn test_p1733() {
-    let regex = Regex::xpath(r#"/^(??{"s"})$/iaa"#, "");
-    // p
-}
-
-#[test]
-fn test_p1734() {
-    let regex = Regex::xpath(r#"/^(??{'\w'})$/u"#, "");
-    // p
-}
-
-#[test]
 fn test_p1739() {
     let regex = Regex::xpath(r#"^(?:(X)?(\d)|(X)?(\d\d))$"#, "");
     // y
@@ -10828,12 +5434,6 @@ fn test_p1740() {
 }
 
 #[test]
-fn test_p1743() {
-    let regex = Regex::xpath(r#"\A(?>\[(?:(?:)(?:R){1}|T|V?|A)\])\z"#, "");
-    // p
-}
-
-#[test]
 fn test_p1745() {
     let regex = Regex::xpath(r#"( [^z] $ [^z]+)"#, "xm");
     // y
@@ -10844,30 +5444,6 @@ bb
 cc
 "#
     ));
-}
-
-#[test]
-fn test_p1748() {
-    let regex = Regex::xpath(r#"[\h]"#, "");
-    // p
-}
-
-#[test]
-fn test_p1749() {
-    let regex = Regex::xpath(r#"[\H]"#, "");
-    // p
-}
-
-#[test]
-fn test_p1750() {
-    let regex = Regex::xpath(r#"[\H]"#, "");
-    // p
-}
-
-#[test]
-fn test_p1751() {
-    let regex = Regex::xpath(r#"[\H]"#, "");
-    // p
 }
 
 #[test]
@@ -10884,18 +5460,6 @@ fn test_p1754() {
     // y
     let regex = regex.unwrap();
     assert!(regex.is_match(r#"a\n"#));
-}
-
-#[test]
-fn test_p1757() {
-    let regex = Regex::xpath(r#"(?a:\p{Any})"#, "");
-    // p
-}
-
-#[test]
-fn test_p1758() {
-    let regex = Regex::xpath(r#"(?aa:\p{Any})"#, "");
-    // p
 }
 
 #[test]
@@ -10931,24 +5495,6 @@ fn test_p1763() {
 }
 
 #[test]
-fn test_p1765() {
-    let regex = Regex::xpath(r#"/^(?d:\xdf|_)*_/i"#, "");
-    // p
-}
-
-#[test]
-fn test_p1770() {
-    let regex = Regex::xpath(r#"(\x{100})"#, "");
-    // p
-}
-
-#[test]
-fn test_p1772() {
-    let regex = Regex::xpath(r#"^\R{2}$"#, "");
-    // p
-}
-
-#[test]
 fn test_p1774() {
     let regex = Regex::xpath(r#"/^\D{11}/a"#, "");
     // n
@@ -10973,59 +5519,11 @@ fn test_p1776() {
 }
 
 #[test]
-fn test_p1779() {
-    let regex = Regex::xpath(r#"\Vn"#, "");
-    // p
-}
-
-#[test]
-fn test_p1782() {
-    let regex = Regex::xpath(r#"/(?l:a?\w)/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1783() {
-    let regex = Regex::xpath(r#"/(?l:a?\D)/"#, "");
-    // p
-}
-
-#[test]
-fn test_p1784() {
-    let regex = Regex::xpath(r#"^_?[^\S_0-9]\w*\z"#, "");
-    // p
-}
-
-#[test]
 fn test_p1785() {
     let regex = Regex::xpath(r#"m?^xy\?$?"#, "");
     // y
     let regex = regex.unwrap();
     assert!(regex.is_match(r#"xy?"#));
-}
-
-#[test]
-fn test_p1786() {
-    let regex = Regex::xpath(r#"a?\X"#, "");
-    // p
-}
-
-#[test]
-fn test_p1787() {
-    let regex = Regex::xpath(r#"a?\R"#, "");
-    // p
-}
-
-#[test]
-fn test_p1788() {
-    let regex = Regex::xpath(r#"^a?\N$"#, "");
-    // p
-}
-
-#[test]
-fn test_p1789() {
-    let regex = Regex::xpath(r#"\N?a"#, "");
-    // p
 }
 
 #[test]
@@ -11053,12 +5551,6 @@ fn test_p1792() {
 }
 
 #[test]
-fn test_p1796() {
-    let regex = Regex::xpath(r#"^(\x{100}|a)(??{ qr/.?\xF7/d})"#, "");
-    // p
-}
-
-#[test]
 fn test_p1799() {
     let regex = Regex::xpath(r#"(a|(bc)){0,0}?xyz"#, "");
     // y
@@ -11074,418 +5566,130 @@ fn test_p1800() {
     assert!(regex.is_match(r#"xyz"#));
 }
 
-// #[test]
-// fn test_p1802() {
-//     let regex = Regex::xpath(r#"(a|(bc)){0,0}+xyz"#, "");
-//     // p
-// }
+#[test]
+fn test_p1803() {
+    let regex = Regex::xpath(r#"(( a | ( bc ) ) {0,0} )+ xyz"#, "x");
+    // y
+    let regex = regex.unwrap();
+    assert!(regex.is_match(r#"xyz"#));
+}
 
-// #[test]
-// fn test_p1803() {
-//     let regex = Regex::xpath(r#"(( a | ( bc ) ) {0,0} )+ xyz"#, "x");
-//     // y
-//     let regex = regex.unwrap();
-//     assert!(regex.is_match(r#"xyz"#));
-// }
+#[test]
+fn test_p1820() {
+    let regex = Regex::xpath(r#"[#]"#, "");
+    // y
+    let regex = regex.unwrap();
+    assert!(regex.is_match(r#"a#b"#));
+}
 
-// #[test]
-// fn test_p1805() {
-//     let regex = Regex::xpath(r#"(A(*PRUNE)B|A(*PRUNE)C)"#, "");
-//     // p
-// }
+#[test]
+fn test_p1821() {
+    let regex = Regex::xpath(r#"[#]b"#, "");
+    // y
+    let regex = regex.unwrap();
+    assert!(regex.is_match(r#"a#b"#));
+}
 
-// #[test]
-// fn test_p1806() {
-//     let regex = Regex::xpath(r#"(A(*PRUNE)B|A(*PRUNE)D|A(*PRUNE)C)"#, "");
-//     // p
-// }
+#[test]
+fn test_p1822() {
+    let regex = Regex::xpath(r#"[#]"#, "x");
+    // y
+    let regex = regex.unwrap();
+    assert!(regex.is_match(r#"a#b"#));
+}
 
-// #[test]
-// fn test_p1807() {
-//     let regex = Regex::xpath(r#"(A(*PRUNE)B|A(*PRUNE)C|A(*PRUNE)D)"#, "");
-//     // p
-// }
+#[test]
+fn test_p1823() {
+    let regex = Regex::xpath(r#"[#]b"#, "x");
+    // y
+    let regex = regex.unwrap();
+    assert!(regex.is_match(r#"a#b"#));
+}
 
-// #[test]
-// fn test_p1808() {
-//     let regex = Regex::xpath(r#"((A(*PRUNE)B|A(*PRUNE)C))"#, "");
-//     // p
-// }
+#[test]
+fn test_p1848() {
+    let regex = Regex::xpath(r#"^\S+="#, "");
+    // y
+    let regex = regex.unwrap();
+    assert!(regex.is_match(r#"Σ=Π"#));
+}
 
-// #[test]
-// fn test_p1809() {
-//     let regex = Regex::xpath(r#"((A(*PRUNE)B|A(*PRUNE)D|A(*PRUNE)C))"#, "");
-//     // p
-// }
+#[test]
+fn test_p1854() {
+    let regex = Regex::xpath(r#"^x?abc?de"#, "");
+    // y
+    let regex = regex.unwrap();
+    assert!(regex.is_match(r#"abcde"#));
+}
 
-// #[test]
-// fn test_p1810() {
-//     let regex = Regex::xpath(r#"((A(*PRUNE)B|A(*PRUNE)C|A(*PRUNE)D))"#, "");
-//     // p
-// }
+#[test]
+fn test_p1860() {
+    let regex = Regex::xpath(r#"/^[+]([^(]+)$/mi"#, "");
+    // n
+    let regex = regex.unwrap();
+    assert!(!regex.is_match(r#"li"#));
+}
 
-// #[test]
-// fn test_p1812() {
-//     let regex = Regex::xpath(r#"A+?(*THEN)BC"#, "");
-//     // p
-// }
+#[test]
+fn test_p1878() {
+    let regex = Regex::xpath(r#"(a)(b)(c)(d)(e)(f)(g)(h)(i)\10"#, "");
+    // n
+    let regex = regex.unwrap();
+    assert!(!regex.is_match(r#"abcdefghi\10"#));
+}
 
-// #[test]
-// fn test_p1813() {
-//     let regex = Regex::xpath(r#"A+?(*PRUNE)BC"#, "");
-//     // p
-// }
+#[test]
+fn test_p1879() {
+    let regex = Regex::xpath(r#"(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)\11"#, "");
+    // n
+    let regex = regex.unwrap();
+    assert!(!regex.is_match(r#"abcdefghij\11"#));
+}
 
-// #[test]
-// fn test_p1814() {
-//     let regex = Regex::xpath(r#"A+(*THEN)BC"#, "");
-//     // p
-// }
+#[test]
+fn test_p1880() {
+    let regex = Regex::xpath(r#"(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k)\12"#, "");
+    // n
+    let regex = regex.unwrap();
+    assert!(!regex.is_match(r#"abcdefghijk\12"#));
+}
 
-// #[test]
-// fn test_p1815() {
-//     let regex = Regex::xpath(r#"A+(*PRUNE)BC"#, "");
-//     // p
-// }
+#[test]
+fn test_p1881() {
+    let regex = Regex::xpath(r#"(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k)\12\13\14"#, "");
+    // n
+    let regex = regex.unwrap();
+    assert!(!regex.is_match(r#"abcdefghijk\12\13\14"#));
+}
 
-// #[test]
-// fn test_p1816() {
-//     let regex = Regex::xpath(r#"A+?(*THEN)BC(?{})"#, "");
-//     // p
-// }
+#[test]
+fn test_p1883() {
+    let regex = Regex::xpath(r#"\d<(.*?)>"#, "");
+    // n
+    let regex = regex.unwrap();
+    assert!(!regex.is_match(r#"a<>"#));
+}
 
-// #[test]
-// fn test_p1817() {
-//     let regex = Regex::xpath(r#"A+?(*PRUNE)BC(?{})"#, "");
-//     // p
-// }
+#[test]
+fn test_p1884() {
+    let regex = Regex::xpath(r#"[bcd].{2,3}aaaa"#, "");
+    // y
+    let regex = regex.unwrap();
+    assert!(regex.is_match(r#"XbXaaaaa"#));
+}
 
-// #[test]
-// fn test_p1818() {
-//     let regex = Regex::xpath(r#"A+(*THEN)BC(?{})"#, "");
-//     // p
-// }
+#[test]
+fn test_p1885() {
+    let regex = Regex::xpath(r#"[bcd].{2,3}aaaa"#, "");
+    // y
+    let regex = regex.unwrap();
+    assert!(regex.is_match(r#"XbĀaaaaa"#));
+}
 
-// #[test]
-// fn test_p1819() {
-//     let regex = Regex::xpath(r#"A+(*PRUNE)BC(?{})"#, "");
-//     // p
-// }
-
-// #[test]
-// fn test_p1820() {
-//     let regex = Regex::xpath(r#"[#]"#, "");
-//     // y
-//     let regex = regex.unwrap();
-//     assert!(regex.is_match(r#"a#b"#));
-// }
-
-// #[test]
-// fn test_p1821() {
-//     let regex = Regex::xpath(r#"[#]b"#, "");
-//     // y
-//     let regex = regex.unwrap();
-//     assert!(regex.is_match(r#"a#b"#));
-// }
-
-// #[test]
-// fn test_p1822() {
-//     let regex = Regex::xpath(r#"[#]"#, "x");
-//     // y
-//     let regex = regex.unwrap();
-//     assert!(regex.is_match(r#"a#b"#));
-// }
-
-// #[test]
-// fn test_p1823() {
-//     let regex = Regex::xpath(r#"[#]b"#, "x");
-//     // y
-//     let regex = regex.unwrap();
-//     assert!(regex.is_match(r#"a#b"#));
-// }
-
-// #[test]
-// fn test_p1824() {
-//     let regex = Regex::xpath(r#"[#](?{})"#, "x");
-//     // p
-// }
-
-// #[test]
-// fn test_p1825() {
-//     let regex = Regex::xpath(r#"[#](??{'b'})"#, "x");
-//     // p
-// }
-
-// #[test]
-// fn test_p1826() {
-//     let regex = Regex::xpath(r#"(?#)(?{})b"#, "");
-//     // p
-// }
-
-// #[test]
-// fn test_p1827() {
-//     let regex = Regex::xpath(r#"(?#)(??{'b'})"#, "");
-//     // p
-// }
-
-// #[test]
-// fn test_p1828() {
-//     let regex = Regex::xpath(r#"[(?#](?{})b"#, "");
-//     // p
-// }
-
-// #[test]
-// fn test_p1829() {
-//     let regex = Regex::xpath(r#"[(?#](??{'b'})"#, "");
-//     // p
-// }
-
-// #[test]
-// fn test_p1830() {
-//     let regex = Regex::xpath(r#"(?#)(?{})b"#, "x");
-//     // p
-// }
-
-// #[test]
-// fn test_p1831() {
-//     let regex = Regex::xpath(r#"(?#)(??{'b'})"#, "x");
-//     // p
-// }
-
-// #[test]
-// fn test_p1834() {
-//     let regex = Regex::xpath(r#"^(?=(a)){0}b(?1)"#, "");
-//     // p
-// }
-
-// #[test]
-// fn test_p1836() {
-//     let regex = Regex::xpath(r#"(?:(a(*SKIP)b)){0}(?:(?1)|ac)"#, "");
-//     // p
-// }
-
-// #[test]
-// fn test_p1838() {
-//     let regex = Regex::xpath(r#"(?1)(?:(b)){0}"#, "");
-//     // p
-// }
-
-// #[test]
-// fn test_p1840() {
-//     let regex = Regex::xpath(r#"^A*\z"#, "");
-//     // p
-// }
-
-// #[test]
-// fn test_p1841() {
-//     let regex = Regex::xpath(r#"\N* "#, "x");
-//     // p
-// }
-
-// #[test]
-// fn test_p1842() {
-//     let regex = Regex::xpath(r#"\N (?#comment) * "#, "x");
-//     // p
-// }
-
-// #[test]
-// fn test_p1845() {
-//     let regex = Regex::xpath(r#"(?<W>a)(?<BB>(?=(?&W))(?<=(?&W)))(?&BB)"#, "");
-//     // p
-// }
-
-// #[test]
-// fn test_p1848() {
-//     let regex = Regex::xpath(r#"^\S+="#, "");
-//     // y
-//     let regex = regex.unwrap();
-//     assert!(regex.is_match(r#"Σ=Π"#));
-// }
-
-// #[test]
-// fn test_p1852() {
-//     let regex = Regex::xpath(r#"\x{100}[xy]\x{100}{2}"#, "");
-//     // p
-// }
-
-// #[test]
-// fn test_p1853() {
-//     let regex = Regex::xpath(r#"\x{100}a{2,3}"#, "");
-//     // p
-// }
-
-// #[test]
-// fn test_p1854() {
-//     let regex = Regex::xpath(r#"^x?abc?de"#, "");
-//     // y
-//     let regex = regex.unwrap();
-//     assert!(regex.is_match(r#"abcde"#));
-// }
-
-// #[test]
-// fn test_p1856() {
-//     let regex = Regex::xpath(r#"(?-m:^abc)"#, "m");
-//     // p
-// }
-
-// #[test]
-// fn test_p1857() {
-//     let regex = Regex::xpath(r#"(?-m:^abc)"#, "m");
-//     // p
-// }
-
-// #[test]
-// fn test_p1860() {
-//     let regex = Regex::xpath(r#"/^[+]([^(]+)$/mi"#, "");
-//     // n
-//     let regex = regex.unwrap();
-//     assert!(!regex.is_match(r#"li"#));
-// }
-
-// #[test]
-// fn test_p1863() {
-//     let regex = Regex::xpath(r#"/(.)((o)\1)(?2)/"#, "");
-//     // p
-// }
-
-// #[test]
-// fn test_p1864() {
-//     let regex = Regex::xpath(r#"/(.)(?2)((\1)(?4)(\1))/"#, "");
-//     // p
-// }
-
-// #[test]
-// fn test_p1865() {
-//     let regex = Regex::xpath(r#"/(.)(?2)((.)(?4)(\1))/"#, "");
-//     // p
-// }
-
-// #[test]
-// fn test_p1866() {
-//     let regex = Regex::xpath(r#"/^(.\2?)(.)(?1)$/"#, "");
-//     // p
-// }
-
-// #[test]
-// fn test_p1867() {
-//     let regex = Regex::xpath(r#"/^(.\1?)(?1)$/"#, "");
-//     // p
-// }
-
-// #[test]
-// fn test_p1868() {
-//     let regex = Regex::xpath(r#"/^ (\3(?2)\3)? ((.)) (?1) $/x"#, "");
-//     // p
-// }
-
-// #[test]
-// fn test_p1869() {
-//     let regex = Regex::xpath(r#"/^ (a|\3(?1)\2|(?2)) ((b|c)(?4)?) (?1) (d(?1)) $/x"#, "");
-//     // p
-// }
-
-// #[test]
-// fn test_p1872() {
-//     let regex = Regex::xpath(r#"(a)\2/"#, "");
-//     // c
-// }
-
-// #[test]
-// fn test_p1873() {
-//     let regex = Regex::xpath(r#"(a)(b)\3"#, "");
-//     // c
-// }
-
-// #[test]
-// fn test_p1874() {
-//     let regex = Regex::xpath(r#"(a)(b)(c)\4"#, "");
-//     // c
-// }
-
-// #[test]
-// fn test_p1875() {
-//     let regex = Regex::xpath(r#"(a)(b)(c)(d)\5"#, "");
-//     // c
-// }
-
-// #[test]
-// fn test_p1876() {
-//     let regex = Regex::xpath(r#"(a)(b)(c)(d)(e)\6"#, "");
-//     // c
-// }
-
-// #[test]
-// fn test_p1877() {
-//     let regex = Regex::xpath(r#"(a)(b)(c)(d)(e)(f)\7"#, "");
-//     // c
-// }
-
-// #[test]
-// fn test_p1878() {
-//     let regex = Regex::xpath(r#"(a)(b)(c)(d)(e)(f)(g)(h)(i)\10"#, "");
-//     // n
-//     let regex = regex.unwrap();
-//     assert!(!regex.is_match(r#"abcdefghi\10"#));
-// }
-
-// #[test]
-// fn test_p1879() {
-//     let regex = Regex::xpath(r#"(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)\11"#, "");
-//     // n
-//     let regex = regex.unwrap();
-//     assert!(!regex.is_match(r#"abcdefghij\11"#));
-// }
-
-// #[test]
-// fn test_p1880() {
-//     let regex = Regex::xpath(r#"(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k)\12"#, "");
-//     // n
-//     let regex = regex.unwrap();
-//     assert!(!regex.is_match(r#"abcdefghijk\12"#));
-// }
-
-// #[test]
-// fn test_p1881() {
-//     let regex = Regex::xpath(r#"(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k)\12\13\14"#, "");
-//     // n
-//     let regex = regex.unwrap();
-//     assert!(!regex.is_match(r#"abcdefghijk\12\13\14"#));
-// }
-
-// #[test]
-// fn test_p1883() {
-//     let regex = Regex::xpath(r#"\d<(.*?)>"#, "");
-//     // n
-//     let regex = regex.unwrap();
-//     assert!(!regex.is_match(r#"a<>"#));
-// }
-
-// #[test]
-// fn test_p1884() {
-//     let regex = Regex::xpath(r#"[bcd].{2,3}aaaa"#, "");
-//     // y
-//     let regex = regex.unwrap();
-//     assert!(regex.is_match(r#"XbXaaaaa"#));
-// }
-
-// #[test]
-// fn test_p1885() {
-//     let regex = Regex::xpath(r#"[bcd].{2,3}aaaa"#, "");
-//     // y
-//     let regex = regex.unwrap();
-//     assert!(regex.is_match(r#"XbĀaaaaa"#));
-// }
-
-// #[test]
-// fn test_p1886() {
-//     let regex = Regex::xpath(r#"\Awibble\z"#, "m");
-//     // p
-// }
-
-// #[test]
-// fn test_p1887() {
-//     let regex = Regex::xpath(r#"(alias|status)es$"#, "i");
-//     // y
-//     let regex = regex.unwrap();
-//     assert!(regex.is_match(r#"Statuses"#));
-// }
+#[test]
+fn test_p1887() {
+    let regex = Regex::xpath(r#"(alias|status)es$"#, "i");
+    // y
+    let regex = regex.unwrap();
+    assert!(regex.is_match(r#"Statuses"#));
+}

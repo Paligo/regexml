@@ -69,7 +69,8 @@ impl OperationControl for GreedyFixed {
         let mut matches = 0;
         while p <= guard {
             let mut it = self.operation.matches_iter(matcher, p);
-            if it.next().is_some() {
+            let matched = it.next().is_some();
+            if matched {
                 matches += 1;
                 p += self.len;
                 if matches == self.max {
