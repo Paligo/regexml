@@ -286,6 +286,7 @@ impl ReCompiler {
                     }
                 } else if block.starts_with(&['I', 's']) {
                     let name = block[2..].iter().collect::<String>();
+                    // TODO: obey isAllowUnknownBlockNames to follow XSD spec (which doesn't make this an error)
                     let cc = CharacterClassBuilder::CodePointInversionListBuilder(category::block(
                         &name,
                     )?);
