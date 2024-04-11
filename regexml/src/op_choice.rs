@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::{
-    operation::{Operation, OperationControl},
+    operation::{Operation, OperationControl, MATCHES_ZLS_NEVER},
     re_matcher::ReMatcher,
 };
 
@@ -41,9 +41,16 @@ impl OperationControl for Choice {
     }
 
     fn matches_empty_string(&self) -> u32 {
-        self.branches
-            .iter()
-            .fold(0, |acc, branch| acc | branch.matches_empty_string())
+        self.branches.iter().fold(0, |acc, branch| {
+            acc | {
+                let b = branch.matches_empty_string();
+                if b != MATCHES_ZLS_NEVER {
+                    acc | b
+                } else {
+                    acc
+                }
+            }
+        })
     }
 
     fn contains_capturing_expressions(&self) -> bool {
@@ -125,3 +132,26 @@ impl<'a> Iterator for ChoiceIterator<'a> {
         }
     }
 }
+
+
+// impl<'a> Iterator for ChoiceIterator<'a> {
+//     type Item = usize;
+
+//     fn next(&mut self) -> Option<Self::Item> {
+//         loop {
+//             if self.current_iter.is_none() {
+//                 if let Some(next) = self.branches_iter.next() {
+//                     self.matcher.clear_captured_groups_beyond(self.position);
+//                     self.current_iter = Some(next.matches_iter(self.matcher, self.position));
+//                 } else {
+//                     return None;
+//                 }
+//             }
+//             if let Some(current_iter) = &mut self.current_iter {
+//                 return current_iter.next();
+//             } else {
+//                 self.current_iter = None;
+//             }
+//         }
+//     }
+// }

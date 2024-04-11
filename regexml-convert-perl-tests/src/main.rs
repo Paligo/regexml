@@ -56,7 +56,7 @@ fn main() {
     .unwrap();
     writeln!(stdout).unwrap();
 
-    writeln!(stdout, "use regexml::{{Regex, Error}};").unwrap();
+    writeln!(stdout, "use regexml::Regex;").unwrap();
     writeln!(stdout).unwrap();
     for test in &tests {
         generate_test_case(&mut stdout, test);
