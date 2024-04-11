@@ -1,5 +1,5 @@
 [workspace]
-members = ["regexml"]
+members = ["regexml", "regexml-convert-perl-tests"]
 # even if all crates are set to edition 2021, we still need to force the
 # resolver to 2
 # https://github.com/gfx-rs/wgpu/issues/2356#issuecomment-1005134986
