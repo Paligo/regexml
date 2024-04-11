@@ -133,7 +133,6 @@ impl<'a> Iterator for ChoiceIterator<'a> {
     }
 }
 
-
 // impl<'a> Iterator for ChoiceIterator<'a> {
 //     type Item = usize;
 
