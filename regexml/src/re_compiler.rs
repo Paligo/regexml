@@ -268,7 +268,7 @@ impl ReCompiler {
                         escape_char
                     )))?;
                 let close = from + close;
-                println!("{:?}, from: {}, close: {}", self.pattern, self.idx, close);
+
                 let block = &self.pattern[self.idx..close];
 
                 if block.len() == 1 || block.len() == 2 {
