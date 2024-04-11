@@ -1,3 +1,5 @@
+use icu_collections::codepointinvlist::CodePointInversionListBuilder;
+use icu_properties::{sets, GeneralCategoryGroup};
 use regexml::Regex;
 
 #[test]
@@ -34,3 +36,22 @@ fn test_backtrack_attempt() {
 //     let regex = regex.unwrap();
 //     assert!(regex.is_match(r#"WORDS"#));
 // }
+
+#[test]
+fn test_l_category_group() {
+    let c = '㐀';
+
+    let set = sets::for_general_category_group(GeneralCategoryGroup::Letter);
+    let inv_list = set.to_code_point_inversion_list();
+    let mut builder = CodePointInversionListBuilder::new();
+    builder.add_set(&inv_list);
+    let b = builder.build();
+    assert!(b.contains(c));
+}
+
+#[test]
+fn test_l_category_membership() {
+    let regex = Regex::xpath(r#"^\p{L}"#, "");
+    let regex = regex.unwrap();
+    assert!(regex.is_match(r#"㐀"#));
+}

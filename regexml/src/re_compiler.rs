@@ -256,7 +256,8 @@ impl ReCompiler {
                         escape_char
                     )));
                 }
-                let from = self.idx + 1;
+                self.idx += 1;
+                let from = self.idx;
                 let close = self
                     .pattern
                     .iter()
@@ -266,21 +267,33 @@ impl ReCompiler {
                         "No closing '}}' after \\{}",
                         escape_char
                     )))?;
+                let close = from + close;
+                println!("{:?}, from: {}, close: {}", self.pattern, self.idx, close);
                 let block = &self.pattern[self.idx..close];
 
                 if block.len() == 1 || block.len() == 2 {
-                    Ok(CharacterClassBuilder::CodePointInversionListBuilder(
-                        category::category_group(&block.iter().collect::<String>())?,
-                    )
-                    .into())
+                    self.idx = close + 1;
+                    let name = block.iter().collect::<String>();
+
+                    let cc = CharacterClassBuilder::CodePointInversionListBuilder(
+                        category::category_group(&name)?,
+                    );
+
+                    if escape_char == 'p' {
+                        Ok(cc.into())
+                    } else {
+                        Ok(cc.complement().into())
+                    }
                 } else if block.starts_with(&['I', 's']) {
                     let name = block[2..].iter().collect::<String>();
-                    Ok(
-                        CharacterClassBuilder::CodePointInversionListBuilder(category::block(
-                            &name,
-                        )?)
-                        .into(),
-                    )
+                    let cc = CharacterClassBuilder::CodePointInversionListBuilder(category::block(
+                        &name,
+                    )?);
+                    if escape_char == 'p' {
+                        Ok(cc.into())
+                    } else {
+                        Ok(cc.complement().into())
+                    }
                 } else {
                     Err(Error::syntax(format!(
                         "Unknown character category: {}",
