@@ -115,7 +115,6 @@ impl<'a> ReMatcher<'a> {
         while which > self.startn_len() - 1 {
             let start_len = self.startn_len();
             let mut s2 = vec![Some(0); start_len * 2];
-            dbg!(&s2, start_len);
             s2[..start_len].copy_from_slice(&self.state.borrow().capture_state.startn[..start_len]);
             for entry in s2.iter_mut().skip(start_len) {
                 *entry = None

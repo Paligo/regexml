@@ -106,7 +106,6 @@ struct SequenceIterator<'a> {
     operations: Vec<Rc<Operation>>,
     backtracking_limit: Option<usize>,
     matcher: &'a ReMatcher<'a>,
-    position: usize,
     saved_state: Option<CaptureState>,
 }
 
@@ -122,13 +121,11 @@ impl<'a> SequenceIterator<'a> {
         } else {
             None
         };
-
         Self {
             iterators: vec![operations.first().unwrap().matches_iter(matcher, position)],
             operations,
             backtracking_limit: matcher.program.backtracking_limit,
             matcher,
-            position,
             saved_state,
         }
     }

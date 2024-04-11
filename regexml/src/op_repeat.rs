@@ -251,7 +251,6 @@ impl<'a> Iterator for ReluctantRepeatIterator<'a> {
                 break;
             }
         }
-        println!("Yielded {:?}", self.position);
         self.position
     }
 }
