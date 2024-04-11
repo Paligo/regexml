@@ -8439,7 +8439,6 @@ fn test_p1235() {
 #[test]
 fn test_p1236() {
     let regex = Regex::xpath(r#"(WORDS|WORLD|WORD)+S"#, "");
-    dbg!(&regex);
     // y
     let regex = regex.unwrap();
     assert!(regex.is_match(r#"WORDS"#));

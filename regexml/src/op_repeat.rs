@@ -231,8 +231,6 @@ impl<'a> Iterator for ReluctantRepeatIterator<'a> {
     type Item = usize;
 
     fn next(&mut self) -> Option<Self::Item> {
-        dbg!(&self.counter);
-
         loop {
             if let Some(position) = self.position {
                 let mut it = self.operation.matches_iter(self.matcher, position);

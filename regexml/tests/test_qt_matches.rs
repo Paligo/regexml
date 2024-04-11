@@ -572,3 +572,18 @@ fn test_matches_61() {
         .collect();
     assert_eq!(found, [false, false, true, true, false, false]);
 }
+
+#[test]
+fn test_choice_with_postfix() {
+    let regex = Regex::xpath(r#"(WORDS|WORLD|WORD)+S"#, "");
+    let regex = regex.unwrap();
+    dbg!(&regex);
+    assert!(regex.is_match(r#"WORDS"#));
+}
+
+#[test]
+fn test_choice_without_postfix() {
+    let regex = Regex::xpath(r#"(WORDS|WORLD|WORD)+"#, "");
+    let regex = regex.unwrap();
+    assert!(regex.is_match(r#"WORDS"#));
+}
