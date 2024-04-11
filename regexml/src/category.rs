@@ -143,6 +143,8 @@ pub(crate) struct BlockLookup {
     blocks: HashMap<String, &'static block::Block>,
 }
 
+// The XML schema regex spec requires block information
+// https://www.w3.org/TR/xmlschema-2/#regexs
 impl BlockLookup {
     fn new() -> Self {
         let mut blocks = HashMap::new();
@@ -157,7 +159,7 @@ impl BlockLookup {
             {
                 continue;
             }
-            let lookup_name = block.name.replace(' ', "").replace('_', "");
+            let lookup_name = block.name.replace([' ', '_'], "");
             blocks.insert(lookup_name, block);
         }
         Self { blocks }
