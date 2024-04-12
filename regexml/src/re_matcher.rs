@@ -86,10 +86,10 @@ impl<'a> ReMatcher<'a> {
         }
     }
 
-    pub(crate) fn get_paren(&self, which: usize) -> Option<&[char]> {
-        if which < self.paren_count() {
+    pub(crate) fn get_paren(&self, group_nr: usize) -> Option<&[char]> {
+        if group_nr < self.paren_count() {
             if let (Some(start), Some(end)) =
-                (self.get_paren_start(which), self.get_paren_end(which))
+                (self.get_paren_start(group_nr), self.get_paren_end(group_nr))
             {
                 return Some(&self.search[start..end]);
             }
@@ -97,73 +97,8 @@ impl<'a> ReMatcher<'a> {
         None
     }
 
-    fn startn_len(&self) -> usize {
-        self.state.borrow().capture_state.startn.len()
-    }
-
-    fn endn_len(&self) -> usize {
-        self.state.borrow().capture_state.endn.len()
-    }
-
     fn start_backref_len(&self) -> usize {
         self.state.borrow().start_backref.len()
-    }
-
-    pub(crate) fn get_paren_start(&self, which: usize) -> Option<usize> {
-        if which < self.state.borrow().capture_state.startn.len() {
-            return self.state.borrow().capture_state.startn[which];
-        }
-        None
-    }
-
-    /// Sets the start of the paren level
-    /// which is the paren level, and i is index in input.
-    pub(crate) fn set_paren_start(&self, which: usize, i: usize) {
-        self.state
-            .borrow_mut()
-            .capture_state
-            .set_paren_start(which, i)
-    }
-
-    pub(crate) fn get_paren_end(&self, which: usize) -> Option<usize> {
-        if which < self.state.borrow().capture_state.endn.len() {
-            return self.state.borrow().capture_state.endn[which];
-        }
-        None
-    }
-
-    pub(crate) fn set_paren_end(&self, which: usize, i: usize) {
-        self.state
-            .borrow_mut()
-            .capture_state
-            .set_paren_end(which, i)
-    }
-
-    pub(crate) fn reset_state(&self, capture_state: CaptureState) {
-        self.state.borrow_mut().capture_state = capture_state;
-    }
-
-    pub(crate) fn clear_captured_groups_beyond(&self, pos: usize) {
-        for i in 0..self.startn_len() {
-            let start = self.capture_state_startn(i);
-            if start >= Some(pos) {
-                self.set_capture_state_endn(i, start);
-            }
-        }
-        for i in 0..self.start_backref_len() {
-            let start = self.start_backref(i);
-            if start >= Some(pos) {
-                self.set_end_backref(i, start);
-            }
-        }
-    }
-
-    fn capture_state_startn(&self, i: usize) -> Option<usize> {
-        self.state.borrow().capture_state.startn[i]
-    }
-
-    fn set_capture_state_endn(&self, i: usize, value: Option<usize>) {
-        self.state.borrow_mut().capture_state.endn[i] = value;
     }
 
     pub(crate) fn match_at(&self, i: usize, anchored: bool) -> bool {
@@ -506,14 +441,6 @@ impl<'a> ReMatcher<'a> {
         self.state.borrow_mut().end_backref[i] = value;
     }
 
-    pub(crate) fn paren_count(&self) -> usize {
-        self.state.borrow().capture_state.paren_count
-    }
-
-    pub(crate) fn set_paren_count(&self, count: usize) {
-        self.state.borrow_mut().capture_state.paren_count = count;
-    }
-
     pub(crate) fn anchored_match(&self) -> bool {
         self.state.borrow().anchored_match
     }
@@ -529,8 +456,79 @@ impl<'a> ReMatcher<'a> {
             .is_duplicate_zero_length_match(operation, position)
     }
 
+    // capture state related
+
+    fn startn_len(&self) -> usize {
+        self.state.borrow().capture_state.startn.len()
+    }
+
+    pub(crate) fn get_paren_start(&self, group_nr: usize) -> Option<usize> {
+        if group_nr < self.state.borrow().capture_state.startn.len() {
+            return self.state.borrow().capture_state.startn[group_nr];
+        }
+        None
+    }
+
+    /// Sets the start of the paren level
+    /// which is the paren level, and i is index in input.
+    pub(crate) fn set_paren_start(&self, group_nr: usize, position: usize) {
+        self.state
+            .borrow_mut()
+            .capture_state
+            .set_paren_start(group_nr, position)
+    }
+
+    pub(crate) fn get_paren_end(&self, group_nr: usize) -> Option<usize> {
+        if group_nr < self.state.borrow().capture_state.endn.len() {
+            return self.state.borrow().capture_state.endn[group_nr];
+        }
+        None
+    }
+
+    pub(crate) fn set_paren_end(&self, group_nr: usize, position: usize) {
+        self.state
+            .borrow_mut()
+            .capture_state
+            .set_paren_end(group_nr, position)
+    }
+
+    pub(crate) fn clear_captured_groups_beyond(&self, pos: usize) {
+        for i in 0..self.startn_len() {
+            let start = self.capture_state_startn(i);
+            if start >= Some(pos) {
+                self.set_capture_state_endn(i, start);
+            }
+        }
+        for i in 0..self.start_backref_len() {
+            let start = self.start_backref(i);
+            if start >= Some(pos) {
+                self.set_end_backref(i, start);
+            }
+        }
+    }
+
+    fn capture_state_startn(&self, i: usize) -> Option<usize> {
+        self.state.borrow().capture_state.startn[i]
+    }
+
+    fn set_capture_state_endn(&self, i: usize, value: Option<usize>) {
+        self.state.borrow_mut().capture_state.endn[i] = value;
+    }
+
+    pub(crate) fn paren_count(&self) -> usize {
+        self.state.borrow().capture_state.paren_count
+    }
+
+    pub(crate) fn set_paren_count(&self, count: usize) {
+        self.state.borrow_mut().capture_state.paren_count = count;
+    }
+
     pub(crate) fn capture_state(&self) -> CaptureState {
         self.state.borrow().capture_state.clone()
+    }
+
+    pub(crate) fn reset_state(&self, capture_state: CaptureState) {
+        self.state.borrow_mut().capture_state = capture_state;
     }
 }
 
@@ -554,29 +552,21 @@ impl CaptureState {
         }
     }
 
-    pub(crate) fn set_paren_start(&mut self, which: usize, i: usize) {
-        while which > (self.startn.len() - 1) {
-            let start_len = self.startn.len();
-            let mut s2 = vec![Some(0); start_len * 2];
-            s2[..start_len].copy_from_slice(&self.startn[..start_len]);
-            for entry in s2.iter_mut().skip(start_len) {
-                *entry = None
-            }
-            self.startn = s2;
+    pub(crate) fn set_paren_start(&mut self, group_nr: usize, position: usize) {
+        // if we use a group nr that' hns bigger than the len
+        // In the Java version this has complicated array doubling and copying
+        // code, but it appears it can be just extended with None values.
+        while group_nr >= self.startn.len() {
+            self.startn.extend(vec![None; self.startn.len()]);
         }
-        self.startn[which] = Some(i);
+        self.startn[group_nr] = Some(position);
     }
 
-    pub(crate) fn set_paren_end(&mut self, which: usize, i: usize) {
-        while which > self.endn.len() - 1 {
-            let end_len = self.endn.len();
-            let mut e2 = vec![Some(0); end_len * 2];
-            e2[..end_len].copy_from_slice(&self.endn[..end_len]);
-            for entry in e2.iter_mut().skip(end_len) {
-                *entry = None
-            }
-            self.endn = e2;
+    pub(crate) fn set_paren_end(&mut self, group_nr: usize, position: usize) {
+        // see set_paren_start
+        while group_nr > self.endn.len() - 1 {
+            self.endn.extend(vec![None; self.endn.len()]);
         }
-        self.endn[which] = Some(i);
+        self.endn[group_nr] = Some(position);
     }
 }
