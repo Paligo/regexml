@@ -79,6 +79,15 @@ impl OperationControl for Sequence {
         0
     }
 
+    fn contains_capturing_expressions(&self) -> bool {
+        for o in &self.operations {
+            if (matches!(o.as_ref(), Operation::Capture(_)) || o.contains_capturing_expressions()) {
+                return true;
+            }
+        }
+        false
+    }
+
     fn matches_iter<'a>(
         &self,
         matcher: &'a ReMatcher<'a>,
@@ -134,28 +143,38 @@ impl<'a> SequenceIterator<'a> {
 impl<'a> Iterator for SequenceIterator<'a> {
     type Item = usize;
 
-    // Get the first match for all subsequent iterators in the sequence. If we
-    // get all the way to the end of the sequence, return the position in the
-    // input string that we have reached. If we don't get all the way to the
-    // end of the sequence, work backwards getting the next match for each term
-    // in the sequence until we find a route through.
+    // Advance the current iterator if possible. Get the first match for all
+    // subsequent iterators in the sequence. If we get all the way to the end
+    // of the sequence, return the position in the input string that we have
+    // reached. If we don't get all the way to the end of the sequence, work
+    // backwards getting the next match for each term in the sequence until we
+    // find a route through.
     fn next(&mut self) -> Option<Self::Item> {
         let mut counter = 0;
+        // as long as there are iterators on the stack
         while !self.iterators.is_empty() {
             loop {
+                // take the top of the stack
                 let top = self.iterators.last_mut().unwrap();
+                // take the next item from the top iterator
                 if let Some(next) = top.next() {
                     self.matcher.clear_captured_groups_beyond(next);
+                    // if the amount of iterators to process is equal or
+                    // greater than the amount of operations in this sequence,
+                    // then we return next
                     let i = self.iterators.len();
                     if i >= self.operations.len() {
                         return Some(next);
                     }
+                    // otherwise we push a new iterator to the stack
                     let new_top = self.operations[i].matches_iter(self.matcher, next);
                     self.iterators.push(new_top);
                 } else {
+                    // continue until we have no more next in the top
                     break;
                 }
             }
+            // we are backtracking. pop the iterator from the stack
             self.iterators.pop();
             if let Some(backtracking_limit) = self.backtracking_limit {
                 if counter > backtracking_limit {
@@ -166,8 +185,9 @@ impl<'a> Iterator for SequenceIterator<'a> {
             }
             counter += 1;
         }
-        if let Some(saved_state) = self.saved_state.take() {
-            self.matcher.reset_state(saved_state);
+        // restore saved state
+        if let Some(saved_state) = &self.saved_state {
+            self.matcher.reset_state(saved_state.clone());
         }
         None
     }

@@ -97,11 +97,32 @@ impl<'a> ReMatcher<'a> {
         None
     }
 
+    fn startn_len(&self) -> usize {
+        self.state.borrow().capture_state.startn.len()
+    }
+
+    fn endn_len(&self) -> usize {
+        self.state.borrow().capture_state.endn.len()
+    }
+
+    fn start_backref_len(&self) -> usize {
+        self.state.borrow().start_backref.len()
+    }
+
     pub(crate) fn get_paren_start(&self, which: usize) -> Option<usize> {
         if which < self.state.borrow().capture_state.startn.len() {
             return self.state.borrow().capture_state.startn[which];
         }
         None
+    }
+
+    /// Sets the start of the paren level
+    /// which is the paren level, and i is index in input.
+    pub(crate) fn set_paren_start(&self, which: usize, i: usize) {
+        self.state
+            .borrow_mut()
+            .capture_state
+            .set_paren_start(which, i)
     }
 
     pub(crate) fn get_paren_end(&self, which: usize) -> Option<usize> {
@@ -111,42 +132,11 @@ impl<'a> ReMatcher<'a> {
         None
     }
 
-    pub(crate) fn set_paren_start(&self, which: usize, i: usize) {
-        while which > self.startn_len() - 1 {
-            let start_len = self.startn_len();
-            let mut s2 = vec![Some(0); start_len * 2];
-            s2[..start_len].copy_from_slice(&self.state.borrow().capture_state.startn[..start_len]);
-            for entry in s2.iter_mut().skip(start_len) {
-                *entry = None
-            }
-            self.state.borrow_mut().capture_state.startn = s2;
-        }
-        self.state.borrow_mut().capture_state.startn[which] = Some(i);
-    }
-
-    fn startn_len(&self) -> usize {
-        self.state.borrow().capture_state.startn.len()
-    }
-
-    fn start_backref_len(&self) -> usize {
-        self.state.borrow().start_backref.len()
-    }
-
     pub(crate) fn set_paren_end(&self, which: usize, i: usize) {
-        while which > self.end_len() - 1 {
-            let end_len = self.end_len();
-            let mut s2 = vec![Some(0); end_len * 2];
-            s2[..end_len].copy_from_slice(&self.state.borrow().capture_state.endn[..end_len]);
-            for entry in s2.iter_mut().skip(end_len) {
-                *entry = None
-            }
-            self.state.borrow_mut().capture_state.endn = s2;
-        }
-        self.state.borrow_mut().capture_state.endn[which] = Some(i);
-    }
-
-    fn end_len(&self) -> usize {
-        self.state.borrow().capture_state.endn.len()
+        self.state
+            .borrow_mut()
+            .capture_state
+            .set_paren_end(which, i)
     }
 
     pub(crate) fn reset_state(&self, capture_state: CaptureState) {
@@ -562,5 +552,31 @@ impl CaptureState {
             startn: vec![None, None, None],
             endn: vec![None, None, None],
         }
+    }
+
+    pub(crate) fn set_paren_start(&mut self, which: usize, i: usize) {
+        while which > (self.startn.len() - 1) {
+            let start_len = self.startn.len();
+            let mut s2 = vec![Some(0); start_len * 2];
+            s2[..start_len].copy_from_slice(&self.startn[..start_len]);
+            for entry in s2.iter_mut().skip(start_len) {
+                *entry = None
+            }
+            self.startn = s2;
+        }
+        self.startn[which] = Some(i);
+    }
+
+    pub(crate) fn set_paren_end(&mut self, which: usize, i: usize) {
+        while which > self.endn.len() - 1 {
+            let end_len = self.endn.len();
+            let mut e2 = vec![Some(0); end_len * 2];
+            e2[..end_len].copy_from_slice(&self.endn[..end_len]);
+            for entry in e2.iter_mut().skip(end_len) {
+                *entry = None
+            }
+            self.endn = e2;
+        }
+        self.endn[which] = Some(i);
     }
 }

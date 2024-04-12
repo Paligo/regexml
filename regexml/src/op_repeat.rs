@@ -192,7 +192,7 @@ impl<'a> Iterator for GreedyRepeatIterator<'a> {
         };
         if has_next {
             self.primed = false;
-            self.positions.last().cloned()
+            self.positions.last().copied()
         } else {
             None
         }

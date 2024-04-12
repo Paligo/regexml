@@ -34,7 +34,47 @@ fn test_backtrack_attempt() {
 // fn test_choice_with_postfix() {
 //     let regex = Regex::xpath(r#"(WORDS|WORLD|WORD)+S"#, "");
 //     let regex = regex.unwrap();
+//     dbg!(&regex);
 //     assert!(regex.is_match(r#"WORDS"#));
+// }
+
+#[test]
+fn test_choice_without_plus() {
+    let regex = Regex::xpath(r#"(WORDS|WORLD|WORD)S"#, "");
+    let regex = regex.unwrap();
+    dbg!(&regex);
+    assert!(regex.is_match(r#"WORDS"#));
+}
+
+// #[test]
+// fn test_another_backtrack() {
+//     let regex = Regex::xpath(r#"^(.+)?B"#, "");
+//     let regex = regex.unwrap();
+//     dbg!(&regex);
+//     assert!(regex.is_match(r#"AB"#));
+// }
+
+// #[test]
+// fn test_backtrack_no_nesting() {
+//     let regex = Regex::xpath(r#"^([AB]+)?B"#, "");
+//     let regex = regex.unwrap();
+//     dbg!(&regex);
+//     assert!(regex.is_match(r#"AB"#));
+// }
+
+// #[test]
+// fn test_simple_capture() {
+//     let regex = Regex::xpath(r#"^(.+)?B"#, "");
+//     let regex = regex.unwrap();
+//     dbg!(&regex);
+//     assert!(regex.is_match(r#"AB"#));
+// }
+
+// #[test]
+// fn test_another_backtrack_without_question() {
+//     let regex = Regex::xpath(r#"^(.+)B"#, "");
+//     let regex = regex.unwrap();
+//     assert!(regex.is_match(r#"AB"#));
 // }
 
 #[test]
