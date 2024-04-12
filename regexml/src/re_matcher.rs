@@ -86,21 +86,6 @@ impl<'a> ReMatcher<'a> {
         }
     }
 
-    pub(crate) fn get_paren(&self, group_nr: usize) -> Option<&[char]> {
-        if group_nr < self.paren_count() {
-            if let (Some(start), Some(end)) =
-                (self.get_paren_start(group_nr), self.get_paren_end(group_nr))
-            {
-                return Some(&self.search[start..end]);
-            }
-        }
-        None
-    }
-
-    fn start_backref_len(&self) -> usize {
-        self.state.borrow().start_backref.len()
-    }
-
     pub(crate) fn match_at(&self, i: usize, anchored: bool) -> bool {
         // initialize start pointer, paren cache and paren count
         self.state.borrow_mut().capture_state.paren_count = 1;
@@ -425,6 +410,12 @@ impl<'a> ReMatcher<'a> {
         false
     }
 
+    // state related
+
+    fn start_backref_len(&self) -> usize {
+        self.state.borrow().start_backref.len()
+    }
+
     pub(crate) fn start_backref(&self, i: usize) -> Option<usize> {
         self.state.borrow().start_backref[i]
     }
@@ -457,6 +448,17 @@ impl<'a> ReMatcher<'a> {
     }
 
     // capture state related
+
+    pub(crate) fn get_paren(&self, group_nr: usize) -> Option<&[char]> {
+        if group_nr < self.paren_count() {
+            if let (Some(start), Some(end)) =
+                (self.get_paren_start(group_nr), self.get_paren_end(group_nr))
+            {
+                return Some(&self.search[start..end]);
+            }
+        }
+        None
+    }
 
     fn startn_len(&self) -> usize {
         self.state.borrow().capture_state.startn.len()
