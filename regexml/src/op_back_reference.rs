@@ -63,8 +63,4 @@ impl OperationControl for BackReference {
             Box::new(std::iter::empty())
         }
     }
-
-    fn display(&self) -> String {
-        format!("\\{}", self.group_nr)
-    }
 }

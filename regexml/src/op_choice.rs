@@ -73,15 +73,6 @@ impl OperationControl for Choice {
             self.branches.clone(),
         ))
     }
-
-    fn display(&self) -> String {
-        format!(
-            "(?:{})",
-            self.branches.iter().fold("".to_string(), |acc, branch| {
-                format!("{}{}|", acc, &branch.display())
-            })
-        )
-    }
 }
 
 struct ChoiceIterator<'a> {

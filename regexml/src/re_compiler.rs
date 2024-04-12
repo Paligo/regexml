@@ -346,11 +346,6 @@ impl ReCompiler {
                     )));
                 }
                 self.has_back_references = true;
-                // for convenience a back-reference is treated as a character
-                // class, though this is a fiction
-                // TODO: need to probably introduce CharacterClass::BackReference
-                // so we can detect these. Alternatively return an enum that's
-                // either a back reference or a character class here.
                 Ok(CharacterClassOrBackReference::BackReference(back_ref))
             }
             escape_char => Err(Error::syntax(format!(

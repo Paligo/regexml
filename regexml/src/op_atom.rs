@@ -65,8 +65,4 @@ impl OperationControl for Atom {
         }
         Box::new(std::iter::once(position + self.len))
     }
-
-    fn display(&self) -> String {
-        self.atom.iter().collect()
-    }
 }

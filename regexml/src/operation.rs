@@ -80,8 +80,6 @@ pub(crate) trait OperationControl {
     fn contains_capturing_expressions(&self) -> bool {
         false
     }
-
-    fn display(&self) -> String;
 }
 
 pub(crate) trait RepeatOperation {

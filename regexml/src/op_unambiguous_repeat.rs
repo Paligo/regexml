@@ -74,10 +74,6 @@ impl OperationControl for UnambiguousRepeat {
             Box::new(std::iter::once(p))
         }
     }
-
-    fn display(&self) -> String {
-        todo!();
-    }
 }
 
 impl RepeatOperation for UnambiguousRepeat {

@@ -33,8 +33,4 @@ impl OperationControl for EndProgram {
             Box::new(std::iter::once(position))
         }
     }
-
-    fn display(&self) -> String {
-        "\\Z".to_string()
-    }
 }

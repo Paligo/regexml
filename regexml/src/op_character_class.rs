@@ -35,8 +35,4 @@ impl OperationControl for CharClass {
             Box::new(std::iter::empty())
         }
     }
-
-    fn display(&self) -> String {
-        todo!()
-    }
 }

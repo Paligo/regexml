@@ -63,10 +63,6 @@ impl OperationControl for ReluctantFixed {
             self.max,
         ))
     }
-
-    fn display(&self) -> String {
-        todo!();
-    }
 }
 
 impl RepeatOperation for ReluctantFixed {

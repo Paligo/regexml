@@ -100,14 +100,6 @@ impl OperationControl for Sequence {
             self.contains_capturing_expressions(),
         ))
     }
-
-    fn display(&self) -> String {
-        self.operations
-            .iter()
-            .map(|op| op.display())
-            .collect::<Vec<_>>()
-            .join("")
-    }
 }
 
 struct SequenceIterator<'a> {

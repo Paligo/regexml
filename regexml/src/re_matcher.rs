@@ -135,7 +135,7 @@ impl<'a> ReMatcher<'a> {
                 return true;
             }
             // TODO: transliterated as close to the Java code as possible to
-            // make sure it works correctly.
+            // make sure it works correctly. But can be cleaned up.
             let mut nl: isize = i.try_into().unwrap();
             loop {
                 nl = self
@@ -538,7 +538,6 @@ impl<'a> ReMatcher<'a> {
 pub(crate) struct CaptureState {
     // Number of subexpressions matched (num open parens + 1)
     pub(crate) paren_count: usize,
-    // TODO can they be arrays instead of vecs?
     // Lazily-allocated array of sub-expression starts
     pub(crate) startn: Vec<Option<usize>>,
     // Lazily-allocated array of sub-expression ends

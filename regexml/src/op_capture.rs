@@ -52,10 +52,6 @@ impl OperationControl for Capture {
             position,
         ))
     }
-
-    fn display(&self) -> String {
-        format!("({})", self.child_op.display())
-    }
 }
 
 struct CaptureGroupIterator<'a> {

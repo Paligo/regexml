@@ -34,8 +34,4 @@ impl OperationControl for Eol {
             Box::new(std::iter::empty())
         }
     }
-
-    fn display(&self) -> String {
-        "$".to_string()
-    }
 }

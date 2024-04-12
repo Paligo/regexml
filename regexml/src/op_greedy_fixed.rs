@@ -89,10 +89,6 @@ impl OperationControl for GreedyFixed {
             position + self.len * self.min,
         ))
     }
-
-    fn display(&self) -> String {
-        todo!();
-    }
 }
 
 impl RepeatOperation for GreedyFixed {

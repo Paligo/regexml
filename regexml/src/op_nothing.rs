@@ -22,8 +22,4 @@ impl OperationControl for Nothing {
     ) -> Box<dyn Iterator<Item = usize>> {
         Box::new(std::iter::once(position))
     }
-
-    fn display(&self) -> String {
-        "()".to_string()
-    }
 }

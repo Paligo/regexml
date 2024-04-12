@@ -108,10 +108,6 @@ impl OperationControl for Repeat {
             )))
         }
     }
-
-    fn display(&self) -> String {
-        todo!()
-    }
 }
 
 impl RepeatOperation for Repeat {

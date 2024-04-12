@@ -31,8 +31,4 @@ impl OperationControl for Bol {
         }
         Box::new(std::iter::once(position))
     }
-
-    fn display(&self) -> String {
-        "^".to_string()
-    }
 }
