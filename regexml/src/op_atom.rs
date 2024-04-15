@@ -66,3 +66,30 @@ impl OperationControl for Atom {
         Box::new(std::iter::once(position + self.len))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::Regex;
+
+    #[test]
+    fn test_atom_case_sensitive() {
+        let regex = Regex::xpath("abc", "").unwrap();
+        let op = regex.path("0");
+        let matches = regex.matcher("abc").all_matches(op.clone());
+        assert_eq!(matches, vec!["abc"]);
+        let matches = regex.matcher("a").all_matches(op.clone());
+        assert!(matches.is_empty());
+        let matches = regex.matcher("abcd").all_matches(op.clone());
+        assert_eq!(matches, vec!["abc"]);
+    }
+
+    #[test]
+    fn test_atom_case_insensitive() {
+        let regex = Regex::xpath("abc", "i").unwrap();
+        let op = regex.path("0");
+        let matches = regex.matcher("abc").all_matches(op.clone());
+        assert_eq!(matches, vec!["abc"]);
+        let matches = regex.matcher("ABC").all_matches(op.clone());
+        assert_eq!(matches, vec!["ABC"]);
+    }
+}
