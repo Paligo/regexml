@@ -677,3 +677,187 @@ fn test_caselessmatch15() {
     let regex = Regex::xpath(r#"\P{Lu}"#, "i").unwrap();
     assert!(regex.is_match("m"));
 }
+
+// The flags argument cannot contain whitespace.
+#[test]
+fn test_k_matches_fun_5() {
+    let regex = Regex::xpath("pattern", " ");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::InvalidFlags("Unrecognized flag ' '".to_string())
+    );
+}
+
+// The flags argument cannot contain 'X'.
+#[test]
+fn test_k_matches_fun_6() {
+    let regex = Regex::xpath("pattern", "X");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::InvalidFlags("Unrecognized flag 'X'".to_string())
+    );
+}
+
+// Whitespace in the regexp is collapsed.
+#[test]
+fn test_k2_matches_func_1() {
+    let regex = Regex::xpath(r#"hello\ sworld"#, "x").unwrap();
+    assert!(regex.is_match("hello world"));
+}
+
+// Whitespace(before) in the regexp is collapsed, but not inside a character class.
+#[test]
+fn test_k2_matches_func_2() {
+    let regex = Regex::xpath(" hello[ ]world", "x").unwrap();
+    assert!(regex.is_match("hello world"));
+}
+
+// Whitespace(after) in the regexp is collapsed, but not inside a character class.
+#[test]
+fn test_k2_matches_func_3() {
+    let regex = Regex::xpath("hello[ ]world ", "x").unwrap();
+    assert!(regex.is_match("hello world"));
+}
+
+// Whitespace(in the middle) in the regexp is collapsed, but not inside a character class.
+#[test]
+fn test_k2_matches_func_4() {
+    let regex = Regex::xpath("he ll o[ ]worl d", "x").unwrap();
+    assert!(regex.is_match("hello world"));
+}
+
+// Whitespace in the regexp is collapsed, and should therefore compile.
+#[test]
+fn test_k2_matches_func_5() {
+    let regex = Regex::xpath("\\p{ IsBasicLatin}+", "x").unwrap();
+    assert!(regex.is_match("hello world"));
+}
+
+// <test-case name="K2-MatchesFunc-5">
+// <description> whitespace in the regexp is collapsed, and should therefore compile. </description>
+// <created by="Frans Englich" on="2007-11-26"/>
+// <test>fn:matches("hello world", "\p{ IsBasicLatin}+", "x")</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="K2-MatchesFunc-6">
+// <description> whitespace in the regexp is collapsed completely, and should therefore compile and match. </description>
+// <created by="Frans Englich" on="2007-11-26"/>
+// <test>fn:matches("hello world", "\p{ I s B a s i c L a t i n }+", "x")</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="K2-MatchesFunc-7">
+// <description> whitespace in the regexp is not collapsed, and should therefore not compile. </description>
+// <created by="Frans Englich" on="2007-11-26"/>
+// <test>fn:matches("hello world", "\p{ IsBasicLatin}+")</test>
+// <result>
+//    <error code="FORX0002"/>
+// </result>
+// </test-case>
+
+// <test-case name="K2-MatchesFunc-8">
+// <description> Since no string is captured by the back-reference, the single character is matched. </description>
+// <created by="Frans Englich" on="2007-11-26"/>
+// <test>fn:matches("h", "(.)\3")</test>
+// <result>
+//    <error code="FORX0002"/>
+// </result>
+// </test-case>
+
+// <test-case name="K2-MatchesFunc-9">
+// <description> Since no string is captured by the back-reference, the single character is matched(#2). </description>
+// <created by="Frans Englich" on="2007-11-26"/>
+// <test>fn:matches("h", "(.)\2")</test>
+// <result>
+//    <error code="FORX0002"/>
+// </result>
+// </test-case>
+
+// <test-case name="K2-MatchesFunc-10">
+// <description> A non-matching backwards-reference matches the empty string. </description>
+// <created by="Frans Englich" on="2007-11-26"/>
+// <test>matches("input", "\3")</test>
+// <result>
+//    <error code="FORX0002"/>
+// </result>
+// </test-case>
+
+// <test-case name="K2-MatchesFunc-11">
+// <description> Use a back reference inside a character class. </description>
+// <created by="Frans Englich" on="2007-11-26"/>
+// <test>matches("abcd", "(asd)[\1]")</test>
+// <result>
+//    <error code="FORX0002"/>
+// </result>
+// </test-case>
+
+// <test-case name="K2-MatchesFunc-12">
+// <description> Use a back reference inside a character class(#2). </description>
+// <created by="Frans Englich" on="2007-11-26"/>
+// <test>matches("abcd", "(asd)[asd\1]")</test>
+// <result>
+//    <error code="FORX0002"/>
+// </result>
+// </test-case>
+
+// <test-case name="K2-MatchesFunc-13">
+// <description> Use a back reference inside a character class(#3). </description>
+// <created by="Frans Englich" on="2007-11-26"/>
+// <test>matches("abcd", "(asd)[asd\0]")</test>
+// <result>
+//    <error code="FORX0002"/>
+// </result>
+// </test-case>
+
+// <test-case name="K2-MatchesFunc-14">
+// <description> Use a back reference inside a character class(#3). </description>
+// <created by="Frans Englich" on="2007-11-26"/>
+// <test>matches("abcd", "1[asd\0]")</test>
+// <result>
+//    <error code="FORX0002"/>
+// </result>
+// </test-case>
+
+// <test-case name="K2-MatchesFunc-15">
+// <description> A negative character class never match a non-character. </description>
+// <created by="Frans Englich" on="2007-11-26"/>
+// <test>fn:matches("a", "a[^b]"), fn:matches("a ", "a[^b]")</test>
+// <result>
+//    <assert-deep-eq>false(), true()</assert-deep-eq>
+// </result>
+// </test-case>
+
+// <test-case name="K2-MatchesFunc-16">
+// <description> Use a pattern whose interpretation is unknown. See public report 4466 and 21425. </description>
+// <created by="Frans Englich" on="2007-11-26"/>
+// <modified by="Michael Kay" on="2013-06-13" change="see bug 21425"/>
+// <dependency type="xsd-version" value="1.1"/>
+// <test>fn:matches("input", "[0-9-.]*/")</test>
+// <result>
+//       <assert-string-value>false</assert-string-value>
+// </result>
+// </test-case>
+
+// <test-case name="K2-MatchesFunc-16a">
+// <description> Use a pattern whose interpretation is unknown. See public report 4466 and 21425. </description>
+// <created by="Michael Kay" on="2013-06-13"/>
+// <dependency type="xsd-version" value="1.0"/>
+// <test>fn:matches("input", "[0-9-.]*/")</test>
+// <result>
+//    <error code="FORX0002"/>
+// </result>
+// </test-case>
+
+// <test-case name="K2-MatchesFunc-17">
+// <description> Caseless match with back-reference. </description>
+// <created by="Frans Englich" on="2007-11-26"/>
+// <test>matches('aA', '(a)\1', 'i')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>

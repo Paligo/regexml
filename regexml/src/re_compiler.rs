@@ -269,7 +269,6 @@ impl ReCompiler {
                         escape_char
                     )))?;
                 let close = from + close;
-
                 let block = &self.pattern[self.idx..close];
 
                 if block.len() == 1 || block.len() == 2 {
@@ -291,6 +290,7 @@ impl ReCompiler {
                     let cc = CharacterClassBuilder::CodePointInversionListBuilder(category::block(
                         &name,
                     )?);
+                    self.idx = close + 1;
                     if escape_char == 'p' {
                         Ok(cc.into())
                     } else {
