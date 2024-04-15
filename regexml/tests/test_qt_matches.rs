@@ -615,94 +615,65 @@ fn test_caselessmatch06() {
     assert!(regex.is_match("\u{212A}"));
 }
 
-// <test-case name="caselessmatch06">
-// <description> Call of matches() with "i" flag and Kelvin sign Kelvin sign </description>
-// <created by="Michael Kay, Saxonica" on="2006-02-01"/>
-// <modified by="Michael Kay" on="2012-01-15" change="Changed to work under both XPath and XQuery"/>
-// <test>matches(codepoints-to-string(8490), 'K', 'i')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
+// Call of matches() with "i" flag and Kelvin sign
+#[test]
+fn test_caselessmatch07() {
+    let regex = Regex::xpath("k", "i").unwrap();
+    assert!(regex.is_match("\u{212A}"));
+}
 
-// <test-case name="caselessmatch07">
-// <description> Call of matches() with "i" flag and Kelvin sign Kelvin sign </description>
-// <created by="Michael Kay, Saxonica" on="2006-02-01"/>
-// <modified by="Michael Kay" on="2012-01-15" change="Changed to work under both XPath and XQuery"/>
-// <test>matches(codepoints-to-string(8490), 'k', 'i')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
+// Call of matches() with "i" flag and range subtraction
+#[test]
+fn test_caselessmatch08() {
+    let regex = Regex::xpath("[A-Z-[OI]]", "i").unwrap();
+    assert!(regex.is_match("x"));
+}
 
-// <test-case name="caselessmatch08">
-// <description> Call of matches() with "i" flag and range subtraction </description>
-// <created by="Michael Kay, Saxonica" on="2006-02-01"/>
-// <test>matches('x', '[A-Z-[OI]]', 'i')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
+// Call of matches() with "i" flag and range subtraction
+#[test]
+fn test_caselessmatch09() {
+    let regex = Regex::xpath("[A-Z-[OI]]", "i").unwrap();
+    assert!(regex.is_match("X"));
+}
 
-// <test-case name="caselessmatch09">
-// <description> Call of matches() with "i" flag and range subtraction </description>
-// <created by="Michael Kay, Saxonica" on="2006-02-01"/>
-// <test>matches('X', '[A-Z-[OI]]', 'i')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
+// Call of matches() with "i" flag and range subtraction
+#[test]
+fn test_caselessmatch10() {
+    let regex = Regex::xpath("[A-Z-[OI]]", "i").unwrap();
+    assert!(!regex.is_match("O"));
+}
 
-// <test-case name="caselessmatch10">
-// <description> Call of matches() with "i" flag and range subtraction </description>
-// <created by="Michael Kay, Saxonica" on="2006-02-01"/>
-// <test>matches('O', '[A-Z-[OI]]', 'i')</test>
-// <result>
-//    <assert-false/>
-// </result>
-// </test-case>
+// Call of matches() with "i" flag and range subtraction
+#[test]
+fn test_caselessmatch11() {
+    let regex = Regex::xpath("[A-Z-[OI]]", "i").unwrap();
+    assert!(!regex.is_match("i"));
+}
 
-// <test-case name="caselessmatch11">
-// <description> Call of matches() with "i" flag and range subtraction </description>
-// <created by="Michael Kay, Saxonica" on="2006-02-01"/>
-// <test>matches('i', '[A-Z-[OI]]', 'i')</test>
-// <result>
-//    <assert-false/>
-// </result>
-// </test-case>
+// Call of matches() with "i" flag and negation
+#[test]
+fn test_caselessmatch12() {
+    let regex = Regex::xpath("[^Q]", "i").unwrap();
+    assert!(!regex.is_match("Q"));
+}
 
-// <test-case name="caselessmatch12">
-// <description> Call of matches() with "i" flag and negation </description>
-// <created by="Michael Kay, Saxonica" on="2006-02-01"/>
-// <test>matches('Q', '[^Q]', 'i')</test>
-// <result>
-//    <assert-false/>
-// </result>
-// </test-case>
+// Call of matches() with "i" flag and negation
+#[test]
+fn test_caselessmatch13() {
+    let regex = Regex::xpath("[^Q]", "i").unwrap();
+    assert!(!regex.is_match("q"));
+}
 
-// <test-case name="caselessmatch13">
-// <description> Call of matches() with "i" flag and negation </description>
-// <created by="Michael Kay, Saxonica" on="2006-02-01"/>
-// <test>matches('q', '[^Q]', 'i')</test>
-// <result>
-//    <assert-false/>
-// </result>
-// </test-case>
+// Call of matches() with "i" flag and upper-case category
+#[test]
+fn test_caselessmatch14() {
+    let regex = Regex::xpath(r#"\p{Lu}"#, "i").unwrap();
+    assert!(!regex.is_match("m"));
+}
 
-// <test-case name="caselessmatch14">
-// <description> Call of matches() with "i" flag and upper-case category </description>
-// <created by="Michael Kay, Saxonica" on="2006-02-01"/>
-// <test>matches('m', '\p{Lu}', 'i')</test>
-// <result>
-//    <assert-false/>
-// </result>
-// </test-case>
-
-// <test-case name="caselessmatch15">
-// <description> Call of matches() with "i" flag and upper-case category </description>
-// <created by="Michael Kay, Saxonica" on="2006-02-01"/>
-// <test>matches('m', '\P{Lu}', 'i')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
+// Call of matches() with "i" flag and upper-case category
+#[test]
+fn test_caselessmatch15() {
+    let regex = Regex::xpath(r#"\P{Lu}"#, "i").unwrap();
+    assert!(regex.is_match("m"));
+}
