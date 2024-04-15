@@ -837,17 +837,6 @@ fn test_k2_matches_func_16() {
     assert!(!regex.is_match("input"));
 }
 
-// Use a pattern whose interpretation is unknown. See public report 4466 and 21425.
-// xsd version 1.0
-// #[test]
-// fn test_k2_matches_func_16a() {
-//     let regex = Regex::xpath("[0-9-.]*/", "");
-//     assert_eq!(
-//         regex.unwrap_err(),
-//         Error::Syntax("No expression before quantifier".to_string())
-//     );
-// }
-
 // Caseless match with back-reference.
 #[test]
 fn test_k2_matches_func_17() {
@@ -855,11 +844,574 @@ fn test_k2_matches_func_17() {
     assert!(regex.is_match("aA"));
 }
 
-// <test-case name="K2-MatchesFunc-17">
-// <description> Caseless match with back-reference. </description>
-// <created by="Frans Englich" on="2007-11-26"/>
-// <test>matches('aA', '(a)\1', 'i')</test>
+// Test an invalid negative pos char group
+#[test]
+fn test_cbcl_matches_001() {
+    let regex = Regex::xpath("[^]", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("Empty negative character group".to_string())
+    );
+}
+
+// Test an invalid char range
+#[test]
+fn test_cbcl_matches_002() {
+    let regex = Regex::xpath("[a-\\b]", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("Escape character 'b' not allowed".to_string())
+    );
+}
+
+// Test a two-digit back reference
+#[test]
+fn test_cbcl_matches_003() {
+    let regex = Regex::xpath(
+        "(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k)\\1\\2\\3\\4\\5\\6\\7\\8\\9\\10\\11",
+        "",
+    )
+    .unwrap();
+    assert!(regex.is_match("abcdefghijkabcdefghijk"));
+}
+
+// Test a very large exact quantifier
+#[test]
+fn test_cbcl_matches_004() {
+    let err = Regex::xpath("a{99999999999999999999999999}", "").unwrap_err();
+    assert_eq!(err, Error::Syntax("Expected valid number".to_string()));
+}
+
+// <test-case name="cbcl-matches-004">
+// <description> test a very large exact quantifier </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+// <modified by="Michael Kay" on="2020-01-07" change="Add a success result; this is not an error defined in the spec"/>
+// <test>fn:matches('aaa', 'a{99999999999999999999999999}')</test>
+// <result>
+//    <any-of>
+//       <assert-false/>
+//       <error code="FORX0002"/>
+//    </any-of>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-005">
+// <description> test with an invalid character range </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('a', '[a--]')</test>
+// <result>
+//    <error code="FORX0002"/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-006">
+// <description> test with a character class containing an escaped character </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+// <dependency type="spec" value="XQ10+"/>
+// <test><![CDATA[fn:matches('&#x9;', '[\t]')]]></test>
 // <result>
 //    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-006b">
+// <description> test with a character class containing an escaped character </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+// <modified by="O'Neil Delpratt" on="2013-07-24" change="Change spec dependency to XP20+. See bug issue #22792" />
+// <dependency type="spec" value="XP20+"/>
+// <test>fn:matches('&#x9;', '[\t]')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-007">
+// <description> test with a character class beginning with a '-' </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('-abba-', '[-ab]+')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-008">
+// <description> test a badly formed category name </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{L')</test>
+// <result>
+//    <error code="FORX0002"/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-009">
+// <description> test a badly formed category name </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{M')</test>
+// <result>
+//    <error code="FORX0002"/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-010">
+// <description> test a badly formed category name </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{N')</test>
+// <result>
+//    <error code="FORX0002"/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-011">
+// <description> test a badly formed category name </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{P')</test>
+// <result>
+//    <error code="FORX0002"/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-012">
+// <description> test a badly formed category name </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{Z')</test>
+// <result>
+//    <error code="FORX0002"/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-013">
+// <description> test a badly formed category name </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{S')</test>
+// <result>
+//    <error code="FORX0002"/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-014">
+// <description> test a badly formed category name </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{C')</test>
+// <result>
+//    <error code="FORX0002"/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-015">
+// <description> test category name L </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{L}')</test>
+// <result>
+//    <assert-false/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-016">
+// <description> test category name M </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{M}')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-017">
+// <description> test category name N </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{N}')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-018">
+// <description> test category name P </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{P}')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-019">
+// <description> test category name Z </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{Z}')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-020">
+// <description> test category name S </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{S}')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-021">
+// <description> test category name C </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{C}')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-022">
+// <description> test category name Lu </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{Lu}')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-023">
+// <description> test category name Me </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{Me}')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-024">
+// <description> test category name No </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{No}')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-025">
+// <description> test category name Pf </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{Pf}')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-026">
+// <description> test category name Zs </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{Zs}')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-027">
+// <description> test category name Sk </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{Sk}')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-028">
+// <description> test category name Cc </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{Cc}')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-029">
+// <description> test invalid category name La </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{La}')</test>
+// <result>
+//    <error code="FORX0002"/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-030">
+// <description> test invalid category name Ma </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{Ma}')</test>
+// <result>
+//    <error code="FORX0002"/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-031">
+// <description> test invalid category name Na </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{Na}')</test>
+// <result>
+//    <error code="FORX0002"/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-032">
+// <description> test invalid category name Pa </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{Pa}')</test>
+// <result>
+//    <error code="FORX0002"/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-033">
+// <description> test invalid category name Za </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{Za}')</test>
+// <result>
+//    <error code="FORX0002"/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-034">
+// <description> test invalid category name Sa </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{Sa}')</test>
+// <result>
+//    <error code="FORX0002"/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-035">
+// <description> test invalid category name Ca </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', '\P{Ca}')</test>
+// <result>
+//    <error code="FORX0002"/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-036">
+// <description> test an empty branch </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test>fn:matches('foo', 'a()b')</test>
+// <result>
+//    <assert-false/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-037">
+// <description> test a multibyte Unicode character </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+
+// <test><![CDATA[fn:matches('&#x10000;', '&#x10000;')]]></test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-038">
+// <description> test a large exact quantifier </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+// <test>fn:matches('aaa', 'a{2147483647}')</test>
+// <result>
+//    <assert-false/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-039">
+// <description> test a two-digit back reference </description>
+// <created by="Tim Mills" on="2008-07-17"/>
+// <test>fn:matches('abcdefghiabcdefghia0a1', '(a)(b)(c)(d)(e)(f)(g)(h)(i)\1\2\3\4\5\6\7\8\9\10\11')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-040">
+// <description> test the multi-character escape \S </description>
+// <created by="Tim Mills" on="2008-07-29"/>
+
+// <test>fn:matches('abc', '\S+')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-041">
+// <description> test the multi-character escape \S </description>
+// <created by="Tim Mills" on="2008-07-29"/>
+// <dependency type="spec" value="XQ10+"/>
+// <test><![CDATA[fn:matches('&#xD;&#x20;&#x9;', '\S+')]]></test>
+// <result>
+//    <assert-false/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-041b">
+// <description> test the multi-character escape \S </description>
+// <created by="Tim Mills" on="2008-07-29"/>
+// <modified by="O'Neil Delpratt" on="2013-07-24" change="Change spec dependency to XP20+. See bug issue #22792" />
+// <dependency type="spec" value="XP20+"/>
+// <test>fn:matches('&#xD;&#x20;&#x9;', '\S+')</test>
+// <result>
+//    <assert-false/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-042">
+// <description> test the multi-character escape \i </description>
+// <created by="Tim Mills" on="2008-07-29"/>
+
+// <test>fn:matches('a_:', '\i+')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-043">
+// <description> test the multi-character escape \i </description>
+// <created by="Tim Mills" on="2008-07-29"/>
+
+// <test>fn:matches('1.0', '\i+')</test>
+// <result>
+//    <assert-false/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-044">
+// <description> test the multi-character escape \I </description>
+// <created by="Tim Mills" on="2008-07-29"/>
+
+// <test>fn:matches('1.0', '\I+')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-045">
+// <description> test the multi-character escape \I </description>
+// <created by="Tim Mills" on="2008-07-29"/>
+
+// <test>fn:matches('a_:', '\I+')</test>
+// <result>
+//    <assert-false/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-046">
+// <description> test the multi-character escape \c </description>
+// <created by="Tim Mills" on="2008-07-29"/>
+
+// <test>fn:matches('abc', '\c+')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-047">
+// <description> test the multi-character escape \c </description>
+// <created by="Tim Mills" on="2008-07-29"/>
+// <dependency type="spec" value="XQ10+"/>
+// <test><![CDATA[fn:matches('&#x20;&#x9;&#xD;', '\c+')]]></test>
+// <result>
+//    <assert-false/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-047b">
+// <description> test the multi-character escape \c </description>
+// <created by="Tim Mills" on="2008-07-29"/>
+// <modified by="O'Neil Delpratt" on="2013-07-24" change="Change spec dependency to XP20+. See bug issue #22792" />
+// <dependency type="spec" value="XP20+"/>
+// <test>fn:matches('&#x20;&#x9;&#xD;', '\c+')</test>
+// <result>
+//    <assert-false/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-048">
+// <description> test the multi-character escape \C </description>
+// <created by="Tim Mills" on="2008-07-29"/>
+
+// <test><![CDATA[fn:matches('&#x20;&#x9;&#xD;', '\C+')]]></test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-049">
+// <description> test the multi-character escape \C </description>
+// <created by="Tim Mills" on="2008-07-29"/>
+
+// <test>fn:matches('abc', '\C+')</test>
+// <result>
+//    <assert-false/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-050">
+// <description> A back-reference is compared using case-blind comparison: that is, each character must either be the same as the corresponding character of the previously matched string, or must be a case-variant of that character. the back reference. For example, the strings "Mum", "mom", "Dad", and "DUD" all match the regular expression "([md])[aeiou]\1" when the "i" flag is used. </description>
+// <created by="Tim Mills" on="2008-07-29"/>
+
+// <test>fn:matches('Mum', '([md])[aeiou]\1', 'i')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-051">
+// <description> Test back-reference to character above &amp;#FFFF; </description>
+// <created by="Tim Mills" on="2008-07-29"/>
+
+// <test><![CDATA[fn:matches('&#x10000;&#x10000;', '(&#x10000;)\1')]]></test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-052">
+// <description> Test back-reference to character above &amp;#FFFF; </description>
+// <created by="Tim Mills" on="2008-07-29"/>
+
+// <test><![CDATA[fn:matches('&#x10000;&#x10001;', '(&#x10000;)\1')]]></test>
+// <result>
+//    <assert-false/>
+// </result>
+// </test-case>
+
+// <test-case name="cbcl-matches-053">
+// <description> A back-reference is compared using case-blind comparison: that is, each character must either be the same as the corresponding character of the previously matched string, or must be a case-variant of that character. the back reference. For example, the strings "Mum", "mom", "Dad", and "DUD" all match the regular expression "([md])[aeiou]\1" when the "i" flag is used. </description>
+// <created by="Tim Mills" on="2008-07-29"/>
+
+// <test>fn:matches('Mud', '([md])[aeiou]\1', 'i')</test>
+// <result>
+//    <assert-false/>
 // </result>
 // </test-case>
