@@ -503,11 +503,10 @@ impl ReCompiler {
                         builder.add_char(simple_char);
                     }
                     if self.re_flags.is_case_independent() {
-                        // TODO
-                        // int[] variants = CaseVariants.getCaseVariants(simpleChar);
-                        // for (int variant : variants) {
-                        //     range.add(variant);
-                        // }
+                        if let Some(simple_char) = simple_char {
+                            builder.add_char(single_case_char(simple_char.to_uppercase())?);
+                            builder.add_char(single_case_char(simple_char.to_lowercase())?);
+                        }
                     }
                 }
             }
