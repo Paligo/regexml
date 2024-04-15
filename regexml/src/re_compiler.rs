@@ -470,13 +470,14 @@ impl ReCompiler {
                     }
                     builder.add_range(&(start..=end));
                     if self.re_flags.is_case_independent() {
-                        // ignore multiple characters returned for upper/lower case
-                        let uppercase_start = single_case_char(start.to_uppercase())?;
-                        let uppercase_end = single_case_char(end.to_uppercase())?;
-                        let lowercase_start = single_case_char(start.to_lowercase())?;
-                        let lowercase_end = single_case_char(end.to_lowercase())?;
-                        builder.add_range(&(uppercase_start..=uppercase_end));
-                        builder.add_range(&(lowercase_start..=lowercase_end));
+                        for i in start..=end {
+                            for uppercase in i.to_uppercase() {
+                                builder.add_char(uppercase);
+                            }
+                            for lowercase in i.to_lowercase() {
+                                builder.add_char(lowercase);
+                            }
+                        }
                     }
                     // we are done defining the range
                     defining_range = false;
@@ -504,8 +505,12 @@ impl ReCompiler {
                     }
                     if self.re_flags.is_case_independent() {
                         if let Some(simple_char) = simple_char {
-                            builder.add_char(single_case_char(simple_char.to_uppercase())?);
-                            builder.add_char(single_case_char(simple_char.to_lowercase())?);
+                            for c in simple_char.to_uppercase() {
+                                builder.add_char(c);
+                            }
+                            for c in simple_char.to_lowercase() {
+                                builder.add_char(c);
+                            }
                         }
                     }
                 }
@@ -1025,17 +1030,6 @@ impl ReCompiler {
             Ok(program)
         }
     }
-}
-
-fn single_case_char(iter: impl Iterator<Item = char>) -> Result<char, Error> {
-    let mut iter = iter.peekable();
-    let c = iter.next().unwrap();
-    if iter.peek().is_some() {
-        return Err(Error::syntax(
-            "Expected single lowercase/uppercase character",
-        ));
-    }
-    Ok(c)
 }
 
 #[cfg(test)]

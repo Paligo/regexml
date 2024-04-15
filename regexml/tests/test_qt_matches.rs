@@ -572,3 +572,143 @@ fn test_matches_61() {
         .collect();
     assert_eq!(found, [false, false, true, true, false, false]);
 }
+
+// Simple call of matches() with "i" flag
+#[test]
+fn test_caselessmatch01() {
+    let regex = Regex::xpath("ABC", "i").unwrap();
+    assert!(regex.is_match("abc"));
+}
+
+// Call of matches() with "i" flag and a character range
+#[test]
+fn test_caselessmatch02() {
+    let regex = Regex::xpath("[A-Z]*", "i").unwrap();
+    assert!(regex.is_match("abZ"));
+}
+
+// Call of matches() with "i" flag and a character range
+#[test]
+fn test_caselessmatch03() {
+    let regex = Regex::xpath("[a-z]*", "i").unwrap();
+    assert!(regex.is_match("abZ"));
+}
+
+// // Call of matches() with "i" flag and Kelvin sign Kelvin sign
+// #[test]
+// fn test_caselessmatch04() {
+//     let regex = Regex::xpath("[A-Z]", "i").unwrap();
+//     assert!(regex.is_match("\u{212A}"));
+// }
+
+// <test-case name="caselessmatch04">
+// <description> Call of matches() with "i" flag and Kelvin sign Kelvin sign </description>
+// <created by="Michael Kay, Saxonica" on="2006-02-01"/>
+// <modified by="Michael Kay" on="2012-01-15" change="Changed to work under both XPath and XQuery"/>
+// <test>matches(codepoints-to-string(8490), '[A-Z]', 'i')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="caselessmatch05">
+// <description> Call of matches() with "i" flag and Kelvin sign Kelvin sign </description>
+// <created by="Michael Kay, Saxonica" on="2006-02-01"/>
+// <modified by="Michael Kay" on="2012-01-15" change="Changed to work under both XPath and XQuery"/>
+// <test>matches(codepoints-to-string(8490), '[a-z]', 'i')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="caselessmatch06">
+// <description> Call of matches() with "i" flag and Kelvin sign Kelvin sign </description>
+// <created by="Michael Kay, Saxonica" on="2006-02-01"/>
+// <modified by="Michael Kay" on="2012-01-15" change="Changed to work under both XPath and XQuery"/>
+// <test>matches(codepoints-to-string(8490), 'K', 'i')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="caselessmatch07">
+// <description> Call of matches() with "i" flag and Kelvin sign Kelvin sign </description>
+// <created by="Michael Kay, Saxonica" on="2006-02-01"/>
+// <modified by="Michael Kay" on="2012-01-15" change="Changed to work under both XPath and XQuery"/>
+// <test>matches(codepoints-to-string(8490), 'k', 'i')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="caselessmatch08">
+// <description> Call of matches() with "i" flag and range subtraction </description>
+// <created by="Michael Kay, Saxonica" on="2006-02-01"/>
+// <test>matches('x', '[A-Z-[OI]]', 'i')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="caselessmatch09">
+// <description> Call of matches() with "i" flag and range subtraction </description>
+// <created by="Michael Kay, Saxonica" on="2006-02-01"/>
+// <test>matches('X', '[A-Z-[OI]]', 'i')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
+
+// <test-case name="caselessmatch10">
+// <description> Call of matches() with "i" flag and range subtraction </description>
+// <created by="Michael Kay, Saxonica" on="2006-02-01"/>
+// <test>matches('O', '[A-Z-[OI]]', 'i')</test>
+// <result>
+//    <assert-false/>
+// </result>
+// </test-case>
+
+// <test-case name="caselessmatch11">
+// <description> Call of matches() with "i" flag and range subtraction </description>
+// <created by="Michael Kay, Saxonica" on="2006-02-01"/>
+// <test>matches('i', '[A-Z-[OI]]', 'i')</test>
+// <result>
+//    <assert-false/>
+// </result>
+// </test-case>
+
+// <test-case name="caselessmatch12">
+// <description> Call of matches() with "i" flag and negation </description>
+// <created by="Michael Kay, Saxonica" on="2006-02-01"/>
+// <test>matches('Q', '[^Q]', 'i')</test>
+// <result>
+//    <assert-false/>
+// </result>
+// </test-case>
+
+// <test-case name="caselessmatch13">
+// <description> Call of matches() with "i" flag and negation </description>
+// <created by="Michael Kay, Saxonica" on="2006-02-01"/>
+// <test>matches('q', '[^Q]', 'i')</test>
+// <result>
+//    <assert-false/>
+// </result>
+// </test-case>
+
+// <test-case name="caselessmatch14">
+// <description> Call of matches() with "i" flag and upper-case category </description>
+// <created by="Michael Kay, Saxonica" on="2006-02-01"/>
+// <test>matches('m', '\p{Lu}', 'i')</test>
+// <result>
+//    <assert-false/>
+// </result>
+// </test-case>
+
+// <test-case name="caselessmatch15">
+// <description> Call of matches() with "i" flag and upper-case category </description>
+// <created by="Michael Kay, Saxonica" on="2006-02-01"/>
+// <test>matches('m', '\P{Lu}', 'i')</test>
+// <result>
+//    <assert-true/>
+// </result>
+// </test-case>
