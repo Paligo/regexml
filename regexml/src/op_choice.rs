@@ -152,15 +152,15 @@ impl<'a> Iterator for ChoiceIterator<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{op_atom::Atom, Regex};
-
-    use super::*;
+    use crate::Regex;
 
     #[test]
     fn test_choice() {
         let regex = Regex::xpath(r#"a|b|c"#, "").unwrap();
         let op = regex.path("0");
-        let matches = regex.matcher("a").all_matches(op);
+        let matches = regex.matcher("a").all_matches(op.clone());
         assert_eq!(matches, vec!["a"]);
+        let matches = regex.matcher("d").all_matches(op);
+        assert!(matches.is_empty());
     }
 }
