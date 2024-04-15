@@ -882,397 +882,292 @@ fn test_cbcl_matches_004() {
     assert_eq!(err, Error::Syntax("Expected valid number".to_string()));
 }
 
-// <test-case name="cbcl-matches-004">
-// <description> test a very large exact quantifier </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-// <modified by="Michael Kay" on="2020-01-07" change="Add a success result; this is not an error defined in the spec"/>
-// <test>fn:matches('aaa', 'a{99999999999999999999999999}')</test>
-// <result>
-//    <any-of>
-//       <assert-false/>
-//       <error code="FORX0002"/>
-//    </any-of>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-005">
-// <description> test with an invalid character range </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('a', '[a--]')</test>
-// <result>
-//    <error code="FORX0002"/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-006">
-// <description> test with a character class containing an escaped character </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-// <dependency type="spec" value="XQ10+"/>
-// <test><![CDATA[fn:matches('&#x9;', '[\t]')]]></test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-006b">
-// <description> test with a character class containing an escaped character </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-// <modified by="O'Neil Delpratt" on="2013-07-24" change="Change spec dependency to XP20+. See bug issue #22792" />
-// <dependency type="spec" value="XP20+"/>
-// <test>fn:matches('&#x9;', '[\t]')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-007">
-// <description> test with a character class beginning with a '-' </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('-abba-', '[-ab]+')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-008">
-// <description> test a badly formed category name </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{L')</test>
-// <result>
-//    <error code="FORX0002"/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-009">
-// <description> test a badly formed category name </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{M')</test>
-// <result>
-//    <error code="FORX0002"/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-010">
-// <description> test a badly formed category name </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{N')</test>
-// <result>
-//    <error code="FORX0002"/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-011">
-// <description> test a badly formed category name </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{P')</test>
-// <result>
-//    <error code="FORX0002"/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-012">
-// <description> test a badly formed category name </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{Z')</test>
-// <result>
-//    <error code="FORX0002"/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-013">
-// <description> test a badly formed category name </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{S')</test>
-// <result>
-//    <error code="FORX0002"/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-014">
-// <description> test a badly formed category name </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{C')</test>
-// <result>
-//    <error code="FORX0002"/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-015">
-// <description> test category name L </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{L}')</test>
-// <result>
-//    <assert-false/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-016">
-// <description> test category name M </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{M}')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-017">
-// <description> test category name N </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{N}')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-018">
-// <description> test category name P </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{P}')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-019">
-// <description> test category name Z </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{Z}')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-020">
-// <description> test category name S </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{S}')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-021">
-// <description> test category name C </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{C}')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-022">
-// <description> test category name Lu </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{Lu}')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-023">
-// <description> test category name Me </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{Me}')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-024">
-// <description> test category name No </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{No}')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-025">
-// <description> test category name Pf </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{Pf}')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-026">
-// <description> test category name Zs </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{Zs}')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-027">
-// <description> test category name Sk </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{Sk}')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-028">
-// <description> test category name Cc </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{Cc}')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-029">
-// <description> test invalid category name La </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{La}')</test>
-// <result>
-//    <error code="FORX0002"/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-030">
-// <description> test invalid category name Ma </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{Ma}')</test>
-// <result>
-//    <error code="FORX0002"/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-031">
-// <description> test invalid category name Na </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{Na}')</test>
-// <result>
-//    <error code="FORX0002"/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-032">
-// <description> test invalid category name Pa </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{Pa}')</test>
-// <result>
-//    <error code="FORX0002"/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-033">
-// <description> test invalid category name Za </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{Za}')</test>
-// <result>
-//    <error code="FORX0002"/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-034">
-// <description> test invalid category name Sa </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{Sa}')</test>
-// <result>
-//    <error code="FORX0002"/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-035">
-// <description> test invalid category name Ca </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', '\P{Ca}')</test>
-// <result>
-//    <error code="FORX0002"/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-036">
-// <description> test an empty branch </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test>fn:matches('foo', 'a()b')</test>
-// <result>
-//    <assert-false/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-037">
-// <description> test a multibyte Unicode character </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-
-// <test><![CDATA[fn:matches('&#x10000;', '&#x10000;')]]></test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-038">
-// <description> test a large exact quantifier </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-// <test>fn:matches('aaa', 'a{2147483647}')</test>
-// <result>
-//    <assert-false/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-039">
-// <description> test a two-digit back reference </description>
-// <created by="Tim Mills" on="2008-07-17"/>
-// <test>fn:matches('abcdefghiabcdefghia0a1', '(a)(b)(c)(d)(e)(f)(g)(h)(i)\1\2\3\4\5\6\7\8\9\10\11')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-040">
-// <description> test the multi-character escape \S </description>
-// <created by="Tim Mills" on="2008-07-29"/>
-
-// <test>fn:matches('abc', '\S+')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-041">
-// <description> test the multi-character escape \S </description>
-// <created by="Tim Mills" on="2008-07-29"/>
-// <dependency type="spec" value="XQ10+"/>
-// <test><![CDATA[fn:matches('&#xD;&#x20;&#x9;', '\S+')]]></test>
-// <result>
-//    <assert-false/>
-// </result>
-// </test-case>
+// Test with an invalid character range
+#[test]
+fn test_cbcl_matches_005() {
+    let regex = Regex::xpath("[a--]", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("Unescaped hyphen cannot act as end of range".to_string())
+    );
+}
+
+// Test with a character class containing an escaped character
+#[test]
+fn test_cbcl_matches_006() {
+    let regex = Regex::xpath("[\t]", "").unwrap();
+    assert!(regex.is_match("\t"));
+}
+
+// Test with a character class beginning with a '-'
+#[test]
+fn test_cbcl_matches_007() {
+    let regex = Regex::xpath("[-ab]+", "").unwrap();
+    assert!(regex.is_match("-abba-"));
+}
+
+// Test a badly formed category name
+#[test]
+fn test_cbcl_matches_008() {
+    let regex = Regex::xpath("\\P{L", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("No closing '}' after \\P".to_string())
+    );
+}
+
+// Test a badly formed category name
+#[test]
+fn test_cbcl_matches_009() {
+    let regex = Regex::xpath("\\P{M", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("No closing '}' after \\P".to_string())
+    );
+}
+
+// Test a badly formed category name
+#[test]
+fn test_cbcl_matches_010() {
+    let regex = Regex::xpath("\\P{N", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("No closing '}' after \\P".to_string())
+    );
+}
+
+// Test a badly formed category name
+#[test]
+fn test_cbcl_matches_011() {
+    let regex = Regex::xpath("\\P{P", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("No closing '}' after \\P".to_string())
+    );
+}
+
+// Test a badly formed category name
+#[test]
+fn test_cbcl_matches_012() {
+    let regex = Regex::xpath("\\P{Z", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("No closing '}' after \\P".to_string())
+    );
+}
+
+// Test a badly formed category name
+#[test]
+fn test_cbcl_matches_013() {
+    let regex = Regex::xpath("\\P{S", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("No closing '}' after \\P".to_string())
+    );
+}
+
+// Test a badly formed category name
+#[test]
+fn test_cbcl_matches_014() {
+    let regex = Regex::xpath("\\P{C", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("No closing '}' after \\P".to_string())
+    );
+}
+
+// Test category name L
+#[test]
+fn test_cbcl_matches_015() {
+    let regex = Regex::xpath("\\P{L}", "").unwrap();
+    assert!(!regex.is_match("foo"));
+}
+
+// Test category name M
+#[test]
+fn test_cbcl_matches_016() {
+    let regex = Regex::xpath("\\P{M}", "").unwrap();
+    assert!(regex.is_match("foo"));
+}
+
+// Test category name N
+#[test]
+fn test_cbcl_matches_017() {
+    let regex = Regex::xpath("\\P{N}", "").unwrap();
+    assert!(regex.is_match("foo"));
+}
+
+// Test category name P
+#[test]
+fn test_cbcl_matches_018() {
+    let regex = Regex::xpath("\\P{P}", "").unwrap();
+    assert!(regex.is_match("foo"));
+}
+
+// Test category name Z
+#[test]
+fn test_cbcl_matches_019() {
+    let regex = Regex::xpath("\\P{Z}", "").unwrap();
+    assert!(regex.is_match("foo"));
+}
+
+// Test category name S
+#[test]
+fn test_cbcl_matches_020() {
+    let regex = Regex::xpath("\\P{S}", "").unwrap();
+    assert!(regex.is_match("foo"));
+}
+
+// Test category name C
+#[test]
+fn test_cbcl_matches_021() {
+    let regex = Regex::xpath("\\P{C}", "").unwrap();
+    assert!(regex.is_match("foo"));
+}
+
+// Test category name Lu
+#[test]
+fn test_cbcl_matches_022() {
+    let regex = Regex::xpath("\\P{Lu}", "").unwrap();
+    assert!(regex.is_match("foo"));
+}
+
+// Test category name Me
+#[test]
+fn test_cbcl_matches_023() {
+    let regex = Regex::xpath("\\P{Me}", "").unwrap();
+    assert!(regex.is_match("foo"));
+}
+
+// Test category name No
+#[test]
+fn test_cbcl_matches_024() {
+    let regex = Regex::xpath("\\P{No}", "").unwrap();
+    assert!(regex.is_match("foo"));
+}
+
+// Test category name Pf
+#[test]
+fn test_cbcl_matches_025() {
+    let regex = Regex::xpath("\\P{Pf}", "").unwrap();
+    assert!(regex.is_match("foo"));
+}
+
+// Test category name Zs
+#[test]
+fn test_cbcl_matches_026() {
+    let regex = Regex::xpath("\\P{Zs}", "").unwrap();
+    assert!(regex.is_match("foo"));
+}
+
+// Test category name Sk
+#[test]
+fn test_cbcl_matches_027() {
+    let regex = Regex::xpath("\\P{Sk}", "").unwrap();
+    assert!(regex.is_match("foo"));
+}
+
+// Test category name Cc
+#[test]
+fn test_cbcl_matches_028() {
+    let regex = Regex::xpath("\\P{Cc}", "").unwrap();
+    assert!(regex.is_match("foo"));
+}
+
+// Test invalid category name La
+#[test]
+fn test_cbcl_matches_029() {
+    let regex = Regex::xpath("\\P{La}", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("Unknown unicode general category La".to_string())
+    );
+}
+
+// Test invalid category name Ma
+#[test]
+fn test_cbcl_matches_030() {
+    let regex = Regex::xpath("\\P{Ma}", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("Unknown unicode general category Ma".to_string())
+    );
+}
+
+// Test invalid category name Na
+#[test]
+fn test_cbcl_matches_031() {
+    let regex = Regex::xpath("\\P{Na}", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("Unknown unicode general category Na".to_string())
+    );
+}
+
+// Test invalid category name Pa
+#[test]
+fn test_cbcl_matches_032() {
+    let regex = Regex::xpath("\\P{Pa}", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("Unknown unicode general category Pa".to_string())
+    );
+}
+
+// Test invalid category name Za
+#[test]
+fn test_cbcl_matches_033() {
+    let regex = Regex::xpath("\\P{Za}", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("Unknown unicode general category Za".to_string())
+    );
+}
+
+// Test an empty branch
+#[test]
+fn test_cbcl_matches_036() {
+    let regex = Regex::xpath("a()b", "").unwrap();
+    assert!(!regex.is_match("foo"));
+}
+// Test a multibyte Unicode character
+#[test]
+fn test_cbcl_matches_037() {
+    let regex = Regex::xpath("\u{10000}", "").unwrap();
+    assert!(regex.is_match("\u{10000}"));
+}
+
+// Test a large exact quantifier
+#[test]
+fn test_cbcl_matches_038() {
+    let regex = Regex::xpath("a{2147483647}", "").unwrap();
+    assert!(!regex.is_match("aaa"));
+}
+
+// Test a two-digit back reference
+#[test]
+fn test_cbcl_matches_039() {
+    let regex = Regex::xpath(
+        "(a)(b)(c)(d)(e)(f)(g)(h)(i)\\1\\2\\3\\4\\5\\6\\7\\8\\9\\10\\11",
+        "",
+    )
+    .unwrap();
+    assert!(regex.is_match("abcdefghiabcdefghia0a1"));
+}
+
+// Test the multi-character escape \S
+#[test]
+fn test_cbcl_matches_040() {
+    let regex = Regex::xpath("\\S+", "").unwrap();
+    assert!(regex.is_match("abc"));
+}
+
+// Test the multi-character escape \S
+#[test]
+fn test_cbcl_matches_041() {
+    let regex = Regex::xpath("\\S+", "").unwrap();
+    assert!(!regex.is_match("\r \t"));
+}
 
 // <test-case name="cbcl-matches-041b">
 // <description> test the multi-character escape \S </description>
