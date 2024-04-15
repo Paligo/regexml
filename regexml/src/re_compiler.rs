@@ -1,6 +1,7 @@
 use std::rc::Rc;
 
 use ahash::{HashSet, HashSetExt};
+use icu_casemap::CaseMapCloser;
 use icu_collections::codepointinvlist::CodePointInversionListBuilder;
 
 use crate::{
@@ -470,13 +471,9 @@ impl ReCompiler {
                     }
                     builder.add_range(&(start..=end));
                     if self.re_flags.is_case_independent() {
-                        for i in start..=end {
-                            for uppercase in i.to_uppercase() {
-                                builder.add_char(uppercase);
-                            }
-                            for lowercase in i.to_lowercase() {
-                                builder.add_char(lowercase);
-                            }
+                        let cm = CaseMapCloser::new();
+                        for c in start..=end {
+                            cm.add_case_closure_to(c, &mut builder);
                         }
                     }
                     // we are done defining the range
@@ -505,12 +502,8 @@ impl ReCompiler {
                     }
                     if self.re_flags.is_case_independent() {
                         if let Some(simple_char) = simple_char {
-                            for c in simple_char.to_uppercase() {
-                                builder.add_char(c);
-                            }
-                            for c in simple_char.to_lowercase() {
-                                builder.add_char(c);
-                            }
+                            let cm = CaseMapCloser::new();
+                            cm.add_case_closure_to(simple_char, &mut builder);
                         }
                     }
                 }

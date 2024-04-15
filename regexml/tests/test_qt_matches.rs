@@ -594,12 +594,12 @@ fn test_caselessmatch03() {
     assert!(regex.is_match("abZ"));
 }
 
-// // Call of matches() with "i" flag and Kelvin sign Kelvin sign
-// #[test]
-// fn test_caselessmatch04() {
-//     let regex = Regex::xpath("[A-Z]", "i").unwrap();
-//     assert!(regex.is_match("\u{212A}"));
-// }
+// Call of matches() with "i" flag and Kelvin sign Kelvin sign
+#[test]
+fn test_caselessmatch04() {
+    let regex = Regex::xpath("[A-Z]", "i").unwrap();
+    assert!(regex.is_match("\u{212A}"));
+}
 
 // <test-case name="caselessmatch04">
 // <description> Call of matches() with "i" flag and Kelvin sign Kelvin sign </description>
