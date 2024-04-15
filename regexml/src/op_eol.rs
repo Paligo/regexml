@@ -20,7 +20,7 @@ impl OperationControl for Eol {
         matcher: &ReMatcher,
         position: usize,
     ) -> Box<dyn Iterator<Item = usize>> {
-        let search = matcher.search;
+        let search = &matcher.search;
 
         if matcher.program.flags.is_multi_line() {
             if search.is_empty() || position >= search.len() || matcher.is_new_line(position) {

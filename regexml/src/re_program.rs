@@ -174,4 +174,15 @@ impl ReProgram {
             }
         }
     }
+
+    pub(crate) fn path(&self, path: &str) -> Rc<Operation> {
+        // path is numbers separated by / and goes into the children of the operation
+        // so 0/1/2 would go into the 0th child, then the 1st child of that, then the 2nd child of that
+        let steps = path.split('/').map(|s| s.parse::<usize>().unwrap());
+        let mut op = self.operation.clone();
+        for step in steps {
+            op = op.children()[step].clone();
+        }
+        op
+    }
 }

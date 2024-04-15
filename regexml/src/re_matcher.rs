@@ -12,7 +12,7 @@ pub(crate) struct ReMatcher<'a> {
     // current program
     pub(crate) program: &'a ReProgram,
     // string being matched against
-    pub(crate) search: &'a [char],
+    pub(crate) search: Vec<char>,
     pub(crate) max_paren: Option<usize>,
     // parenthesized subexpressions
     state: RefCell<State>,
@@ -76,11 +76,12 @@ impl State {
 }
 
 impl<'a> ReMatcher<'a> {
-    pub(crate) fn new(program: &'a ReProgram) -> Self {
+    pub(crate) fn new(program: &'a ReProgram, search: &str) -> Self {
+        let search = search.chars().collect::<Vec<_>>();
         let max_paren = program.max_parens;
         Self {
             program,
-            search: &[],
+            search,
             max_paren,
             state: RefCell::new(State::new()),
         }
@@ -111,15 +112,11 @@ impl<'a> ReMatcher<'a> {
     }
 
     // an 'is' function that mutates self? weird
-    pub(crate) fn is_anchored_match(&mut self, search: &'a [char]) -> bool {
-        self.search = search;
+    pub(crate) fn is_anchored_match(&mut self) -> bool {
         self.match_at(0, true)
     }
 
-    pub(crate) fn matches(&mut self, search: &'a [char], i: usize) -> bool {
-        // save string to search
-        self.search = search;
-
+    pub(crate) fn matches(&mut self, i: usize) -> bool {
         // clear the captured group state
         self.state.borrow_mut().capture_state = CaptureState::new();
 
@@ -179,7 +176,7 @@ impl<'a> ReMatcher<'a> {
                     }
                 } else {
                     for k in 0..prefix_length {
-                        if search[k + j] != prefix[k] {
+                        if self.search[k + j] != prefix[k] {
                             prefix_ok = false;
                             break;
                         }
@@ -211,7 +208,7 @@ impl<'a> ReMatcher<'a> {
             }
 
             // unprefixed matching must try for a match at each character
-            for j in i..(search.len() + 1) {
+            for j in i..(self.search.len() + 1) {
                 // try a match at index i
                 if self.match_at(j, false) {
                     return true;
@@ -221,8 +218,8 @@ impl<'a> ReMatcher<'a> {
         }
     }
 
-    pub(crate) fn is_match(&mut self, search: &'a [char]) -> bool {
-        self.matches(search, 0)
+    pub(crate) fn is_match(&mut self) -> bool {
+        self.matches(0)
     }
 
     fn check_preconditions(&self, start: usize) -> bool {
@@ -262,26 +259,22 @@ impl<'a> ReMatcher<'a> {
         true
     }
 
-    pub(crate) fn replace(
-        &mut self,
-        input: &'a [char],
-        replacement: &[char],
-    ) -> Result<Vec<char>, Error> {
+    pub(crate) fn replace(&mut self, replacement: &[char]) -> Result<Vec<char>, Error> {
         // string to return
         let mut result = Vec::new();
 
         // start at position 0 and search the whole string
         let mut pos = 0;
-        let len = input.len();
+        let len = self.search.len();
 
         let mut first_match = true;
         let mut simple_replacement = false;
 
         // try a match at each position
-        while pos < len && self.matches(input, pos) {
+        while pos < len && self.matches(pos) {
             // append chars from input string before match
             if let Some(start) = self.get_paren_start(0) {
-                result.extend(&input[pos..start]);
+                result.extend(&self.search[pos..start]);
             }
             if first_match {
                 simple_replacement = self.program.flags.is_literal();
@@ -381,11 +374,11 @@ impl<'a> ReMatcher<'a> {
 
         // if no matches were found, return the input unchanged
         if first_match {
-            return Ok(input.to_vec());
+            return Ok(self.search.to_vec());
         }
 
         // if there's remaining input, append it
-        result.extend(&input[pos..len]);
+        result.extend(self.search[pos..len].iter());
 
         // return the string buffer
         Ok(result)

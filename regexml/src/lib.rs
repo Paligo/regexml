@@ -24,8 +24,10 @@ mod regex_iterator;
 mod regular_expression;
 
 use std::cell::{Ref, RefCell};
+use std::rc::Rc;
 
 use ahash::{HashMap, HashMapExt};
+use operation::Operation;
 
 use crate::re_compiler::ReCompiler;
 use crate::re_flags::ReFlags;
@@ -63,46 +65,47 @@ impl Regex {
 
     /// Returns `true` if the argument matches this regular expression.
     pub fn is_match(&self, haystack: &str) -> bool {
-        let mut matcher = ReMatcher::new(&self.re_program);
-        let search: Vec<char> = haystack.chars().collect();
-        matcher.is_match(&search)
+        let mut matcher = self.matcher(haystack);
+        matcher.is_match()
     }
 
     /// Returns a string with all pieces matching this regular expression replaced
     /// by the replacement.
     pub fn replace_all(&self, haystack: &str, replacement: &str) -> Result<String, Error> {
-        let mut matcher = ReMatcher::new(&self.re_program);
-        let search: Vec<char> = haystack.chars().collect();
+        let mut matcher = self.matcher(haystack);
         let replacement: Vec<char> = replacement.chars().collect();
         matcher
-            .replace(&search, &replacement)
+            .replace(&replacement)
             .map(|chars| chars.into_iter().collect())
     }
 
     /// Returns a vector of the input string tokenized by the regular expression.
     pub fn tokenize(&self, haystack: &str) -> Result<Vec<String>, Error> {
-        let mut matcher = ReMatcher::new(&self.re_program);
+        let mut matcher = self.matcher(haystack);
 
         let mut result: Vec<String> = Vec::new();
         let mut prev_end = Some(0);
-        let input = &haystack.chars().collect::<Vec<_>>();
 
         while let Some(end) = prev_end {
-            let matches = matcher.matches(input, end);
+            let matches = matcher.matches(end);
             if matches {
                 let start = matcher.get_paren_start(0).unwrap();
                 prev_end = matcher.get_paren_end(0);
-                result.push(input[end..start].iter().collect())
+                result.push(matcher.search[end..start].iter().collect())
             } else {
-                result.push(input[end..].iter().collect());
+                result.push(matcher.search[end..].iter().collect());
                 break;
             }
         }
         Ok(result)
     }
 
-    pub(crate) fn program(&self) -> &ReProgram {
-        &self.re_program
+    pub(crate) fn matcher(&self, search: &str) -> ReMatcher {
+        ReMatcher::new(&self.re_program, search)
+    }
+
+    pub(crate) fn path(&self, s: &str) -> Rc<Operation> {
+        self.re_program.path(s)
     }
 
     /// Use this regular expression to analyze an input string, The resulting
@@ -323,7 +326,7 @@ impl<'a> Iterator for AnalyzeIter<'a> {
                         }
                     }
                 }
-                if self.matcher.matches(self.the_string, search_start) {
+                if self.matcher.matches(search_start) {
                     let start = self.matcher.get_paren_start(0).unwrap();
                     let end = self.matcher.get_paren_end(0).unwrap();
                     self.skip = start == end;

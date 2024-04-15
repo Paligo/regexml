@@ -225,7 +225,7 @@ impl<'a> Iterator for RegexIterator<'a> {
                     }
                 }
             }
-            if self.matcher.matches(self.the_string, search_start) {
+            if self.matcher.matches(search_start) {
                 let start = self.matcher.get_paren_start(0).unwrap();
                 let end = self.matcher.get_paren_end(0).unwrap();
                 self.skip = start == end;

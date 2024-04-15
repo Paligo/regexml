@@ -42,7 +42,7 @@ impl OperationControl for Atom {
         matcher: &'a ReMatcher,
         position: usize,
     ) -> Box<dyn Iterator<Item = usize> + 'a> {
-        let in_ = matcher.search;
+        let in_ = &matcher.search;
         if (position + self.len) > in_.len() {
             return Box::new(std::iter::empty());
         }

@@ -156,8 +156,13 @@ mod tests {
 
     use super::*;
 
-    #[test]
-    fn test_choice() {
-        let regex = Regex::xpath(r#"a|b|c"#, "").unwrap();
-    }
+    // #[test]
+    // fn test_choice() {
+    //     let regex = Regex::xpath(r#"a|b|c"#, "").unwrap();
+    //     let op = regex.path("0");
+    //     let matcher = regex.matcher("a");
+    //     let positions = op.matches_iter(&matcher, 0).collect::<Vec<_>>();
+
+    //     assert!(false);
+    // }
 }

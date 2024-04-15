@@ -28,7 +28,7 @@ impl OperationControl for CharClass {
         matcher: &'b crate::re_matcher::ReMatcher,
         position: usize,
     ) -> Box<dyn Iterator<Item = usize> + 'b> {
-        let search = matcher.search;
+        let search = &matcher.search;
         if position < search.len() && self.character_class.contains(search[position]) {
             Box::new(std::iter::once(position + 1))
         } else {

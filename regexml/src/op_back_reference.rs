@@ -36,7 +36,7 @@ impl OperationControl for BackReference {
             let l = e - s;
 
             // if there's not enough input left, give up
-            let search = matcher.search;
+            let search = &matcher.search;
             if (position + l - 1) >= search.len() {
                 return Box::new(std::iter::empty());
             }
