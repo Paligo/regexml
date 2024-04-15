@@ -470,40 +470,15 @@ impl ReCompiler {
                     }
                     builder.add_range(&(start..=end));
                     if self.re_flags.is_case_independent() {
-                        for c in start..=end {
-                            let chars = c.to_uppercase().collect::<Vec<_>>();
-                            // any special situations where the uppercase or
-                            // lower case version is multiple characters is
-                            // ignored
-                            if chars.len() == 1 {
-                                builder.add_char(chars[0]);
-                            }
-                            let chars = c.to_lowercase().collect::<Vec<_>>();
-                            if chars.len() == 1 {
-                                builder.add_char(chars[0]);
-                            }
-                        }
-                        // // special case A-Z and a-z
-                        // if start == 'a' && end == 'z' {
-                        //     for c in 'A'..='Z' {
-                        //         range.insert(c);
-                        //     }
-                        //     range.extend(ROMAN_VARIANTS);
-                        // } else if start == 'A' && end == 'Z' {
-                        //     for c in 'a'..='z' {
-                        //         range.insert(c);
-                        //     }
-                        //     range.extend(ROMAN_VARIANTS)
-                        // } else {
-                        //     for k in start..=end {
-                        //         // TODO: case_variants isn't filled with
-                        //         // anything yet
-                        //         let variants = self.case_variants.get_case_variants(k);
-                        //         range.extend(variants);
-                        //     }
-                        // }
+                        // ignore multiple characters returned for upper/lower case
+                        let uppercase_start = single_case_char(start.to_uppercase())?;
+                        let uppercase_end = single_case_char(end.to_uppercase())?;
+                        let lowercase_start = single_case_char(start.to_lowercase())?;
+                        let lowercase_end = single_case_char(end.to_lowercase())?;
+                        builder.add_range(&(uppercase_start..=uppercase_end));
+                        builder.add_range(&(lowercase_start..=lowercase_end));
                     }
-                    // we are don defining the range
+                    // we are done defining the range
                     defining_range = false;
                     range_start = None;
                 }
@@ -1051,6 +1026,17 @@ impl ReCompiler {
             Ok(program)
         }
     }
+}
+
+fn single_case_char(iter: impl Iterator<Item = char>) -> Result<char, Error> {
+    let mut iter = iter.peekable();
+    let c = iter.next().unwrap();
+    if iter.peek().is_some() {
+        return Err(Error::syntax(
+            "Expected single lowercase/uppercase character",
+        ));
+    }
+    Ok(c)
 }
 
 #[cfg(test)]
