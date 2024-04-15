@@ -254,3 +254,35 @@ impl<'a> Iterator for ReluctantRepeatIterator<'a> {
         self.position
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::Regex;
+
+    #[test]
+    fn test_repeat_star() {
+        let regex = Regex::xpath(r#"a*"#, "").unwrap();
+        let op = regex.path("0");
+        let matcher = regex.matcher("aaaaa");
+        let matches = matcher.operation_matches(op);
+        assert_eq!(matches, vec!["aaaaa", "aaaa", "aaa", "aa", "a", ""]);
+    }
+
+    #[test]
+    fn test_repeat_plus() {
+        let regex = Regex::xpath(r#"a+"#, "").unwrap();
+        let op = regex.path("0");
+        let matcher = regex.matcher("aaaaa");
+        let matches = matcher.operation_matches(op);
+        assert_eq!(matches, vec!["aaaaa", "aaaa", "aaa", "aa", "a"]);
+    }
+
+    #[test]
+    fn test_repeat_question() {
+        let regex = Regex::xpath(r#"a?"#, "").unwrap();
+        let op = regex.path("0");
+        let matcher = regex.matcher("aaaaa");
+        let matches = matcher.operation_matches(op);
+        assert_eq!(matches, vec!["a", ""]);
+    }
+}

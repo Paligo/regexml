@@ -158,9 +158,9 @@ mod tests {
     fn test_choice() {
         let regex = Regex::xpath(r#"a|b|c"#, "").unwrap();
         let op = regex.path("0");
-        let matches = regex.matcher("a").all_matches(op.clone());
+        let matches = regex.matcher("a").operation_matches(op.clone());
         assert_eq!(matches, vec!["a"]);
-        let matches = regex.matcher("d").all_matches(op);
+        let matches = regex.matcher("d").operation_matches(op);
         assert!(matches.is_empty());
     }
 }

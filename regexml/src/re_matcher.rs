@@ -388,7 +388,7 @@ impl<'a> ReMatcher<'a> {
         self.search[i] == '\n'
     }
 
-    pub(crate) fn all_matches(&self, op: Rc<Operation>) -> Vec<String> {
+    pub(crate) fn operation_matches(&self, op: Rc<Operation>) -> Vec<String> {
         let start_position = 0;
         let positions = op.matches_iter(self, start_position);
         let ranges = positions.map(|e| start_position..e);
