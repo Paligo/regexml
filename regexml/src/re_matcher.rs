@@ -1,4 +1,4 @@
-use std::cell::RefCell;
+use std::{cell::RefCell, rc::Rc};
 
 use ahash::{HashMap, HashMapExt, HashSet, HashSetExt};
 
@@ -386,6 +386,15 @@ impl<'a> ReMatcher<'a> {
 
     pub(crate) fn is_new_line(&self, i: usize) -> bool {
         self.search[i] == '\n'
+    }
+
+    pub(crate) fn all_matches(&self, op: Rc<Operation>) -> Vec<String> {
+        let start_position = 0;
+        let positions = op.matches_iter(self, start_position);
+        let ranges = positions.map(|e| start_position..e);
+        ranges
+            .map(|r| self.search[r].iter().collect::<String>())
+            .collect()
     }
 
     pub(crate) fn equal_case_blind(&self, a: char, b: char) -> bool {
