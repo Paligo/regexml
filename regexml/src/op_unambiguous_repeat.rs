@@ -74,6 +74,10 @@ impl OperationControl for UnambiguousRepeat {
             Box::new(std::iter::once(p))
         }
     }
+
+    fn children(&self) -> Vec<Rc<Operation>> {
+        vec![self.operation.clone()]
+    }
 }
 
 impl RepeatOperation for UnambiguousRepeat {

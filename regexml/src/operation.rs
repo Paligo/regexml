@@ -80,6 +80,12 @@ pub(crate) trait OperationControl {
     fn contains_capturing_expressions(&self) -> bool {
         false
     }
+
+    /// Access child information so we can structurally dive into
+    /// a regex, mostly for testing purposes.
+    fn children(&self) -> Vec<Rc<Operation>> {
+        Vec::new()
+    }
 }
 
 pub(crate) trait RepeatOperation {

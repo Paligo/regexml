@@ -52,6 +52,10 @@ impl OperationControl for Capture {
             position,
         ))
     }
+
+    fn children(&self) -> Vec<Rc<Operation>> {
+        vec![self.child_op.clone()]
+    }
 }
 
 struct CaptureGroupIterator<'a> {

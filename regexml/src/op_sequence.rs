@@ -100,6 +100,10 @@ impl OperationControl for Sequence {
             self.contains_capturing_expressions(),
         ))
     }
+
+    fn children(&self) -> Vec<Rc<Operation>> {
+        self.operations.clone()
+    }
 }
 
 struct SequenceIterator<'a> {

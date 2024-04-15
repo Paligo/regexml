@@ -108,6 +108,10 @@ impl OperationControl for Repeat {
             )))
         }
     }
+
+    fn children(&self) -> Vec<Rc<Operation>> {
+        vec![self.operation.clone()]
+    }
 }
 
 impl RepeatOperation for Repeat {

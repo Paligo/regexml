@@ -73,6 +73,10 @@ impl OperationControl for Choice {
             self.branches.clone(),
         ))
     }
+
+    fn children(&self) -> Vec<Rc<Operation>> {
+        self.branches.clone()
+    }
 }
 
 struct ChoiceIterator<'a> {
@@ -145,3 +149,15 @@ impl<'a> Iterator for ChoiceIterator<'a> {
 //         }
 //     }
 // }
+
+#[cfg(test)]
+mod tests {
+    use crate::{op_atom::Atom, Regex};
+
+    use super::*;
+
+    #[test]
+    fn test_choice() {
+        let regex = Regex::xpath(r#"a|b|c"#, "").unwrap();
+    }
+}

@@ -101,6 +101,10 @@ impl Regex {
         Ok(result)
     }
 
+    pub(crate) fn program(&self) -> &ReProgram {
+        &self.re_program
+    }
+
     /// Use this regular expression to analyze an input string, The resulting
     /// vector provides both the matching and non-matching substrings. It also
     /// provides access to matched subgroups.

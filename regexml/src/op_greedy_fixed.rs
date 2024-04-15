@@ -89,6 +89,10 @@ impl OperationControl for GreedyFixed {
             position + self.len * self.min,
         ))
     }
+
+    fn children(&self) -> Vec<Rc<Operation>> {
+        vec![self.operation.clone()]
+    }
 }
 
 impl RepeatOperation for GreedyFixed {

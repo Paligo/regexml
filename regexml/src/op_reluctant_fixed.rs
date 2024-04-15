@@ -63,6 +63,10 @@ impl OperationControl for ReluctantFixed {
             self.max,
         ))
     }
+
+    fn children(&self) -> Vec<Rc<Operation>> {
+        vec![self.operation.clone()]
+    }
 }
 
 impl RepeatOperation for ReluctantFixed {
