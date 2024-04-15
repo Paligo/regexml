@@ -733,125 +733,127 @@ fn test_k2_matches_func_5() {
     assert!(regex.is_match("hello world"));
 }
 
-// <test-case name="K2-MatchesFunc-5">
-// <description> whitespace in the regexp is collapsed, and should therefore compile. </description>
-// <created by="Frans Englich" on="2007-11-26"/>
-// <test>fn:matches("hello world", "\p{ IsBasicLatin}+", "x")</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
+// Whitespace in the regexp is collapsed completely, and should therefore compile and match.
+#[test]
+fn test_k2_matches_func_6() {
+    let regex = Regex::xpath("\\p{ I s B a s i c L a t i n }+", "x").unwrap();
+    assert!(regex.is_match("hello world"));
+}
 
-// <test-case name="K2-MatchesFunc-6">
-// <description> whitespace in the regexp is collapsed completely, and should therefore compile and match. </description>
-// <created by="Frans Englich" on="2007-11-26"/>
-// <test>fn:matches("hello world", "\p{ I s B a s i c L a t i n }+", "x")</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
+// Whitespace in the regexp is not collapsed, and should therefore not compile.
+#[test]
+fn test_k2_matches_func_7() {
+    let regex = Regex::xpath("\\p{ IsBasicLatin}+", "");
+    let err = regex.unwrap_err();
+    assert_eq!(
+        err,
+        Error::Syntax("Unknown character category:  IsBasicLatin".to_string())
+    );
+}
 
-// <test-case name="K2-MatchesFunc-7">
-// <description> whitespace in the regexp is not collapsed, and should therefore not compile. </description>
-// <created by="Frans Englich" on="2007-11-26"/>
-// <test>fn:matches("hello world", "\p{ IsBasicLatin}+")</test>
-// <result>
-//    <error code="FORX0002"/>
-// </result>
-// </test-case>
+// Since no string is captured by the back-reference, the single character is matched.
+#[test]
+fn test_k2_matches_func_8() {
+    let regex = Regex::xpath("(.)\\3", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("invalid backreference \\3 (no such group)".to_string())
+    );
+}
 
-// <test-case name="K2-MatchesFunc-8">
-// <description> Since no string is captured by the back-reference, the single character is matched. </description>
-// <created by="Frans Englich" on="2007-11-26"/>
-// <test>fn:matches("h", "(.)\3")</test>
-// <result>
-//    <error code="FORX0002"/>
-// </result>
-// </test-case>
+// Since no string is captured by the back-reference, the single character is matched.
+#[test]
+fn test_k2_matches_func_9() {
+    let regex = Regex::xpath("(.)\\2", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("invalid backreference \\2 (no such group)".to_string())
+    );
+}
 
-// <test-case name="K2-MatchesFunc-9">
-// <description> Since no string is captured by the back-reference, the single character is matched(#2). </description>
-// <created by="Frans Englich" on="2007-11-26"/>
-// <test>fn:matches("h", "(.)\2")</test>
-// <result>
-//    <error code="FORX0002"/>
-// </result>
-// </test-case>
+// A non-matching backwards-reference matches the empty string.
+#[test]
+fn test_k2_matches_func_10() {
+    let regex = Regex::xpath("\\3", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("invalid backreference \\3 (no such group)".to_string())
+    );
+}
 
-// <test-case name="K2-MatchesFunc-10">
-// <description> A non-matching backwards-reference matches the empty string. </description>
-// <created by="Frans Englich" on="2007-11-26"/>
-// <test>matches("input", "\3")</test>
-// <result>
-//    <error code="FORX0002"/>
-// </result>
-// </test-case>
+// Use a back reference inside a character class.
+#[test]
+fn test_k2_matches_func_11() {
+    let regex = Regex::xpath("(asd)[\\1]", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("Backreferences not allowed within character classes".to_string())
+    );
+}
 
-// <test-case name="K2-MatchesFunc-11">
-// <description> Use a back reference inside a character class. </description>
-// <created by="Frans Englich" on="2007-11-26"/>
-// <test>matches("abcd", "(asd)[\1]")</test>
-// <result>
-//    <error code="FORX0002"/>
-// </result>
-// </test-case>
+// Use a back reference inside a character class.
+#[test]
+fn test_k2_matches_func_12() {
+    let regex = Regex::xpath("(asd)[asd\\1]", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("Backreferences not allowed within character classes".to_string())
+    );
+}
 
-// <test-case name="K2-MatchesFunc-12">
-// <description> Use a back reference inside a character class(#2). </description>
-// <created by="Frans Englich" on="2007-11-26"/>
-// <test>matches("abcd", "(asd)[asd\1]")</test>
-// <result>
-//    <error code="FORX0002"/>
-// </result>
-// </test-case>
+// Use a back reference inside a character class.
+#[test]
+fn test_k2_matches_func_13() {
+    let regex = Regex::xpath("(asd)[asd\\0]", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("Octal escapes are not allowed".to_string())
+    );
+}
 
-// <test-case name="K2-MatchesFunc-13">
-// <description> Use a back reference inside a character class(#3). </description>
-// <created by="Frans Englich" on="2007-11-26"/>
-// <test>matches("abcd", "(asd)[asd\0]")</test>
-// <result>
-//    <error code="FORX0002"/>
-// </result>
-// </test-case>
+// Use a back reference inside a character class.
+#[test]
+fn test_k2_matches_func_14() {
+    let regex = Regex::xpath("1[asd\\0]", "");
+    assert_eq!(
+        regex.unwrap_err(),
+        Error::Syntax("Octal escapes are not allowed".to_string())
+    );
+}
 
-// <test-case name="K2-MatchesFunc-14">
-// <description> Use a back reference inside a character class(#3). </description>
-// <created by="Frans Englich" on="2007-11-26"/>
-// <test>matches("abcd", "1[asd\0]")</test>
-// <result>
-//    <error code="FORX0002"/>
-// </result>
-// </test-case>
+// A negative character class never match a non-character
+#[test]
+fn test_k2_matches_func_15() {
+    let regex = Regex::xpath("a[^b]", "").unwrap();
+    assert!(!regex.is_match("a"));
+    assert!(regex.is_match("a "));
+}
 
-// <test-case name="K2-MatchesFunc-15">
-// <description> A negative character class never match a non-character. </description>
-// <created by="Frans Englich" on="2007-11-26"/>
-// <test>fn:matches("a", "a[^b]"), fn:matches("a ", "a[^b]")</test>
-// <result>
-//    <assert-deep-eq>false(), true()</assert-deep-eq>
-// </result>
-// </test-case>
+// Use a pattern whose interpretation is unknown. See public report 4466 and 21425.
+// xsd version 1.1
+#[test]
+fn test_k2_matches_func_16() {
+    let regex = Regex::xpath("[0-9-.]*/", "").unwrap();
+    assert!(!regex.is_match("input"));
+}
 
-// <test-case name="K2-MatchesFunc-16">
-// <description> Use a pattern whose interpretation is unknown. See public report 4466 and 21425. </description>
-// <created by="Frans Englich" on="2007-11-26"/>
-// <modified by="Michael Kay" on="2013-06-13" change="see bug 21425"/>
-// <dependency type="xsd-version" value="1.1"/>
-// <test>fn:matches("input", "[0-9-.]*/")</test>
-// <result>
-//       <assert-string-value>false</assert-string-value>
-// </result>
-// </test-case>
+// Use a pattern whose interpretation is unknown. See public report 4466 and 21425.
+// xsd version 1.0
+// #[test]
+// fn test_k2_matches_func_16a() {
+//     let regex = Regex::xpath("[0-9-.]*/", "");
+//     assert_eq!(
+//         regex.unwrap_err(),
+//         Error::Syntax("No expression before quantifier".to_string())
+//     );
+// }
 
-// <test-case name="K2-MatchesFunc-16a">
-// <description> Use a pattern whose interpretation is unknown. See public report 4466 and 21425. </description>
-// <created by="Michael Kay" on="2013-06-13"/>
-// <dependency type="xsd-version" value="1.0"/>
-// <test>fn:matches("input", "[0-9-.]*/")</test>
-// <result>
-//    <error code="FORX0002"/>
-// </result>
-// </test-case>
+// Caseless match with back-reference.
+#[test]
+fn test_k2_matches_func_17() {
+    let regex = Regex::xpath("(a)\\1", "i").unwrap();
+    assert!(regex.is_match("aA"));
+}
 
 // <test-case name="K2-MatchesFunc-17">
 // <description> Caseless match with back-reference. </description>
