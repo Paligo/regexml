@@ -601,25 +601,19 @@ fn test_caselessmatch04() {
     assert!(regex.is_match("\u{212A}"));
 }
 
-// <test-case name="caselessmatch04">
-// <description> Call of matches() with "i" flag and Kelvin sign Kelvin sign </description>
-// <created by="Michael Kay, Saxonica" on="2006-02-01"/>
-// <modified by="Michael Kay" on="2012-01-15" change="Changed to work under both XPath and XQuery"/>
-// <test>matches(codepoints-to-string(8490), '[A-Z]', 'i')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
+// Call of matches() with "i" flag and Kelvin sign Kelvin sign
+#[test]
+fn test_caselessmatch05() {
+    let regex = Regex::xpath("[a-z]", "i").unwrap();
+    assert!(regex.is_match("\u{212A}"));
+}
 
-// <test-case name="caselessmatch05">
-// <description> Call of matches() with "i" flag and Kelvin sign Kelvin sign </description>
-// <created by="Michael Kay, Saxonica" on="2006-02-01"/>
-// <modified by="Michael Kay" on="2012-01-15" change="Changed to work under both XPath and XQuery"/>
-// <test>matches(codepoints-to-string(8490), '[a-z]', 'i')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
+// Call of matches() with "i" flag and Kelvin sign
+#[test]
+fn test_caselessmatch06() {
+    let regex = Regex::xpath("K", "i").unwrap();
+    assert!(regex.is_match("\u{212A}"));
+}
 
 // <test-case name="caselessmatch06">
 // <description> Call of matches() with "i" flag and Kelvin sign Kelvin sign </description>

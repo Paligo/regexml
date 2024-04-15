@@ -1,6 +1,7 @@
 use std::{cell::RefCell, rc::Rc};
 
 use ahash::{HashMap, HashMapExt, HashSet, HashSetExt};
+use icu_casemap::CaseMapper;
 
 use crate::{
     operation::{Operation, OperationControl},
@@ -14,6 +15,8 @@ pub(crate) struct ReMatcher<'a> {
     // string being matched against
     pub(crate) search: Vec<char>,
     pub(crate) max_paren: Option<usize>,
+
+    case_mapper: CaseMapper,
     // parenthesized subexpressions
     state: RefCell<State>,
 }
@@ -84,6 +87,7 @@ impl<'a> ReMatcher<'a> {
             search,
             max_paren,
             state: RefCell::new(State::new()),
+            case_mapper: CaseMapper::new(),
         }
     }
 
@@ -401,13 +405,10 @@ impl<'a> ReMatcher<'a> {
         if a == b {
             return true;
         }
-        let uppercase = a.to_uppercase().collect::<Vec<_>>();
-        if uppercase.len() == 1 && uppercase[0] == b {
+        let lowercase_a = self.case_mapper.simple_lowercase(a);
+        let lowercase_b = self.case_mapper.simple_lowercase(b);
+        if lowercase_a == lowercase_b {
             return true;
-        }
-        let lowercase = a.to_lowercase().collect::<Vec<_>>();
-        if lowercase.len() == 1 {
-            return lowercase[0] == b;
         }
         false
     }
