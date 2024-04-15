@@ -171,13 +171,13 @@ impl<'a> Iterator for ForceProgressIterator<'a> {
         if self.count_zero_length > 3 {
             return None;
         }
-        let p = self.base.next()?;
-        if Some(p) == self.current_pos {
+        let p = Some(self.base.next()?);
+        if p == self.current_pos {
             self.count_zero_length += 1;
         } else {
             self.count_zero_length = 0;
-            self.current_pos = Some(p);
+            self.current_pos = p;
         }
-        Some(p)
+        p
     }
 }

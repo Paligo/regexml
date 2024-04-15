@@ -188,7 +188,7 @@ impl<'a> Iterator for GreedyRepeatIterator<'a> {
                     break;
                 }
             }
-            self.iterators.is_empty()
+            !self.iterators.is_empty()
         };
         if has_next {
             self.primed = false;
@@ -258,13 +258,4 @@ impl<'a> Iterator for ReluctantRepeatIterator<'a> {
 #[cfg(test)]
 mod tests {
     use crate::Regex;
-
-    // #[test]
-    // fn test_repeat_star_greedy() {
-    //     let regex = Regex::xpath(r#"a*"#, "").unwrap();
-    //     let op = regex.path("0");
-    //     let matcher = regex.matcher("aaaaa");
-    //     let matches = matcher.operation_matches(op);
-    //     assert_eq!(matches, vec!["aaaaa", "aaaa", "aaa", "aa", "a", ""]);
-    // }
 }
