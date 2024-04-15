@@ -74,6 +74,13 @@ fn test_star_outside_capture_group() {
 // }
 
 // #[test]
+// fn test_whatever() {
+//     let regex = Regex::xpath(r#"(AS|A)+S"#, "");
+//     let regex = regex.unwrap();
+//     assert!(regex.is_match(r#"AS"#));
+// }
+
+// #[test]
 // fn test_star_inside_and_outside_capture_group() {
 //     let regex = Regex::xpath(r#"^(.*)*B"#, "");
 //     let regex = regex.unwrap();
