@@ -529,7 +529,7 @@ fn test_fn_replace_single_backslash() {
     let err = regex.replace_all("abracadabra", "\\").unwrap_err();
     assert_eq!(
         err,
-        Error::Syntax("Invalid escape at end of replacement string".to_string())
+        Error::InvalidReplacementString("Invalid escape at end of replacement string".to_string())
     );
 }
 
@@ -560,7 +560,7 @@ fn test_k_replacefunc_6() {
     let err = regex.replace_all("input", "thisIsInvalid\\").unwrap_err();
     assert_eq!(
         err,
-        Error::Syntax("Invalid escape at end of replacement string".to_string())
+        Error::InvalidReplacementString("Invalid escape at end of replacement string".to_string())
     );
 }
 
@@ -571,7 +571,7 @@ fn test_k_replacefunc_7() {
     let err = regex.replace_all("input", "thisIsInvalid$").unwrap_err();
     assert_eq!(
         err,
-        Error::Syntax("Invalid escape at end of replacement string".to_string())
+        Error::InvalidReplacementString("Invalid escape at end of replacement string".to_string())
     );
 }
 
@@ -582,7 +582,7 @@ fn test_k_replacefunc_8() {
     let err = regex.replace_all("input", "thisIsInvalid\\ ").unwrap_err();
     assert_eq!(
         err,
-        Error::Syntax("Invalid escape ' ' in replacement string".to_string())
+        Error::InvalidReplacementString("Invalid escape ' ' in replacement string".to_string())
     );
 }
 
@@ -593,6 +593,70 @@ fn test_k_replacefunc_9() {
     let err = regex.replace_all("input", "thisIsInvalid$ ").unwrap_err();
     assert_eq!(
         err,
-        Error::Syntax("$ in replacement string must be followed by a digit".to_string())
+        Error::InvalidReplacementString(
+            "$ in replacement string must be followed by a digit".to_string()
+        )
+    );
+}
+
+// Unexpectedly ending escape.
+#[test]
+fn test_k_replacefunc_10() {
+    let regex = Regex::xpath("(a )", "").unwrap();
+    let err = regex.replace_all("a a a ", "replacment: \\1").unwrap_err();
+    assert_eq!(
+        err,
+        Error::InvalidReplacementString("Invalid escape '1' in replacement string".to_string())
+    );
+}
+
+// Unexpected ending escape.
+#[test]
+fn test_k2_replacefunc_1() {
+    let regex = Regex::xpath("(a )", "").unwrap();
+    let err = regex.replace_all("a a a ", "replacment: \\1").unwrap_err();
+    assert_eq!(
+        err,
+        Error::InvalidReplacementString("Invalid escape '1' in replacement string".to_string())
+    );
+}
+
+// Use a back reference inside a character class.
+#[test]
+fn test_k2_replacefunc_4() {
+    let err = Regex::xpath("(asd)[\\1]", "").unwrap_err();
+    assert_eq!(
+        err,
+        Error::Syntax("Backreferences not allowed within character classes".to_string())
+    );
+}
+
+// Use a back reference inside a character class(#2).
+#[test]
+fn test_k2_replacefunc_5() {
+    let err = Regex::xpath("(asd)[asd\\1]", "").unwrap_err();
+    assert_eq!(
+        err,
+        Error::Syntax("Backreferences not allowed within character classes".to_string())
+    );
+}
+
+// Use a back reference inside a character class(#3).
+#[test]
+fn test_k2_replacefunc_6() {
+    let err = Regex::xpath("(asd)[asd\\0]", "").unwrap_err();
+    assert_eq!(
+        err,
+        Error::Syntax("Octal escapes are not allowed".to_string())
+    );
+}
+
+// Use a back reference inside a character class(#3).
+#[test]
+fn test_k2_replacefunc_7() {
+    let err = Regex::xpath("1[asd\\0]", "").unwrap_err();
+    assert_eq!(
+        err,
+        Error::Syntax("Octal escapes are not allowed".to_string())
     );
 }

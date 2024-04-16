@@ -299,8 +299,8 @@ impl<'a> ReMatcher<'a> {
                             i += 1;
                             let index = i;
                             if index >= replacement.len() {
-                                return Err(Error::syntax(
-                                    "Invalid escape at end of replacement string",
+                                return Err(Error::InvalidReplacementString(
+                                    "Invalid escape at end of replacement string".to_string(),
                                 ));
                             }
                             let ch = replacement[index];
@@ -310,10 +310,10 @@ impl<'a> ReMatcher<'a> {
                                     result.push(ch);
                                 }
                                 _ => {
-                                    return Err(Error::syntax(format!(
-                                        "Invalid escape '{}' in replacement string",
-                                        ch
-                                    )))
+                                    return Err(Error::InvalidReplacementString(
+                                        format!("Invalid escape '{}' in replacement string", ch)
+                                            .to_string(),
+                                    ))
                                 }
                             }
                         }
@@ -322,14 +322,15 @@ impl<'a> ReMatcher<'a> {
                             i += 1;
                             let index = i;
                             if index >= replacement.len() {
-                                return Err(Error::syntax(
-                                    "Invalid escape at end of replacement string",
+                                return Err(Error::InvalidReplacementString(
+                                    "Invalid escape at end of replacement string".to_string(),
                                 ));
                             }
                             let ch = replacement[index];
                             if !ch.is_ascii_digit() {
-                                return Err(Error::syntax(
-                                    "$ in replacement string must be followed by a digit",
+                                return Err(Error::InvalidReplacementString(
+                                    "$ in replacement string must be followed by a digit"
+                                        .to_string(),
                                 ));
                             }
                             let mut n = (ch as usize) - ('0' as usize);

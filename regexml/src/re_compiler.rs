@@ -67,7 +67,7 @@ pub enum Error {
     // FORX0003
     MatchesZeroLengthString,
     // FORX0004
-    InvalidReplacementString,
+    InvalidReplacementString(String),
 }
 
 impl Error {
