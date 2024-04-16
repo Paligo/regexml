@@ -277,6 +277,7 @@ impl<'a> ReMatcher<'a> {
         // try a match at each position
         while pos < len && self.matches(pos) {
             // append chars from input string before match
+            // TODO: what happens if this returns None as there is no paren start?
             if let Some(start) = self.get_paren_start(0) {
                 result.extend(&self.search[pos..start]);
             }
@@ -297,9 +298,15 @@ impl<'a> ReMatcher<'a> {
                             simple_replacement = false;
                             i += 1;
                             let index = i;
+                            if index >= replacement.len() {
+                                return Err(Error::syntax(
+                                    "Invalid escape at end of replacement string",
+                                ));
+                            }
                             let ch = replacement[index];
                             match ch {
                                 '\\' | '$' => {
+                                    println!("well well");
                                     result.push(ch);
                                 }
                                 _ => {
@@ -331,7 +338,7 @@ impl<'a> ReMatcher<'a> {
                             } else {
                                 loop {
                                     i += 1;
-                                    if i > replacement.len() {
+                                    if i >= replacement.len() {
                                         break;
                                     }
                                     let ch = replacement[i];
