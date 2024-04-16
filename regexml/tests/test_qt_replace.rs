@@ -532,3 +532,67 @@ fn test_fn_replace_single_backslash() {
         Error::Syntax("Invalid escape at end of replacement string".to_string())
     );
 }
+
+// The flags argument cannot contain whitespace.
+#[test]
+fn test_k_replacefunc_1() {
+    let err = Regex::xpath("input", " ").unwrap_err();
+    assert_eq!(
+        err,
+        Error::InvalidFlags("Unrecognized flag ' '".to_string())
+    );
+}
+
+// The flags argument cannot contain 'X'.
+#[test]
+fn test_k_replacefunc_2() {
+    let err = Regex::xpath("input", "X").unwrap_err();
+    assert_eq!(
+        err,
+        Error::InvalidFlags("Unrecognized flag 'X'".to_string())
+    );
+}
+
+// A '\' cannot occur at the end of the line.
+#[test]
+fn test_k_replacefunc_6() {
+    let regex = Regex::xpath("in", "").unwrap();
+    let err = regex.replace_all("input", "thisIsInvalid\\").unwrap_err();
+    assert_eq!(
+        err,
+        Error::Syntax("Invalid escape at end of replacement string".to_string())
+    );
+}
+
+// A '$' cannot occur at the end of the line.
+#[test]
+fn test_k_replacefunc_7() {
+    let regex = Regex::xpath("(input)", "").unwrap();
+    let err = regex.replace_all("input", "thisIsInvalid$").unwrap_err();
+    assert_eq!(
+        err,
+        Error::Syntax("Invalid escape at end of replacement string".to_string())
+    );
+}
+
+// A '\' cannot be used to escape whitespace.
+#[test]
+fn test_k_replacefunc_8() {
+    let regex = Regex::xpath("in", "").unwrap();
+    let err = regex.replace_all("input", "thisIsInvalid\\ ").unwrap_err();
+    assert_eq!(
+        err,
+        Error::Syntax("Invalid escape ' ' in replacement string".to_string())
+    );
+}
+
+// A '$' cannot be followed by whitespace.
+#[test]
+fn test_k_replacefunc_9() {
+    let regex = Regex::xpath("in", "").unwrap();
+    let err = regex.replace_all("input", "thisIsInvalid$ ").unwrap_err();
+    assert_eq!(
+        err,
+        Error::Syntax("$ in replacement string must be followed by a digit".to_string())
+    );
+}

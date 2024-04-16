@@ -321,6 +321,11 @@ impl<'a> ReMatcher<'a> {
                             simple_replacement = false;
                             i += 1;
                             let index = i;
+                            if index >= replacement.len() {
+                                return Err(Error::syntax(
+                                    "Invalid escape at end of replacement string",
+                                ));
+                            }
                             let ch = replacement[index];
                             if !ch.is_ascii_digit() {
                                 return Err(Error::syntax(
