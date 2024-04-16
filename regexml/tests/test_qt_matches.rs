@@ -1169,144 +1169,94 @@ fn test_cbcl_matches_041() {
     assert!(!regex.is_match("\r \t"));
 }
 
-// <test-case name="cbcl-matches-041b">
-// <description> test the multi-character escape \S </description>
-// <created by="Tim Mills" on="2008-07-29"/>
-// <modified by="O'Neil Delpratt" on="2013-07-24" change="Change spec dependency to XP20+. See bug issue #22792" />
-// <dependency type="spec" value="XP20+"/>
-// <test>fn:matches('&#xD;&#x20;&#x9;', '\S+')</test>
-// <result>
-//    <assert-false/>
-// </result>
-// </test-case>
+// Test the multi-character escape \i
+#[test]
+fn test_cbcl_matches_042() {
+    let regex = Regex::xpath("\\i+", "").unwrap();
+    assert!(regex.is_match("a_:"));
+}
 
-// <test-case name="cbcl-matches-042">
-// <description> test the multi-character escape \i </description>
-// <created by="Tim Mills" on="2008-07-29"/>
+// Test the multi-character escape \i
+#[test]
+fn test_cbcl_matches_043() {
+    let regex = Regex::xpath("\\i+", "").unwrap();
+    assert!(!regex.is_match("1.0"));
+}
 
-// <test>fn:matches('a_:', '\i+')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
+// Test the multi-character escape \I
+#[test]
+fn test_cbcl_matches_044() {
+    let regex = Regex::xpath("\\I+", "").unwrap();
+    assert!(regex.is_match("1.0"));
+}
 
-// <test-case name="cbcl-matches-043">
-// <description> test the multi-character escape \i </description>
-// <created by="Tim Mills" on="2008-07-29"/>
+// Test the multi-character escape \I
+#[test]
+fn test_cbcl_matches_045() {
+    let regex = Regex::xpath("\\I+", "").unwrap();
+    assert!(!regex.is_match("a_:"));
+}
 
-// <test>fn:matches('1.0', '\i+')</test>
-// <result>
-//    <assert-false/>
-// </result>
-// </test-case>
+// Test the multi-character escape \c
+#[test]
+fn test_cbcl_matches_046() {
+    let regex = Regex::xpath("\\c+", "").unwrap();
+    assert!(regex.is_match("abc"));
+}
 
-// <test-case name="cbcl-matches-044">
-// <description> test the multi-character escape \I </description>
-// <created by="Tim Mills" on="2008-07-29"/>
+// Test the multi-character escape \c
+#[test]
+fn test_cbcl_matches_047() {
+    let regex = Regex::xpath("\\c+", "").unwrap();
+    assert!(!regex.is_match(" \t\r"));
+}
 
-// <test>fn:matches('1.0', '\I+')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
+// Test the multi-character escape \C
+#[test]
+fn test_cbcl_matches_048() {
+    let regex = Regex::xpath("\\C+", "").unwrap();
+    assert!(regex.is_match(" \t\r"));
+}
 
-// <test-case name="cbcl-matches-045">
-// <description> test the multi-character escape \I </description>
-// <created by="Tim Mills" on="2008-07-29"/>
+// Test the multi-character escape \C
+#[test]
+fn test_cbcl_matches_049() {
+    let regex = Regex::xpath("\\C+", "").unwrap();
+    assert!(!regex.is_match("abc"));
+}
 
-// <test>fn:matches('a_:', '\I+')</test>
-// <result>
-//    <assert-false/>
-// </result>
-// </test-case>
+// A back-reference is compared using case-blind comparison: that is, each
+// character must either be the same as the corresponding character of the
+// previously matched string, or must be a case-variant of that character. the
+// back reference. For example, the strings "Mum", "mom", "Dad", and "DUD" all
+// match the regular expression "([md])[aeiou]\1" when the "i" flag is used.
+#[test]
+fn test_cbcl_matches_050() {
+    let regex = Regex::xpath("([md])[aeiou]\\1", "i").unwrap();
+    assert!(regex.is_match("Mum"));
+}
 
-// <test-case name="cbcl-matches-046">
-// <description> test the multi-character escape \c </description>
-// <created by="Tim Mills" on="2008-07-29"/>
+// Test back-reference to character above &#xFFFF;
+#[test]
+fn test_cbcl_matches_051() {
+    let regex = Regex::xpath("(\u{10000})\\1", "").unwrap();
+    assert!(regex.is_match("\u{10000}\u{10000}"));
+}
 
-// <test>fn:matches('abc', '\c+')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
+// Test back-reference to character above &#xFFFF;
+#[test]
+fn test_cbcl_matches_052() {
+    let regex = Regex::xpath("(\u{10000})\\1", "").unwrap();
+    assert!(!regex.is_match("\u{10000}\u{10001}"));
+}
 
-// <test-case name="cbcl-matches-047">
-// <description> test the multi-character escape \c </description>
-// <created by="Tim Mills" on="2008-07-29"/>
-// <dependency type="spec" value="XQ10+"/>
-// <test><![CDATA[fn:matches('&#x20;&#x9;&#xD;', '\c+')]]></test>
-// <result>
-//    <assert-false/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-047b">
-// <description> test the multi-character escape \c </description>
-// <created by="Tim Mills" on="2008-07-29"/>
-// <modified by="O'Neil Delpratt" on="2013-07-24" change="Change spec dependency to XP20+. See bug issue #22792" />
-// <dependency type="spec" value="XP20+"/>
-// <test>fn:matches('&#x20;&#x9;&#xD;', '\c+')</test>
-// <result>
-//    <assert-false/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-048">
-// <description> test the multi-character escape \C </description>
-// <created by="Tim Mills" on="2008-07-29"/>
-
-// <test><![CDATA[fn:matches('&#x20;&#x9;&#xD;', '\C+')]]></test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-049">
-// <description> test the multi-character escape \C </description>
-// <created by="Tim Mills" on="2008-07-29"/>
-
-// <test>fn:matches('abc', '\C+')</test>
-// <result>
-//    <assert-false/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-050">
-// <description> A back-reference is compared using case-blind comparison: that is, each character must either be the same as the corresponding character of the previously matched string, or must be a case-variant of that character. the back reference. For example, the strings "Mum", "mom", "Dad", and "DUD" all match the regular expression "([md])[aeiou]\1" when the "i" flag is used. </description>
-// <created by="Tim Mills" on="2008-07-29"/>
-
-// <test>fn:matches('Mum', '([md])[aeiou]\1', 'i')</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-051">
-// <description> Test back-reference to character above &amp;#FFFF; </description>
-// <created by="Tim Mills" on="2008-07-29"/>
-
-// <test><![CDATA[fn:matches('&#x10000;&#x10000;', '(&#x10000;)\1')]]></test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-052">
-// <description> Test back-reference to character above &amp;#FFFF; </description>
-// <created by="Tim Mills" on="2008-07-29"/>
-
-// <test><![CDATA[fn:matches('&#x10000;&#x10001;', '(&#x10000;)\1')]]></test>
-// <result>
-//    <assert-false/>
-// </result>
-// </test-case>
-
-// <test-case name="cbcl-matches-053">
-// <description> A back-reference is compared using case-blind comparison: that is, each character must either be the same as the corresponding character of the previously matched string, or must be a case-variant of that character. the back reference. For example, the strings "Mum", "mom", "Dad", and "DUD" all match the regular expression "([md])[aeiou]\1" when the "i" flag is used. </description>
-// <created by="Tim Mills" on="2008-07-29"/>
-
-// <test>fn:matches('Mud', '([md])[aeiou]\1', 'i')</test>
-// <result>
-//    <assert-false/>
-// </result>
-// </test-case>
+// A back-reference is compared using case-blind comparison: that is, each
+// character must either be the same as the corresponding character of the
+// previously matched string, or must be a case-variant of that character. the
+// back reference. For example, the strings "Mum", "mom", "Dad", and "DUD" all
+// match the regular expression "([md])[aeiou]\1" when the "i" flag is used.
+#[test]
+fn test_cbcl_matches_053() {
+    let regex = Regex::xpath("([md])[aeiou]\\1", "i").unwrap();
+    assert!(!regex.is_match("Mud"));
+}
