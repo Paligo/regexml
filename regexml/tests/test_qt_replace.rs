@@ -515,19 +515,13 @@ fn test_fn_replace_57() {
     assert_eq!(result, "1A");
 }
 
-// <test-case name="fn-replace-58">
-// <description>Evaluation of replace with emoji. Saxon bug 5174.</description>
-// <created by="Michael Kay after Martin Honnen" on="2021-11-24"/>
-// <modified by="Michael Kay" on="2022-07-11" change="add dependency (arrow operator)"/>
-// <dependency type="spec" value="XP31+ XQ31+"/>
-// <test>let $in := codepoints-to-string((72, 101, 108, 108, 111, 32, 128512, 128515, 128516, 32,
-//                                        128156, 129446, 32, 252, 228, 246, 36))
-//    return replace($in, "\p{IsEmoticons}+", "") => string-to-codepoints()</test>
-// <result>
-//    <assert-deep-eq>72, 101, 108, 108, 111, 32, 32,
-//       128156, 129446, 32, 252, 228, 246, 36</assert-deep-eq>
-// </result>
-// </test-case>
+// Evaluation of replace with emoji. Saxon bug 5174.
+#[test]
+fn test_fn_replace_58() {
+    let regex = Regex::xpath(r"\p{IsEmoticons}+", "").unwrap();
+    let result = regex.replace_all("Hello 😀😃😄🙆 üäö$", "").unwrap();
+    assert_eq!(result, "Hello  üäö$");
+}
 
 #[test]
 fn test_fn_replace_single_backslash() {
