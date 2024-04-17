@@ -16,7 +16,7 @@ pub enum MatchEntry {
 pub struct AnalyzeIter<'a> {
     matcher: ReMatcher<'a>,
     next_substring: Option<Vec<char>>,
-    prevend: Option<usize>,
+    prev_end: Option<usize>,
     nesting_table: HashMap<usize, usize>,
     skip: bool,
 }
@@ -26,7 +26,7 @@ impl<'a> AnalyzeIter<'a> {
         AnalyzeIter {
             matcher,
             next_substring: None,
-            prevend: Some(0),
+            prev_end: Some(0),
             nesting_table: Self::compute_nesting_table(pattern),
             skip: false,
         }
@@ -41,7 +41,7 @@ impl<'a> AnalyzeIter<'a> {
     }
 
     fn is_matching(&self) -> bool {
-        self.next_substring.is_none() && self.prevend.is_some()
+        self.next_substring.is_none() && self.prev_end.is_some()
     }
 
     fn process_matching_substring(&self, current: &[char]) -> Vec<MatchEntry> {
@@ -194,12 +194,12 @@ impl<'a> Iterator for AnalyzeIter<'a> {
     type Item = AnalyzeEntry;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if let Some(prevend) = self.prevend {
+        if let Some(prev_end) = self.prev_end {
             if let Some(substring) = self.next_substring.take() {
                 // we've added a non-match, so now added the match that follows
                 // it, if there is one
-                if self.prevend.is_some() {
-                    self.prevend = self.matcher.get_paren_end(0);
+                if self.prev_end.is_some() {
+                    self.prev_end = self.matcher.get_paren_end(0);
                     Some(self.analyze_entry(&substring))
                 } else {
                     None
@@ -207,41 +207,46 @@ impl<'a> Iterator for AnalyzeIter<'a> {
             } else {
                 // we've returned a match (or we're at the start) so find the
                 // next match
-                let mut search_start = prevend;
+                let mut search_start = prev_end;
                 if self.skip {
                     // previous match was zero-length
                     search_start += 1;
                     if search_start >= self.matcher.search.len() {
-                        if prevend < self.matcher.search.len() {
+                        if prev_end < self.matcher.search.len() {
                             self.next_substring = None;
                         } else {
-                            self.prevend = None;
+                            self.prev_end = None;
                             return None;
                         }
                     }
                 }
+
                 if self.matcher.matches(search_start) {
                     let start = self.matcher.get_paren_start(0).unwrap();
                     let end = self.matcher.get_paren_end(0).unwrap();
                     self.skip = start == end;
-                    if prevend == start {
+                    if prev_end == start {
                         // there's no intervening non-matching string to return
                         self.next_substring = None;
-                        self.prevend = Some(end);
+                        self.prev_end = Some(end);
                         Some(self.analyze_entry(&self.matcher.search[start..end]))
                     } else {
                         // return the non-matching substring first
                         self.next_substring = Some(self.matcher.search[start..end].to_vec());
-                        Some(self.analyze_entry(&self.matcher.search[prevend..start]))
+                        Some(self.analyze_entry(&self.matcher.search[prev_end..start]))
                     }
                 } else {
                     // there are no more regex matches, we must return the final non-match
-                    if prevend < self.matcher.search.len() {
+                    if prev_end < self.matcher.search.len() {
                         self.next_substring = None;
-                        Some(self.analyze_entry(&self.matcher.search[prevend..]))
+                        let non_match = AnalyzeEntry::NonMatch(
+                            self.matcher.search[prev_end..].iter().collect(),
+                        );
+                        self.prev_end = None;
+                        Some(non_match)
                     } else {
                         // this really is the end...
-                        self.prevend = None;
+                        self.prev_end = None;
                         None
                     }
                 }

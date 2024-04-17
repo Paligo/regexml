@@ -96,7 +96,7 @@ impl<'a> ReMatcher<'a> {
 
     pub(crate) fn match_at(&self, i: usize, anchored: bool) -> bool {
         // initialize start pointer, paren cache and paren count
-        self.state.borrow_mut().capture_state.paren_count = 1;
+        self.set_paren_count(1);
         self.state.borrow_mut().anchored_match = anchored;
         self.set_paren_start(0, i);
 
@@ -309,7 +309,6 @@ impl<'a> ReMatcher<'a> {
                             let ch = replacement[index];
                             match ch {
                                 '\\' | '$' => {
-                                    println!("well well");
                                     result.push(ch);
                                 }
                                 _ => {
