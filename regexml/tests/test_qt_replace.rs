@@ -48,8 +48,14 @@ fn test_fn_replace_5() {
     assert_eq!(result, "abbraccaddabbra");
 }
 
-// fn-replace-6 is not translated, as it checks that a replace of an empty
-// string is an error. We can do this in the integration layer with xpath.
+// Evaluation of replace function with pattern = ".*?" and replacement = "$1" as
+// an example 6 for this function. Should raise an error
+#[test]
+fn test_fn_replace_6() {
+    let regex = Regex::xpath(".*?", "").unwrap();
+    let err = regex.replace_all("abracadabra", "$1").unwrap_err();
+    assert_eq!(err, Error::MatchesEmptyString);
+}
 
 // Evaluation of replace function with pattern = "A+" and replacement = "b" as
 // an example 7 for this function.
@@ -659,4 +665,28 @@ fn test_k2_replacefunc_7() {
         err,
         Error::Syntax("Octal escapes are not allowed".to_string())
     );
+}
+
+// Tests a prepared expression which matches the empty sequence.
+#[test]
+fn test_cbcl_fn_replace_002() {
+    let regex = Regex::xpath("", "").unwrap();
+    let err = regex.replace_all("a", "b").unwrap_err();
+    assert_eq!(err, Error::MatchesEmptyString);
+}
+
+// Tests empty regex on prepared fn:replace.
+#[test]
+fn test_cbcl_fn_replace_003() {
+    let regex = Regex::xpath("", "").unwrap();
+    let err = regex.replace_all("2,4,6,8,10", "c").unwrap_err();
+    assert_eq!(err, Error::MatchesEmptyString);
+}
+
+// Tests empty regex on prepared fn:replace.
+#[test]
+fn test_cbcl_fn_replace_004() {
+    let regex = Regex::xpath("", "m").unwrap();
+    let err = regex.replace_all("2,4,6,8,10", "c").unwrap_err();
+    assert_eq!(err, Error::MatchesEmptyString);
 }

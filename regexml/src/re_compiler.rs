@@ -65,7 +65,7 @@ pub enum Error {
     Syntax(String),
 
     // FORX0003
-    MatchesZeroLengthString,
+    MatchesEmptyString,
     // FORX0004
     InvalidReplacementString(String),
 }

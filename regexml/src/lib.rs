@@ -42,6 +42,7 @@ pub use crate::re_compiler::Error;
 #[derive(Debug)]
 pub struct Regex {
     re_program: ReProgram,
+    matches_empty_string: RefCell<Option<bool>>,
 }
 
 impl Regex {
@@ -50,7 +51,10 @@ impl Regex {
         let mut re_compiler = ReCompiler::new(re_flags);
         let pattern = re.chars().collect();
         let re_program = re_compiler.compile(pattern)?;
-        Ok(Self { re_program })
+        Ok(Self {
+            re_program,
+            matches_empty_string: RefCell::new(None),
+        })
     }
 
     /// Create a regular expression from a string, using XPath 3.1 rules.
@@ -69,9 +73,34 @@ impl Regex {
         matcher.is_match()
     }
 
+    // returns an error if this regex is known to match an empty string.
+    // caches the last result so it doesn't have to do the match again.
+    fn check_matches_empty_string(&self) -> Result<(), Error> {
+        let matches_empty_string = *self.matches_empty_string.borrow();
+        if let Some(matches_empty_string) = matches_empty_string {
+            if !matches_empty_string {
+                Ok(())
+            } else {
+                Err(Error::MatchesEmptyString)
+            }
+        } else {
+            // we need to check if the regex matches the empty string
+            let mut matcher = self.matcher("");
+            let matches_empty_string = matcher.is_match();
+            *self.matches_empty_string.borrow_mut() = Some(matches_empty_string);
+            if matches_empty_string {
+                Err(Error::MatchesEmptyString)
+            } else {
+                Ok(())
+            }
+        }
+    }
+
     /// Returns a string with all pieces matching this regular expression replaced
     /// by the replacement.
     pub fn replace_all(&self, haystack: &str, replacement: &str) -> Result<String, Error> {
+        self.check_matches_empty_string()?;
+
         let mut matcher = self.matcher(haystack);
         let replacement: Vec<char> = replacement.chars().collect();
         matcher
