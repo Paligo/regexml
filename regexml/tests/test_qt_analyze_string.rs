@@ -1,12 +1,22 @@
-use regexml::{AnalyzeEntry, Error, Regex};
+use regexml::{AnalyzeEntry, Error, MatchEntry, Regex};
 
 // analyze-string with a mix of matching and non-matching strings
-// #[test]
-// fn test_analyze_string_003() {
-//     let regex = Regex::xpath("a", "").unwrap();
-//     let result = regex.analyze("banana").unwrap().collect::<Vec<_>>();
-//     assert_eq!(result, vec![])
-// }
+#[test]
+fn test_analyze_string_003() {
+    let regex = Regex::xpath("a", "").unwrap();
+    let result = regex.analyze("banana").unwrap().collect::<Vec<_>>();
+    assert_eq!(
+        result,
+        vec![
+            AnalyzeEntry::NonMatch("b".to_string()),
+            AnalyzeEntry::Match(vec![MatchEntry::String("a".to_string())]),
+            AnalyzeEntry::NonMatch("n".to_string()),
+            AnalyzeEntry::Match(vec![MatchEntry::String("a".to_string())]),
+            AnalyzeEntry::NonMatch("n".to_string()),
+            AnalyzeEntry::Match(vec![MatchEntry::String("a".to_string())]),
+        ]
+    )
+}
 
 // <test-case name="analyzeString-003">
 // <description> analyze-string with a mix of matching and non-matching strings</description>

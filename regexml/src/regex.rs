@@ -6,11 +6,10 @@ use crate::re_compiler::ReCompiler;
 use crate::re_flags::ReFlags;
 use crate::re_matcher::ReMatcher;
 use crate::re_program::ReProgram;
-use ahash::{HashMap, HashMapExt};
 #[cfg(test)]
 use std::rc::Rc;
 
-pub use crate::analyze_string::{AnalyzeEntry, AnalyzeIter, MatchEntry};
+pub use crate::analyze_string::AnalyzeIter;
 pub use crate::re_compiler::Error;
 pub use crate::re_flags::Language;
 
@@ -25,7 +24,7 @@ impl Regex {
     fn new(re: &str, flags: &str, language: Language) -> Result<Self, Error> {
         let re_flags = ReFlags::new(flags, language)?;
         let pattern = re.chars().collect();
-        let mut re_compiler = ReCompiler::new(pattern, re_flags);
+        let re_compiler = ReCompiler::new(pattern, re_flags);
         let re_program = re_compiler.compile()?;
         Ok(Self {
             re_program,
@@ -114,7 +113,11 @@ impl Regex {
     /// vector provides both the matching and non-matching substrings. It also
     /// provides access to matched subgroups.
     pub fn analyze<'a>(&'a self, haystack: &str) -> Result<AnalyzeIter<'a>, Error> {
-        todo!();
+        self.check_matches_empty_string()?;
+        Ok(AnalyzeIter::new(
+            &self.re_program.pattern,
+            self.matcher(haystack),
+        ))
     }
 
     // TODO: continue translating ARegexIterator

@@ -22,12 +22,12 @@ pub struct AnalyzeIter<'a> {
 }
 
 impl<'a> AnalyzeIter<'a> {
-    pub(crate) fn new(regex: &'a [char], matcher: ReMatcher<'a>) -> Self {
+    pub(crate) fn new(pattern: &'a [char], matcher: ReMatcher<'a>) -> Self {
         AnalyzeIter {
             matcher,
             next_substring: None,
             prevend: Some(0),
-            nesting_table: Self::compute_nesting_table(regex),
+            nesting_table: Self::compute_nesting_table(pattern),
             skip: false,
         }
     }
@@ -142,19 +142,18 @@ impl<'a> AnalyzeIter<'a> {
         }
     }
 
-    fn compute_nesting_table(regex: &'a [char]) -> HashMap<usize, usize> {
+    fn compute_nesting_table(pattern: &'a [char]) -> HashMap<usize, usize> {
         let mut nesting_table = HashMap::new();
-        let mut stack = Vec::with_capacity(regex.len());
+        let mut stack = vec![0; pattern.len()];
         let mut tos = 0;
-        let mut capture_stack = Vec::with_capacity(regex.len());
+        let mut capture_stack = vec![false; pattern.len()];
         let mut capture_tos = 0;
         let mut group = 1;
         let mut in_brackets = 0;
-        stack[0] = 0;
         tos += 1;
         let mut i = 0;
-        while i < regex.len() {
-            let ch = regex[i];
+        while i < pattern.len() {
+            let ch = pattern[i];
             match ch {
                 '\\' => {
                     i += 1;
@@ -166,7 +165,7 @@ impl<'a> AnalyzeIter<'a> {
                     in_brackets -= 1;
                 }
                 '(' if in_brackets == 0 => {
-                    let capture = regex[i + 1] != '?';
+                    let capture = pattern[i + 1] != '?';
                     capture_stack[capture_tos] = capture;
                     capture_tos += 1;
                     if capture {
