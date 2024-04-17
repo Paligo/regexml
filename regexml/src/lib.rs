@@ -109,30 +109,45 @@ impl Regex {
     }
 
     /// Returns a vector of the input string tokenized by the regular expression.
-    pub fn tokenize(&self, haystack: &str) -> Result<Vec<String>, Error> {
-        let mut matcher = self.matcher(haystack);
-
-        let mut result: Vec<String> = Vec::new();
-        let mut prev_end = Some(0);
-
-        while let Some(end) = prev_end {
-            let matches = matcher.matches(end);
-            if matches {
-                let start = matcher.get_paren_start(0).unwrap();
-                prev_end = matcher.get_paren_end(0);
-                result.push(matcher.search[end..start].iter().collect())
-            } else {
-                result.push(matcher.search[end..].iter().collect());
-                break;
-            }
+    pub fn tokenize<'a>(&'a self, haystack: &str) -> Result<TokenIter<'a>, Error> {
+        // if we input the empty string, we should return no tokens
+        if haystack.is_empty() {
+            return Ok(TokenIter {
+                matcher: self.matcher(haystack),
+                prev_end: None,
+            });
         }
-        Ok(result)
+        self.check_matches_empty_string()?;
+
+        Ok(TokenIter {
+            matcher: self.matcher(haystack),
+            prev_end: Some(0),
+        })
+
+        // let mut matcher = self.matcher(haystack);
+
+        // let mut result: Vec<String> = Vec::new();
+        // let mut prev_end = Some(0);
+
+        // while let Some(end) = prev_end {
+        //     let matches = matcher.matches(end);
+        //     if matches {
+        //         let start = matcher.get_paren_start(0).unwrap();
+        //         prev_end = matcher.get_paren_end(0);
+        //         result.push(matcher.search[end..start].iter().collect())
+        //     } else {
+        //         result.push(matcher.search[end..].iter().collect());
+        //         break;
+        //     }
+        // }
+        // Ok(result)
     }
 
     pub(crate) fn matcher(&self, search: &str) -> ReMatcher {
         ReMatcher::new(&self.re_program, search)
     }
 
+    #[cfg(test)]
     pub(crate) fn path(&self, s: &str) -> Rc<Operation> {
         self.re_program.path(s)
     }
@@ -148,6 +163,33 @@ impl Regex {
     // this also has an isMatching protocol, and a processMatchingSubstring story
     // and a computeNestingTable story too. Need to read more into how this is
     // actually used. - it seems vastly complicated.
+}
+
+#[derive(Debug)]
+pub struct TokenIter<'a> {
+    matcher: ReMatcher<'a>,
+    prev_end: Option<usize>,
+}
+
+impl<'a> Iterator for TokenIter<'a> {
+    type Item = String;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(prev_end) = self.prev_end {
+            if self.matcher.matches(prev_end) {
+                let start = self.matcher.get_paren_start(0).unwrap();
+                let current = self.matcher.search[prev_end..start].iter().collect();
+                self.prev_end = self.matcher.get_paren_end(0);
+                Some(current)
+            } else {
+                let current = self.matcher.search[prev_end..].iter().collect();
+                self.prev_end = None;
+                Some(current)
+            }
+        } else {
+            None
+        }
+    }
 }
 
 struct AnalyzeIter<'a> {

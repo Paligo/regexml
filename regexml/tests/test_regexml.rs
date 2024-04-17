@@ -163,7 +163,7 @@ fn test_replace_48() {
 fn test_tokenize_9() {
     let regex = Regex::xpath("(ab)|(a)", "").unwrap();
     assert_eq!(
-        regex.tokenize("abracadabra").unwrap(),
+        regex.tokenize("abracadabra").unwrap().collect::<Vec<_>>(),
         vec![
             "".to_string(),
             "r".to_string(),
@@ -179,7 +179,7 @@ fn test_tokenize_9() {
 fn test_tokenize_10() {
     let regex = Regex::xpath("ww", "").unwrap();
     assert_eq!(
-        regex.tokenize("abracadabra").unwrap(),
+        regex.tokenize("abracadabra").unwrap().collect::<Vec<_>>(),
         vec!["abracadabra".to_string(),]
     );
 }
@@ -188,7 +188,7 @@ fn test_tokenize_10() {
 fn test_tokenize_11() {
     let regex = Regex::xpath("^a", "").unwrap();
     assert_eq!(
-        regex.tokenize("abracadabra").unwrap(),
+        regex.tokenize("abracadabra").unwrap().collect::<Vec<_>>(),
         vec!["".to_string(), "bracadabra".to_string()]
     );
 }

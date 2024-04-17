@@ -9,6 +9,7 @@ use crate::{
     re_program::{ReProgram, OPT_HASBACKREFS, OPT_HASBOL},
 };
 
+#[derive(Debug)]
 pub(crate) struct ReMatcher<'a> {
     // current program
     pub(crate) program: &'a ReProgram,
@@ -21,6 +22,7 @@ pub(crate) struct ReMatcher<'a> {
     state: RefCell<State>,
 }
 
+#[derive(Debug)]
 pub(crate) struct History {
     zero_length_matches: HashMap<Operation, HashSet<usize>>,
 }
@@ -58,6 +60,7 @@ impl History {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct State {
     pub(crate) start_backref: Vec<Option<usize>>,
     pub(crate) end_backref: Vec<Option<usize>>,
