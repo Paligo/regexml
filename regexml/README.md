@@ -51,3 +51,7 @@ The Java code has been translated by hand into Rust. There are some differences:
   provided through the [qt3tests](https://github.com/w3c/qt3tests) project for
   testing XPath and XQuery. Most of those tests have been ported into simple
   Rust tests, which makes this package easier to maintain and debug.
+
+Now that the port is complete we expect this package to evolve separately
+wherever it may go - no 1 to 1 mapping with the original Java code is going to
+be maintained.
