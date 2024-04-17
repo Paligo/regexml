@@ -88,12 +88,13 @@ impl From<CharacterClassBuilder> for CharacterClassOrBackReference {
 }
 
 impl ReCompiler {
-    pub(crate) fn new(re_flags: ReFlags) -> Self {
+    pub(crate) fn new(pattern: Vec<char>, re_flags: ReFlags) -> Self {
         Self {
-            pattern: Vec::new(),
-            len: 0,
+            len: pattern.len(),
+            pattern,
             idx: 0,
-            capturing_open_paren_count: 0,
+            // the implicit outer parens
+            capturing_open_paren_count: 1,
             bracket_min: 0,
             bracket_max: 0,
             captures: HashSet::new(),
@@ -939,18 +940,7 @@ impl ReCompiler {
         }
     }
 
-    pub(crate) fn compile(&mut self, pattern: Vec<char>) -> Result<ReProgram, Error> {
-        // initialize variables for compilation
-
-        // save pattern in instance variable
-        self.pattern = pattern;
-        // precompute pattern length for speed
-        self.len = self.pattern.len();
-        // set parsing index to the first character
-        self.idx = 0;
-        // set paren level to 1 (the implicit outer parens)
-        self.capturing_open_paren_count = 1;
-
+    pub(crate) fn compile(mut self) -> Result<ReProgram, Error> {
         if self.re_flags.is_literal() {
             // 'q' flag is set
             // create a string node
@@ -958,6 +948,7 @@ impl ReCompiler {
             let end_node = Operation::from(EndProgram);
             let seq = Self::make_sequence(ret, end_node);
             Ok(ReProgram::new(
+                self.pattern,
                 Rc::new(seq),
                 Some(self.capturing_open_paren_count),
                 self.re_flags.clone(),
@@ -1013,6 +1004,7 @@ impl ReCompiler {
             }
 
             let mut program = ReProgram::new(
+                self.pattern,
                 Rc::new(exp),
                 Some(self.capturing_open_paren_count),
                 self.re_flags.clone(),
@@ -1033,9 +1025,9 @@ mod tests {
 
     fn compiled(pattern: &str) -> ReProgram {
         let re_flags = ReFlags::new("", Language::XPath).unwrap();
-        let mut re_compiler = ReCompiler::new(re_flags);
         let pattern = pattern.chars().collect();
-        re_compiler.compile(pattern).unwrap()
+        let mut re_compiler = ReCompiler::new(pattern, re_flags);
+        re_compiler.compile().unwrap()
     }
 
     #[test]

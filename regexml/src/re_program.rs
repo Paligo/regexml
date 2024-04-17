@@ -19,6 +19,7 @@ pub(crate) struct RegexPrecondition {
 
 #[derive(Debug)]
 pub(crate) struct ReProgram {
+    pub(crate) pattern: Vec<char>,
     pub(crate) operation: Rc<Operation>,
     pub(crate) flags: ReFlags,
     pub(crate) prefix: Option<Vec<char>>,
@@ -32,7 +33,12 @@ pub(crate) struct ReProgram {
 }
 
 impl ReProgram {
-    pub(crate) fn new(operation: Rc<Operation>, max_parens: Option<usize>, flags: ReFlags) -> Self {
+    pub(crate) fn new(
+        pattern: Vec<char>,
+        operation: Rc<Operation>,
+        max_parens: Option<usize>,
+        flags: ReFlags,
+    ) -> Self {
         let minimum_length = operation.get_minimum_match_length();
         let fixed_length = operation.get_match_length();
 
@@ -60,6 +66,7 @@ impl ReProgram {
         };
 
         let mut r = Self {
+            pattern,
             operation,
             flags,
             prefix,
