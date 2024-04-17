@@ -1,45 +1,172 @@
-mod block;
-mod category;
-mod character_class;
-mod op_atom;
-mod op_back_reference;
-mod op_bol;
-mod op_capture;
-mod op_character_class;
-mod op_choice;
-mod op_end_program;
-mod op_eol;
-mod op_greedy_fixed;
-mod op_nothing;
-mod op_reluctant_fixed;
-mod op_repeat;
-mod op_sequence;
-mod op_unambiguous_repeat;
-mod operation;
-mod re_compiler;
-mod re_flags;
-mod re_matcher;
-mod re_program;
-mod regex;
-mod regex_iterator;
-mod regular_expression;
+use std::cell::RefCell;
 
-use std::cell::{Ref, RefCell};
-use std::rc::Rc;
-
-use ahash::{HashMap, HashMapExt};
-use operation::Operation;
-
+#[cfg(test)]
+use crate::operation::Operation;
 use crate::re_compiler::ReCompiler;
 use crate::re_flags::ReFlags;
 use crate::re_matcher::ReMatcher;
 use crate::re_program::ReProgram;
+use ahash::{HashMap, HashMapExt};
+#[cfg(test)]
+use std::rc::Rc;
 
 pub use crate::re_flags::Language;
 
 pub use crate::re_compiler::Error;
 
-pub use crate::regex::Regex;
+/// A XML-style regular expression.
+#[derive(Debug)]
+pub struct Regex {
+    re_program: ReProgram,
+    matches_empty_string: RefCell<Option<bool>>,
+}
+
+impl Regex {
+    fn new(re: &str, flags: &str, language: Language) -> Result<Self, Error> {
+        let re_flags = ReFlags::new(flags, language)?;
+        let mut re_compiler = ReCompiler::new(re_flags);
+        let pattern = re.chars().collect();
+        let re_program = re_compiler.compile(pattern)?;
+        Ok(Self {
+            re_program,
+            matches_empty_string: RefCell::new(None),
+        })
+    }
+
+    /// Create a regular expression from a string, using XPath 3.1 rules.
+    pub fn xpath(re: &str, flags: &str) -> Result<Self, Error> {
+        Self::new(re, flags, Language::XPath)
+    }
+
+    /// Create a regular expression from a string, using XML Schema 1.1 rules.
+    pub fn xsd(re: &str, flags: &str) -> Result<Self, Error> {
+        Self::new(re, flags, Language::XSD)
+    }
+
+    /// Returns `true` if the argument matches this regular expression.
+    pub fn is_match(&self, haystack: &str) -> bool {
+        let mut matcher = self.matcher(haystack);
+        matcher.is_match()
+    }
+
+    // returns an error if this regex is known to match an empty string.
+    // caches the last result so it doesn't have to do the match again.
+    fn check_matches_empty_string(&self) -> Result<(), Error> {
+        let matches_empty_string = *self.matches_empty_string.borrow();
+        if let Some(matches_empty_string) = matches_empty_string {
+            if !matches_empty_string {
+                Ok(())
+            } else {
+                Err(Error::MatchesEmptyString)
+            }
+        } else {
+            // we need to check if the regex matches the empty string
+            let mut matcher = self.matcher("");
+            let matches_empty_string = matcher.is_match();
+            *self.matches_empty_string.borrow_mut() = Some(matches_empty_string);
+            if matches_empty_string {
+                Err(Error::MatchesEmptyString)
+            } else {
+                Ok(())
+            }
+        }
+    }
+
+    /// Returns a string with all pieces matching this regular expression replaced
+    /// by the replacement.
+    pub fn replace_all(&self, haystack: &str, replacement: &str) -> Result<String, Error> {
+        self.check_matches_empty_string()?;
+
+        let mut matcher = self.matcher(haystack);
+        let replacement: Vec<char> = replacement.chars().collect();
+        matcher
+            .replace(&replacement)
+            .map(|chars| chars.into_iter().collect())
+    }
+
+    /// Returns a vector of the input string tokenized by the regular expression.
+    pub fn tokenize<'a>(&'a self, haystack: &str) -> Result<TokenIter<'a>, Error> {
+        // if we input the empty string, we should return no tokens
+        if haystack.is_empty() {
+            return Ok(TokenIter {
+                matcher: self.matcher(haystack),
+                prev_end: None,
+            });
+        }
+        self.check_matches_empty_string()?;
+
+        Ok(TokenIter {
+            matcher: self.matcher(haystack),
+            prev_end: Some(0),
+        })
+
+        // let mut matcher = self.matcher(haystack);
+
+        // let mut result: Vec<String> = Vec::new();
+        // let mut prev_end = Some(0);
+
+        // while let Some(end) = prev_end {
+        //     let matches = matcher.matches(end);
+        //     if matches {
+        //         let start = matcher.get_paren_start(0).unwrap();
+        //         prev_end = matcher.get_paren_end(0);
+        //         result.push(matcher.search[end..start].iter().collect())
+        //     } else {
+        //         result.push(matcher.search[end..].iter().collect());
+        //         break;
+        //     }
+        // }
+        // Ok(result)
+    }
+
+    pub(crate) fn matcher(&self, search: &str) -> ReMatcher {
+        ReMatcher::new(&self.re_program, search)
+    }
+
+    #[cfg(test)]
+    pub(crate) fn path(&self, s: &str) -> Rc<Operation> {
+        self.re_program.path(s)
+    }
+
+    /// Use this regular expression to analyze an input string, The resulting
+    /// vector provides both the matching and non-matching substrings. It also
+    /// provides access to matched subgroups.
+    pub fn analyze(&self, haystack: &str) -> Result<Vec<AnalyzeEntry>, Error> {
+        todo!();
+    }
+
+    // TODO: continue translating ARegexIterator
+    // this also has an isMatching protocol, and a processMatchingSubstring story
+    // and a computeNestingTable story too. Need to read more into how this is
+    // actually used. - it seems vastly complicated.
+}
+
+#[derive(Debug)]
+pub struct TokenIter<'a> {
+    matcher: ReMatcher<'a>,
+    prev_end: Option<usize>,
+}
+
+impl<'a> Iterator for TokenIter<'a> {
+    type Item = String;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(prev_end) = self.prev_end {
+            if self.matcher.matches(prev_end) {
+                let start = self.matcher.get_paren_start(0).unwrap();
+                let current = self.matcher.search[prev_end..start].iter().collect();
+                self.prev_end = self.matcher.get_paren_end(0);
+                Some(current)
+            } else {
+                let current = self.matcher.search[prev_end..].iter().collect();
+                self.prev_end = None;
+                Some(current)
+            }
+        } else {
+            None
+        }
+    }
+}
 
 struct AnalyzeIter<'a> {
     // the input string being matched
