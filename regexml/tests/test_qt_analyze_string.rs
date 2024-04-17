@@ -1,14 +1,14 @@
-// use regexml::{AnalyzeEntry, Error, Regex};
+use regexml::{AnalyzeEntry, Error, Regex};
 
-// // analyze-string with a mix of matching and non-matching strings
+// analyze-string with a mix of matching and non-matching strings
 // #[test]
 // fn test_analyze_string_003() {
 //     let regex = Regex::xpath("a", "").unwrap();
-//     let result = regex.analyze_string("banana").unwrap().collect::<Vec<_>>();
+//     let result = regex.analyze("banana").unwrap().collect::<Vec<_>>();
 //     assert_eq!(result, vec![])
 // }
 
-// // <test-case name="analyzeString-003">
+// <test-case name="analyzeString-003">
 // <description> analyze-string with a mix of matching and non-matching strings</description>
 // <created by="Michael Kay" on="2009-10-18"/>
 // <modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>

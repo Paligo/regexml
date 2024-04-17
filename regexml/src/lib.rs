@@ -25,7 +25,7 @@ mod regex;
 mod regex_iterator;
 mod regular_expression;
 
-// pub use crate::analyze_string::{AnalyzeEntry, MatchEntry};
+pub use crate::analyze_string::{AnalyzeEntry, MatchEntry};
 pub use crate::re_compiler::Error;
 pub use crate::re_flags::Language;
 pub use crate::regex::Regex;

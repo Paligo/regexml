@@ -10,7 +10,7 @@ use ahash::{HashMap, HashMapExt};
 #[cfg(test)]
 use std::rc::Rc;
 
-// pub use crate::analyze_string::{AnalyzeEntry, AnalyzeIter, MatchEntry};
+pub use crate::analyze_string::{AnalyzeEntry, AnalyzeIter, MatchEntry};
 pub use crate::re_compiler::Error;
 pub use crate::re_flags::Language;
 
@@ -101,16 +101,6 @@ impl Regex {
         })
     }
 
-    /// Returns an iterator of the input string analyzed by the regular expression.
-    // pub fn analyze_string<'a>(&'a self, haystack: &str) -> Result<AnalyzeIter<'a>, Error> {
-    //     self.check_matches_empty_string()?;
-
-    //     Ok(AnalyzeIter::new(
-    //         &self.re_program.pattern,
-    //         self.matcher(haystack),
-    //     ))
-    // }
-
     pub(crate) fn matcher(&self, search: &str) -> ReMatcher {
         ReMatcher::new(&self.re_program, search)
     }
@@ -120,12 +110,12 @@ impl Regex {
         self.re_program.path(s)
     }
 
-    // Use this regular expression to analyze an input string, The resulting
-    // vector provides both the matching and non-matching substrings. It also
-    // provides access to matched subgroups.
-    // pub fn analyze(&self, haystack: &str) -> Result<Vec<AnalyzeEntry>, Error> {
-    //     todo!();
-    // }
+    /// Use this regular expression to analyze an input string, The resulting
+    /// vector provides both the matching and non-matching substrings. It also
+    /// provides access to matched subgroups.
+    pub fn analyze<'a>(&'a self, haystack: &str) -> Result<AnalyzeIter<'a>, Error> {
+        todo!();
+    }
 
     // TODO: continue translating ARegexIterator
     // this also has an isMatching protocol, and a processMatchingSubstring story
