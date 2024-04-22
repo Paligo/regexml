@@ -141,144 +141,301 @@ fn test_analyze_string_008() {
     );
 }
 
-// <test-case name="analyzeString-008">
-// <description> analyze-string with nested captured groups</description>
-// <created by="Michael Kay" on="2009-10-18"/>
-// <modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>
-// <test>analyze-string("banana", "(a(n?))")</test>
-// <result>
-//    <assert-xml ignore-prefixes="true"><![CDATA[<fn:analyze-string-result xmlns:fn="http://www.w3.org/2005/xpath-functions"><fn:non-match>b</fn:non-match><fn:match><fn:group nr="1">a<fn:group nr="2">n</fn:group></fn:group></fn:match><fn:match><fn:group nr="1">a<fn:group nr="2">n</fn:group></fn:group></fn:match><fn:match><fn:group nr="1">a<fn:group nr="2"/></fn:group></fn:match></fn:analyze-string-result>]]></assert-xml>
-// </result>
-// </test-case>
-// <test-case name="analyzeString-009">
-// <description> analyze-string, groups in alternatives </description>
-// <created by="Michael Kay" on="2009-10-18"/>
-// <modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>
-// <test>analyze-string("how now brown cow", "(how)|(now)|(brown)|(cow)")</test>
-// <result>
-//    <assert-xml ignore-prefixes="true"><![CDATA[<fn:analyze-string-result xmlns:fn="http://www.w3.org/2005/xpath-functions"><fn:match><fn:group nr="1">how</fn:group></fn:match><fn:non-match> </fn:non-match><fn:match><fn:group nr="2">now</fn:group></fn:match><fn:non-match> </fn:non-match><fn:match><fn:group nr="3">brown</fn:group></fn:match><fn:non-match> </fn:non-match><fn:match><fn:group nr="4">cow</fn:group></fn:match></fn:analyze-string-result>]]></assert-xml>
-// </result>
-// </test-case>
-// <test-case name="analyzeString-010">
-// <description> analyze-string, with i flag </description>
-// <created by="Michael Kay" on="2009-10-18"/>
-// <modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>
-// <test>analyze-string("how now brown cow", "(HOW)|(NOW)|(BROWN)|(COW)", "i")</test>
-// <result>
-//    <assert-xml ignore-prefixes="true"><![CDATA[<fn:analyze-string-result xmlns:fn="http://www.w3.org/2005/xpath-functions"><fn:match><fn:group nr="1">how</fn:group></fn:match><fn:non-match> </fn:non-match><fn:match><fn:group nr="2">now</fn:group></fn:match><fn:non-match> </fn:non-match><fn:match><fn:group nr="3">brown</fn:group></fn:match><fn:non-match> </fn:non-match><fn:match><fn:group nr="4">cow</fn:group></fn:match></fn:analyze-string-result>]]></assert-xml>
-// </result>
-// </test-case>
-// <test-case name="analyzeString-011">
-// <description> analyze-string, with i and x flag </description>
-// <created by="Michael Kay" on="2009-10-18"/>
-// <modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>
-// <test>analyze-string("how now brown cow", " (HOW) | (NOW) &#xa;| (BROWN) | (COW) ", "ix")</test>
-// <result>
-//    <assert-xml ignore-prefixes="true"><![CDATA[<fn:analyze-string-result xmlns:fn="http://www.w3.org/2005/xpath-functions"><fn:match><fn:group nr="1">how</fn:group></fn:match><fn:non-match> </fn:non-match><fn:match><fn:group nr="2">now</fn:group></fn:match><fn:non-match> </fn:non-match><fn:match><fn:group nr="3">brown</fn:group></fn:match><fn:non-match> </fn:non-match><fn:match><fn:group nr="4">cow</fn:group></fn:match></fn:analyze-string-result>]]></assert-xml>
-// </result>
-// </test-case>
-// <test-case name="analyzeString-012">
-// <description> analyze-string, with flags set to empty string</description>
-// <created by="Michael Kay" on="2009-10-18"/>
-// <modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>
-// <test>analyze-string("how now brown cow", "(.*?ow\s+)+", "")</test>
-// <result>
-//    <assert-xml ignore-prefixes="true"><![CDATA[<fn:analyze-string-result xmlns:fn="http://www.w3.org/2005/xpath-functions"><fn:match>how <fn:group nr="1">now </fn:group></fn:match><fn:non-match>brown cow</fn:non-match></fn:analyze-string-result>]]></assert-xml>
-// </result>
-// </test-case>
-// <test-case name="analyzeString-013">
-// <description> analyze-string, with "s" flag</description>
-// <created by="Michael Kay" on="2009-10-18"/>
-// <modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>
-// <test>let $in :=
-// "Mary had a little lamb,
-// it's fleece was black as soot,
-// and everywhere that Mary went,
-// it put its sooty foot."
-//       return analyze-string($in, "Mary.*foot", "s")</test>
-// <result>
-//       <assert-xml ignore-prefixes="true"><![CDATA[<fn:analyze-string-result xmlns:fn="http://www.w3.org/2005/xpath-functions"><fn:match>Mary had a little lamb,
-// it's fleece was black as soot,
-// and everywhere that Mary went,
-// it put its sooty foot</fn:match><fn:non-match>.</fn:non-match></fn:analyze-string-result>]]></assert-xml>
-// </result>
-// </test-case>
-// <test-case name="analyzeString-014">
-// <description> analyze-string, multiple lines without "s" flag </description>
-// <created by="Michael Kay" on="2009-10-18"/>
-// <modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>
-// <test>let $in :=
-// "Mary had a little lamb,
-// it's fleece was black as soot,
-// and everywhere that Mary went,
-// it put its sooty foot."
-//       return analyze-string($in, ".+", "")</test>
-// <result>
-//    <any-of>
-//       <assert-xml ignore-prefixes="true"><![CDATA[<fn:analyze-string-result xmlns:fn="http://www.w3.org/2005/xpath-functions"><fn:match>Mary had a little lamb,</fn:match><fn:non-match>
-// </fn:non-match><fn:match>it's fleece was black as soot,</fn:match><fn:non-match>
-// </fn:non-match><fn:match>and everywhere that Mary went,</fn:match><fn:non-match>
-// </fn:non-match><fn:match>it put its sooty foot.</fn:match></fn:analyze-string-result>]]></assert-xml>
-//       </any-of>
-// </result>
-// </test-case>
-// <test-case name="analyzeString-015">
-// <description> analyze-string, multiple lines with "m" flag </description>
-// <created by="Michael Kay" on="2009-10-18"/>
-// <modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>
-// <test>let $in :=
-// "Mary had a little lamb,
-// it's fleece was black as soot,
-// and everywhere that Mary went,
-// it put its sooty foot."
-//       return analyze-string($in, "^.+$", "m")</test>
-// <result>
-//    <any-of>
-//       <assert-xml ignore-prefixes="true"><![CDATA[<fn:analyze-string-result xmlns:fn="http://www.w3.org/2005/xpath-functions"><fn:match>Mary had a little lamb,</fn:match><fn:non-match>
-// </fn:non-match><fn:match>it's fleece was black as soot,</fn:match><fn:non-match>
-// </fn:non-match><fn:match>and everywhere that Mary went,</fn:match><fn:non-match>
-// </fn:non-match><fn:match>it put its sooty foot.</fn:match></fn:analyze-string-result>]]></assert-xml>
-//       </any-of>
-// </result>
-// </test-case>
-// <test-case name="analyzeString-016">
-// <description>
+// analyze-string, groups in alternatives
+#[test]
+fn test_analyze_string_009() {
+    let regex = Regex::xpath("(how)|(now)|(brown)|(cow)", "").unwrap();
+    let result = regex
+        .analyze("how now brown cow")
+        .unwrap()
+        .collect::<Vec<_>>();
+
+    assert_eq!(
+        result,
+        vec![
+            AnalyzeEntry::Match(vec![MatchEntry::Group {
+                nr: 1,
+                value: vec![MatchEntry::String("how".to_string())]
+            }]),
+            AnalyzeEntry::NonMatch(" ".to_string()),
+            AnalyzeEntry::Match(vec![MatchEntry::Group {
+                nr: 2,
+                value: vec![MatchEntry::String("now".to_string())]
+            }]),
+            AnalyzeEntry::NonMatch(" ".to_string()),
+            AnalyzeEntry::Match(vec![MatchEntry::Group {
+                nr: 3,
+                value: vec![MatchEntry::String("brown".to_string())]
+            }]),
+            AnalyzeEntry::NonMatch(" ".to_string()),
+            AnalyzeEntry::Match(vec![MatchEntry::Group {
+                nr: 4,
+                value: vec![MatchEntry::String("cow".to_string())]
+            }]),
+        ]
+    );
+}
+
+// analyze-string, with i flag
+#[test]
+fn test_analyze_string_010() {
+    let regex = Regex::xpath("(HOW)|(NOW)|(BROWN)|(COW)", "i").unwrap();
+    let result = regex
+        .analyze("how now brown cow")
+        .unwrap()
+        .collect::<Vec<_>>();
+
+    assert_eq!(
+        result,
+        vec![
+            AnalyzeEntry::Match(vec![MatchEntry::Group {
+                nr: 1,
+                value: vec![MatchEntry::String("how".to_string())]
+            }]),
+            AnalyzeEntry::NonMatch(" ".to_string()),
+            AnalyzeEntry::Match(vec![MatchEntry::Group {
+                nr: 2,
+                value: vec![MatchEntry::String("now".to_string())]
+            }]),
+            AnalyzeEntry::NonMatch(" ".to_string()),
+            AnalyzeEntry::Match(vec![MatchEntry::Group {
+                nr: 3,
+                value: vec![MatchEntry::String("brown".to_string())]
+            }]),
+            AnalyzeEntry::NonMatch(" ".to_string()),
+            AnalyzeEntry::Match(vec![MatchEntry::Group {
+                nr: 4,
+                value: vec![MatchEntry::String("cow".to_string())]
+            }]),
+        ]
+    );
+}
+
+// analyze-string, with i and x flag
+#[test]
+fn test_analyze_string_011() {
+    let regex = Regex::xpath("(HOW) | (NOW) \n| (BROWN) | (COW)", "ix").unwrap();
+    let result = regex
+        .analyze("how now brown cow")
+        .unwrap()
+        .collect::<Vec<_>>();
+    assert_eq!(
+        result,
+        vec![
+            AnalyzeEntry::Match(vec![MatchEntry::Group {
+                nr: 1,
+                value: vec![MatchEntry::String("how".to_string())]
+            }]),
+            AnalyzeEntry::NonMatch(" ".to_string()),
+            AnalyzeEntry::Match(vec![MatchEntry::Group {
+                nr: 2,
+                value: vec![MatchEntry::String("now".to_string())]
+            }]),
+            AnalyzeEntry::NonMatch(" ".to_string()),
+            AnalyzeEntry::Match(vec![MatchEntry::Group {
+                nr: 3,
+                value: vec![MatchEntry::String("brown".to_string())]
+            }]),
+            AnalyzeEntry::NonMatch(" ".to_string()),
+            AnalyzeEntry::Match(vec![MatchEntry::Group {
+                nr: 4,
+                value: vec![MatchEntry::String("cow".to_string())]
+            }]),
+        ]
+    );
+}
+
+// analyze-string, with flags set to empty string
+#[test]
+fn test_analyze_string_012() {
+    let regex = Regex::xpath("(.*?ow\\s+)+", "").unwrap();
+    let result = regex
+        .analyze("how now brown cow")
+        .unwrap()
+        .collect::<Vec<_>>();
+    assert_eq!(
+        result,
+        vec![
+            AnalyzeEntry::Match(vec![
+                MatchEntry::String("how ".to_string()),
+                MatchEntry::Group {
+                    nr: 1,
+                    value: vec![MatchEntry::String("now ".to_string())]
+                }
+            ]),
+            AnalyzeEntry::NonMatch("brown cow".to_string()),
+        ]
+    );
+}
+
+// analyze-string, with "s" flag
+#[test]
+fn test_analyze_string_013() {
+    let regex = Regex::xpath("Mary.*foot", "s").unwrap();
+    let result = regex
+        .analyze(
+            r"Mary had a little lamb,
+its fleece was black as soot,
+and everywhere that Mary went,
+it put its sooty foot.",
+        )
+        .unwrap()
+        .collect::<Vec<_>>();
+    assert_eq!(
+        result,
+        vec![
+            AnalyzeEntry::Match(vec![MatchEntry::String(
+                r"Mary had a little lamb,
+its fleece was black as soot,
+and everywhere that Mary went,
+it put its sooty foot"
+                    .to_string(),
+            )]),
+            AnalyzeEntry::NonMatch(".".to_string()),
+        ]
+    );
+}
+
+// analyze-string, multiple lines without "s" flag
+#[test]
+fn test_analyze_string_014() {
+    let regex = Regex::xpath(".+", "").unwrap();
+    let result = regex
+        .analyze(
+            r"Mary had a little lamb,
+its fleece was black as soot,
+and everywhere that Mary went,
+it put its sooty foot.",
+        )
+        .unwrap()
+        .collect::<Vec<_>>();
+    assert_eq!(
+        result,
+        vec![
+            AnalyzeEntry::Match(vec![MatchEntry::String(
+                "Mary had a little lamb,".to_string()
+            )]),
+            AnalyzeEntry::NonMatch("\n".to_string()),
+            AnalyzeEntry::Match(vec![MatchEntry::String(
+                "its fleece was black as soot,".to_string()
+            )]),
+            AnalyzeEntry::NonMatch("\n".to_string()),
+            AnalyzeEntry::Match(vec![MatchEntry::String(
+                "and everywhere that Mary went,".to_string()
+            )]),
+            AnalyzeEntry::NonMatch("\n".to_string()),
+            AnalyzeEntry::Match(vec![MatchEntry::String(
+                "it put its sooty foot.".to_string()
+            )]),
+        ]
+    );
+}
+
 // analyze-string, multiple lines with "m" flag
-// </description>
-// <created by="Michael Kay" on="2009-10-18"/>
-// <modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>
-// <test>let $in :=
-// "Mary had a little lamb,
-// it's fleece was black as soot,
-// and everywhere that Mary went,
-// it put its sooty foot."
-//       return analyze-string($in, "^.+$", "")</test>
-// <result>
-//    <any-of>
-//       <assert-xml ignore-prefixes="true"><![CDATA[<fn:analyze-string-result xmlns:fn="http://www.w3.org/2005/xpath-functions"><fn:non-match>Mary had a little lamb,
-// it's fleece was black as soot,
-// and everywhere that Mary went,
-// it put its sooty foot.</fn:non-match></fn:analyze-string-result>]]></assert-xml>
-//       </any-of>
-// </result>
-// </test-case>
-// <test-case name="analyzeString-017">
-// <description> subtle distinction in the positioning of an empty captured group </description>
-// <created by="Michael Kay" on="2009-10-18"/>
-// <modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>
-// <test>analyze-string("banana", "(b)(x?)")</test>
-// <result>
-//    <assert-xml ignore-prefixes="true"><![CDATA[<fn:analyze-string-result xmlns:fn="http://www.w3.org/2005/xpath-functions"><fn:match><fn:group nr="1">b</fn:group><fn:group nr="2"/></fn:match><fn:non-match>anana</fn:non-match></fn:analyze-string-result>]]></assert-xml>
-// </result>
-// </test-case>
-// <test-case name="analyzeString-017a">
-// <description> subtle distinction in the positioning of an empty captured group</description>
-// <created by="Michael Kay" on="2009-10-18"/><modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>
-// <test>analyze-string("banana", "(b(x?))")</test>
-// <result>
-//    <assert-xml ignore-prefixes="true"><![CDATA[<fn:analyze-string-result xmlns:fn="http://www.w3.org/2005/xpath-functions"><fn:match><fn:group nr="1">b<fn:group nr="2"/></fn:group></fn:match><fn:non-match>anana</fn:non-match></fn:analyze-string-result>]]></assert-xml>
-// </result>
-// </test-case>
+#[test]
+fn test_analyze_string_015() {
+    let regex = Regex::xpath(".+$", "m").unwrap();
+    let result = regex
+        .analyze(
+            r"Mary had a little lamb,
+its fleece was black as soot,
+and everywhere that Mary went,
+it put its sooty foot.",
+        )
+        .unwrap()
+        .collect::<Vec<_>>();
+    assert_eq!(
+        result,
+        vec![
+            AnalyzeEntry::Match(vec![MatchEntry::String(
+                "Mary had a little lamb,".to_string()
+            )]),
+            AnalyzeEntry::NonMatch("\n".to_string()),
+            AnalyzeEntry::Match(vec![MatchEntry::String(
+                "its fleece was black as soot,".to_string()
+            )]),
+            AnalyzeEntry::NonMatch("\n".to_string()),
+            AnalyzeEntry::Match(vec![MatchEntry::String(
+                "and everywhere that Mary went,".to_string()
+            )]),
+            AnalyzeEntry::NonMatch("\n".to_string()),
+            AnalyzeEntry::Match(vec![MatchEntry::String(
+                "it put its sooty foot.".to_string()
+            )]),
+        ]
+    );
+}
+
+#[test]
+fn test_analyze_string_016() {
+    let regex = Regex::xpath("^.+$", "").unwrap();
+    let result = regex
+        .analyze(
+            r"Mary had a little lamb,
+its fleece was black as soot,
+and everywhere that Mary went,
+it put its sooty foot.",
+        )
+        .unwrap()
+        .collect::<Vec<_>>();
+    assert_eq!(
+        result,
+        vec![AnalyzeEntry::NonMatch(
+            r"Mary had a little lamb,
+its fleece was black as soot,
+and everywhere that Mary went,
+it put its sooty foot."
+                .to_string(),
+        ),]
+    );
+}
+
+// analyze-string, subtle distinction in the positioning of an empty captured group
+#[test]
+fn test_analyze_string_017() {
+    let regex = Regex::xpath("(b)(x?)", "").unwrap();
+    let result = regex.analyze("banana").unwrap().collect::<Vec<_>>();
+    assert_eq!(
+        result,
+        vec![
+            AnalyzeEntry::Match(vec![
+                MatchEntry::Group {
+                    nr: 1,
+                    value: vec![MatchEntry::String("b".to_string())]
+                },
+                MatchEntry::Group {
+                    nr: 2,
+                    value: vec![],
+                },
+            ]),
+            AnalyzeEntry::NonMatch("anana".to_string()),
+        ]
+    );
+}
+
+// analyze-string, subtle distinction in the positioning of an empty captured group
+#[test]
+fn test_analyze_string_017a() {
+    let regex = Regex::xpath("(b(x?))", "").unwrap();
+    let result = regex.analyze("banana").unwrap().collect::<Vec<_>>();
+    assert_eq!(
+        result,
+        vec![
+            AnalyzeEntry::Match(vec![MatchEntry::Group {
+                nr: 1,
+                value: vec![
+                    MatchEntry::String("b".to_string()),
+                    MatchEntry::Group {
+                        nr: 2,
+                        value: vec![],
+                    },
+                ],
+            }]),
+            AnalyzeEntry::NonMatch("anana".to_string()),
+        ]
+    );
+}
+
 // <test-case name="analyzeString-018" covers-30="regex-non-capturing">
 // <description> non-capturing group indicated by "(?:...)" </description>
 // <created by="Michael Kay" on="2009-10-18"/>

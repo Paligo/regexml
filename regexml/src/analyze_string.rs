@@ -126,7 +126,7 @@ impl<'a> AnalyzeIter<'a> {
                         regex_match_handler.characters(buff);
                     }
                     for group in events {
-                        if group > &0 {
+                        if *group > 0 {
                             regex_match_handler.on_group_start(*group as usize);
                         } else {
                             regex_match_handler.on_group_end();
