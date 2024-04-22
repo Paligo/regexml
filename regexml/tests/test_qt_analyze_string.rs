@@ -76,14 +76,14 @@ fn test_analyze_string_007() {
                 MatchEntry::String("a".to_string()),
                 MatchEntry::Group {
                     nr: 1,
-                    value: "n".to_string()
+                    value: vec![MatchEntry::String("n".to_string())]
                 }
             ]),
             AnalyzeEntry::Match(vec![
                 MatchEntry::String("a".to_string()),
                 MatchEntry::Group {
                     nr: 1,
-                    value: "n".to_string()
+                    value: vec![MatchEntry::String("n".to_string())]
                 }
             ]),
             AnalyzeEntry::NonMatch("a".to_string()),
@@ -91,39 +91,55 @@ fn test_analyze_string_007() {
     )
 }
 
-// // analyze-string with nested captured groups
-// #[test]
-// fn test_analyze_string_008() {
-//     let regex = Regex::xpath("(a(n?))", "").unwrap();
-//     let result = regex.analyze("banana").unwrap().collect::<Vec<_>>();
-//     assert_eq!(
-//         result,
-//         vec![
-//             AnalyzeEntry::NonMatch("b".to_string()),
-//             AnalyzeEntry::Match(vec![
-//                 MatchEntry::String("a".to_string()),
-//                 MatchEntry::Group {
-//                     nr: 1,
-//                     value: "n".to_string()
-//                 }
-//             ]),
-//             AnalyzeEntry::Match(vec![
-//                 MatchEntry::String("a".to_string()),
-//                 MatchEntry::Group {
-//                     nr: 1,
-//                     value: "n".to_string()
-//                 }
-//             ]),
-//             AnalyzeEntry::Match(vec![
-//                 MatchEntry::String("a".to_string()),
-//                 MatchEntry::Group {
-//                     nr: 1,
-//                     value: "".to_string()
-//                 }
-//             ]),
-//         ]
-//     )
-// }
+// analyze-string with nested captured groups
+#[test]
+fn test_analyze_string_008() {
+    let regex = Regex::xpath("(a(n?))", "").unwrap();
+    let result = regex.analyze("banana").unwrap().collect::<Vec<_>>();
+
+    let match0 = MatchEntry::Group {
+        nr: 1,
+        value: vec![
+            MatchEntry::String("a".to_string()),
+            MatchEntry::Group {
+                nr: 2,
+                value: vec![MatchEntry::String("n".to_string())],
+            },
+        ],
+    };
+
+    let match1 = MatchEntry::Group {
+        nr: 1,
+        value: vec![
+            MatchEntry::String("a".to_string()),
+            MatchEntry::Group {
+                nr: 2,
+                value: vec![MatchEntry::String("n".to_string())],
+            },
+        ],
+    };
+
+    let match2 = MatchEntry::Group {
+        nr: 1,
+        value: vec![
+            MatchEntry::String("a".to_string()),
+            MatchEntry::Group {
+                nr: 2,
+                value: vec![],
+            },
+        ],
+    };
+
+    assert_eq!(
+        result,
+        vec![
+            AnalyzeEntry::NonMatch("b".to_string()),
+            AnalyzeEntry::Match(vec![match0]),
+            AnalyzeEntry::Match(vec![match1]),
+            AnalyzeEntry::Match(vec![match2]),
+        ]
+    );
+}
 
 // <test-case name="analyzeString-008">
 // <description> analyze-string with nested captured groups</description>

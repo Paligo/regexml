@@ -10,7 +10,7 @@ pub enum AnalyzeEntry {
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum MatchEntry {
     String(String),
-    Group { nr: usize, value: String },
+    Group { nr: usize, value: Vec<MatchEntry> },
 }
 
 pub struct AnalyzeIter<'a> {
@@ -72,6 +72,13 @@ impl<'a> AnalyzeIter<'a> {
                         let i: isize = i.try_into().unwrap();
                         e.insert(0, -i);
                     } else {
+                        // zero-length group (start==end). The problem here is
+                        // that the information available by itself isn't
+                        // sufficient to determine the nesting of groups:
+                        // match("a", "(a(b?))") and match("a", "(a)(b?)") will
+                        // both give the same result for group 2 (start=1,
+                        // end=1). So we need to go back to the original regex
+                        // to determine the group nesting
                         let parent_group = self.nesting_table.get(&i).unwrap();
                         // insert the start and end events immediately before
                         // the end event for the parent group, if present;
@@ -103,42 +110,41 @@ impl<'a> AnalyzeIter<'a> {
                 }
             }
 
-            let mut result = Vec::new();
-            let mut buff = Some(String::new());
-            let mut in_group = None;
+            let mut buf = None;
+
+            let mut regex_match_handler = RegexMatchHandler {
+                stack: vec![GroupInfo {
+                    nr: 0, // fake outer group, this number will be ignored
+                    entries: Vec::new(),
+                }],
+            };
+
             for i in 0..=current.len() {
                 let events = actions.get(&i);
                 if let Some(events) = events {
-                    if let Some(buff) = buff.take() {
-                        let match_entry = if let Some(in_group) = in_group {
-                            MatchEntry::Group {
-                                nr: in_group,
-                                value: buff,
-                            }
-                        } else {
-                            MatchEntry::String(buff)
-                        };
-                        result.push(match_entry);
+                    if let Some(buff) = buf.take() {
+                        regex_match_handler.characters(buff);
                     }
                     for group in events {
                         if group > &0 {
-                            in_group = Some((*group).try_into().unwrap());
+                            regex_match_handler.on_group_start(*group as usize);
                         } else {
-                            in_group = None;
+                            regex_match_handler.on_group_end();
                         }
                     }
                 }
                 if i < current.len() {
-                    if let Some(buff) = &mut buff {
+                    if let Some(buff) = &mut buf {
                         buff.push(current[i]);
                     } else {
-                        let mut s = String::new();
-                        s.push(current[i]);
-                        buff = Some(s)
+                        buf = Some(current[i].to_string());
                     }
                 }
             }
-            result
+            if let Some(buf) = buf.take() {
+                regex_match_handler.characters(buf);
+            }
+            regex_match_handler.stack.pop().unwrap().entries
         }
     }
 
@@ -254,5 +260,41 @@ impl<'a> Iterator for AnalyzeIter<'a> {
         } else {
             None
         }
+    }
+}
+
+struct GroupInfo {
+    nr: usize,
+    entries: Vec<MatchEntry>,
+}
+
+struct RegexMatchHandler {
+    // the top of the stack contains a fake group info, which is
+    // really the anonymous vec of match entries
+    stack: Vec<GroupInfo>,
+}
+
+impl RegexMatchHandler {
+    fn top(&mut self) -> &mut Vec<MatchEntry> {
+        &mut self.stack.last_mut().unwrap().entries
+    }
+
+    fn characters(&mut self, s: String) {
+        self.top().push(MatchEntry::String(s));
+    }
+
+    fn on_group_start(&mut self, nr: usize) {
+        self.stack.push(GroupInfo {
+            nr,
+            entries: Vec::new(),
+        });
+    }
+
+    fn on_group_end(&mut self) {
+        let group_info = self.stack.pop().unwrap();
+        self.top().push(MatchEntry::Group {
+            nr: group_info.nr,
+            value: group_info.entries,
+        });
     }
 }
