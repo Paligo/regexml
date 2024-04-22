@@ -49,7 +49,7 @@ impl OperationControl for Choice {
             let cc = o.get_initial_character_class(case_blind);
             builder.add_set(cc.as_code_point_inversion_list());
         }
-        CharacterClassBuilder::CodePointInversionListBuilder(builder).build()
+        CharacterClass::new(builder.build())
     }
 
     fn matches_empty_string(&self) -> u32 {

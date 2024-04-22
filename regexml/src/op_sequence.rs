@@ -1,6 +1,9 @@
 use std::rc::Rc;
 
+use icu_collections::codepointinvlist::CodePointInversionListBuilder;
+
 use crate::{
+    character_class::CharacterClass,
     operation::{
         Operation, OperationControl, MATCHES_ZLS_ANYWHERE, MATCHES_ZLS_AT_END,
         MATCHES_ZLS_AT_START, MATCHES_ZLS_NEVER,
@@ -30,6 +33,18 @@ impl OperationControl for Sequence {
         self.operations
             .iter()
             .fold(0, |acc, op| acc + op.get_minimum_match_length())
+    }
+
+    fn get_initial_character_class(&self, case_blind: bool) -> CharacterClass {
+        let mut builder = CodePointInversionListBuilder::new();
+        for o in &self.operations {
+            let cc = o.get_initial_character_class(case_blind);
+            builder.add_set(cc.as_code_point_inversion_list());
+            if o.matches_empty_string() == MATCHES_ZLS_NEVER {
+                break;
+            }
+        }
+        CharacterClass::new(builder.build())
     }
 
     fn matches_empty_string(&self) -> u32 {

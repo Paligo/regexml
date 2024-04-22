@@ -1,6 +1,7 @@
 use std::rc::Rc;
 
 use crate::{
+    character_class::CharacterClass,
     operation::{
         ForceProgressIterator, Operation, OperationControl, RepeatOperation, MATCHES_ZLS_ANYWHERE,
     },
@@ -39,6 +40,10 @@ impl OperationControl for Repeat {
 
     fn get_minimum_match_length(&self) -> usize {
         self.min * self.operation.get_minimum_match_length()
+    }
+
+    fn get_initial_character_class(&self, case_blind: bool) -> CharacterClass {
+        self.operation.get_initial_character_class(case_blind)
     }
 
     fn matches_empty_string(&self) -> u32 {
@@ -253,9 +258,4 @@ impl<'a> Iterator for ReluctantRepeatIterator<'a> {
         }
         self.position
     }
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::Regex;
 }
