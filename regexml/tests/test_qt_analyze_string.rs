@@ -34,44 +34,97 @@ fn test_analyze_string_004() {
     assert_eq!(result, vec![AnalyzeEntry::NonMatch("banana".to_string())])
 }
 
-// <test-case name="analyzeString-004">
-// <description> analyze-string with a single non-matching string</description>
-// <created by="Michael Kay" on="2009-10-18"/>
-// <modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>
-// <test>analyze-string("banana", "custard")</test>
-// <result>
-//    <assert-xml ignore-prefixes="true"><![CDATA[<fn:analyze-string-result xmlns:fn="http://www.w3.org/2005/xpath-functions"><fn:non-match>banana</fn:non-match></fn:analyze-string-result>]]></assert-xml>
-// </result>
-// </test-case>
-// <test-case name="analyzeString-005">
-// <description> analyze-string with a single matching string</description>
-// <created by="Michael Kay" on="2009-10-18"/>
-// <modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>
-// <test>analyze-string("banana", ".+")</test>
-// <result>
-//    <assert-xml ignore-prefixes="true"><![CDATA[<fn:analyze-string-result xmlns:fn="http://www.w3.org/2005/xpath-functions"><fn:match>banana</fn:match></fn:analyze-string-result>]]></assert-xml>
-// </result>
-// </test-case>
-// <test-case name="analyzeString-006">
-// <description> analyze-string with a adjacent matching strings</description>
-// <created by="Michael Kay" on="2009-10-18"/>
-// <modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>
-// <test>analyze-string("banana", "an")</test>
-// <result>
-//    <any-of>
-//       <assert-xml ignore-prefixes="true"><![CDATA[<fn:analyze-string-result xmlns:fn="http://www.w3.org/2005/xpath-functions"><fn:non-match>b</fn:non-match><fn:match>an</fn:match><fn:match>an</fn:match><fn:non-match>a</fn:non-match></fn:analyze-string-result>]]></assert-xml>
-//       </any-of>
-// </result>
-// </test-case>
-// <test-case name="analyzeString-007">
-// <description> analyze-string with a single captured group</description>
-// <created by="Michael Kay" on="2009-10-18"/>
-// <modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>
-// <test>analyze-string("banana", "a(n)")</test>
-// <result>
-//    <assert-xml ignore-prefixes="true"><![CDATA[<fn:analyze-string-result xmlns:fn="http://www.w3.org/2005/xpath-functions"><fn:non-match>b</fn:non-match><fn:match>a<fn:group nr="1">n</fn:group></fn:match><fn:match>a<fn:group nr="1">n</fn:group></fn:match><fn:non-match>a</fn:non-match></fn:analyze-string-result>]]></assert-xml>
-// </result>
-// </test-case>
+// analyze-string with a single matching string
+#[test]
+fn test_analyze_string_005() {
+    let regex = Regex::xpath(".+", "").unwrap();
+    let result = regex.analyze("banana").unwrap().collect::<Vec<_>>();
+    assert_eq!(
+        result,
+        vec![AnalyzeEntry::Match(vec![MatchEntry::String(
+            "banana".to_string()
+        )])]
+    )
+}
+
+// analyze-string with a adjacent matching strings
+#[test]
+fn test_analyze_string_006() {
+    let regex = Regex::xpath("an", "").unwrap();
+    let result = regex.analyze("banana").unwrap().collect::<Vec<_>>();
+    assert_eq!(
+        result,
+        vec![
+            AnalyzeEntry::NonMatch("b".to_string()),
+            AnalyzeEntry::Match(vec![MatchEntry::String("an".to_string())]),
+            AnalyzeEntry::Match(vec![MatchEntry::String("an".to_string())]),
+            AnalyzeEntry::NonMatch("a".to_string()),
+        ]
+    )
+}
+
+// analyze-string with a single captured group
+#[test]
+fn test_analyze_string_007() {
+    let regex = Regex::xpath("a(n)", "").unwrap();
+    let result = regex.analyze("banana").unwrap().collect::<Vec<_>>();
+    assert_eq!(
+        result,
+        vec![
+            AnalyzeEntry::NonMatch("b".to_string()),
+            AnalyzeEntry::Match(vec![
+                MatchEntry::String("a".to_string()),
+                MatchEntry::Group {
+                    nr: 1,
+                    value: "n".to_string()
+                }
+            ]),
+            AnalyzeEntry::Match(vec![
+                MatchEntry::String("a".to_string()),
+                MatchEntry::Group {
+                    nr: 1,
+                    value: "n".to_string()
+                }
+            ]),
+            AnalyzeEntry::NonMatch("a".to_string()),
+        ]
+    )
+}
+
+// // analyze-string with nested captured groups
+// #[test]
+// fn test_analyze_string_008() {
+//     let regex = Regex::xpath("(a(n?))", "").unwrap();
+//     let result = regex.analyze("banana").unwrap().collect::<Vec<_>>();
+//     assert_eq!(
+//         result,
+//         vec![
+//             AnalyzeEntry::NonMatch("b".to_string()),
+//             AnalyzeEntry::Match(vec![
+//                 MatchEntry::String("a".to_string()),
+//                 MatchEntry::Group {
+//                     nr: 1,
+//                     value: "n".to_string()
+//                 }
+//             ]),
+//             AnalyzeEntry::Match(vec![
+//                 MatchEntry::String("a".to_string()),
+//                 MatchEntry::Group {
+//                     nr: 1,
+//                     value: "n".to_string()
+//                 }
+//             ]),
+//             AnalyzeEntry::Match(vec![
+//                 MatchEntry::String("a".to_string()),
+//                 MatchEntry::Group {
+//                     nr: 1,
+//                     value: "".to_string()
+//                 }
+//             ]),
+//         ]
+//     )
+// }
+
 // <test-case name="analyzeString-008">
 // <description> analyze-string with nested captured groups</description>
 // <created by="Michael Kay" on="2009-10-18"/>
