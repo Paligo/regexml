@@ -436,191 +436,85 @@ fn test_analyze_string_017a() {
     );
 }
 
-// <test-case name="analyzeString-018" covers-30="regex-non-capturing">
-// <description> non-capturing group indicated by "(?:...)" </description>
-// <created by="Michael Kay" on="2009-10-18"/>
-// <modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>
-// <test>analyze-string("banana", "(?:b(an)*a)")</test>
-// <result>
-//   <assert-xml ignore-prefixes="true"><![CDATA[<fn:analyze-string-result xmlns:fn="http://www.w3.org/2005/xpath-functions"><fn:match>ban<fn:group nr="1">an</fn:group>a</fn:match></fn:analyze-string-result>]]></assert-xml>
-// </result>
-// </test-case>
-// <test-case name="analyzeString-019" covers-30="regex-q-flag">
-// <description> "q" flag suppresses grouping</description>
-// <created by="Michael Kay" on="2009-10-18"/>
-// <modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>
-// <test>analyze-string("((banana))", "(banana)", "q")</test>
-// <result>
-//    <assert-xml ignore-prefixes="true"><![CDATA[<fn:analyze-string-result xmlns:fn="http://www.w3.org/2005/xpath-functions"><fn:non-match>(</fn:non-match><fn:match>(banana)</fn:match><fn:non-match>)</fn:non-match></fn:analyze-string-result>]]></assert-xml>
-// </result>
-// </test-case>
-// <test-case name="analyzeString-020">
-// <description> test typing of result of analyze-string: with no import-schema </description>
-// <created by="Michael Kay" on="2009-10-18"/>
-// <modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>
-// <dependency type="feature" value="schemaValidation"/>
-// <test>
-//   let $result := analyze-string("banana", "(b)(anana)")
-//   return ($result//@nr)[1] instance of attribute(nr, xs:positiveInteger)
-// </test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
-// <test-case name="analyzeString-021">
-// <description> test typing of result of analyze-string: with no import-schema </description>
-// <created by="Michael Kay" on="2009-10-18"/>
-// <modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>
-// <dependency type="feature" value="schemaValidation"/>
-// <test>let $result := analyze-string("banana", "(b)(anana)") return $result instance of element(*, xs:untyped)</test>
-// <result>
-//    <assert-false/>
-// </result>
-// </test-case>
-// <test-case name="analyzeString-022">
-// <description> test string value of result of analyze-string </description>
-// <created by="Michael Kay" on="2009-10-18"/>
-// <modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>
-// <test>let $result := analyze-string("banana", "(b)(anana)") return string($result)</test>
-// <result>
-//       <assert-string-value>banana</assert-string-value>
-// </result>
-// </test-case>
-// <test-case name="analyzeString-023">
-// <description> test string value of result of analyze-string </description>
-// <created by="Michael Kay" on="2009-10-18"/><modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>
-// <test>let $result := analyze-string("banana", "(b)(anana)") return string($result/fn:match[1])</test>
-// <result>
-//    <assert-string-value>banana</assert-string-value>
-// </result>
-// </test-case>
-// <test-case name="analyzeString-024">
-// <description> test typed value of result of analyze-string: referencing a name defined in the schema </description>
-// <created by="Michael Kay" on="2009-10-18"/>
-// <modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>
-// <modified by="O'Neil Delpratt" on="2012-08-17" change="fix bug 14873"/>
-// <environment ref="analyze-string-schema" />
-// <dependency type="spec" value="XQ30+"/>
-// <dependency type="feature" value="schemaValidation"/>
-// <dependency type="feature" value="schemaImport"/>
-// <test>
-//   import schema "http://www.w3.org/2005/xpath-functions";
-//   let $result := analyze-string("banana", "(b)(anana)")
-//   return $result/fn:match[1] instance of schema-element(fn:match)</test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
-// <test-case name="analyzeString-025">
-// <description> test typing of result of analyze-string: with import-schema </description>
-// <created by="Tim Mills" on="2012-03-22"/>
-// <environment ref="analyze-string-schema" />
-// <dependency type="spec" value="XQ30+"/>
-// <dependency type="feature" value="schemaImport"/>
-// <dependency type="feature" value="schemaValidation"/>
-// <test>
-// import schema "http://www.w3.org/2005/xpath-functions";
-//   analyze-string("banana", "(b)(anana)") instance of schema-element(fn:analyze-string-result)
-// </test>
-// <result>
-//    <assert-true/>
-// </result>
-// </test-case>
-// <test-case name="analyzeString-026" covers-30="regex-dot-matching-cr">
-// <description> "." does NOT match CR in default mode</description>
-// <created by="Tim Mills" on="2012-09-25"/>
-// <dependency type="spec" value="XQ30+"/>
-// <test>exactly-one(fn:analyze-string(concat('Mary', codepoints-to-string(13), 'Jones'), 'y.J')/fn:non-match)/string()</test>
-// <result>
-// <assert-eq>concat('Mary', codepoints-to-string(13), 'Jones')</assert-eq>
-// </result>
-// </test-case>
+// non-capturing group indicated by "(?:...)"
+#[test]
+fn test_analyze_string_018() {
+    let regex = Regex::xpath("(?:b(an)*a)", "").unwrap();
+    let result = regex.analyze("banana").unwrap().collect::<Vec<_>>();
+    assert_eq!(
+        result,
+        vec![AnalyzeEntry::Match(vec![
+            MatchEntry::String("ban".to_string()),
+            MatchEntry::Group {
+                nr: 1,
+                value: vec![MatchEntry::String("an".to_string())]
+            },
+            MatchEntry::String("a".to_string()),
+        ])]
+    );
+}
 
-// <test-case name="analyzeString-027" covers-30="regex-dot-matching-cr">
-// <description> "." does NOT match CR in default mode</description>
-// <created by="Tim Mills" on="2012-09-25"/>
-// <dependency type="spec" value="XQ30+"/>
-// <test>exactly-one(fn:analyze-string(concat('Mary', codepoints-to-string(13), 'Jones'), 'y.J', 's')/fn:match)/string()</test>
-// <result>
-// <assert-eq>concat('y', codepoints-to-string(13), 'J')</assert-eq>
-// </result>
-// </test-case>
+// "q" flag suppresses grouping
+#[test]
+fn test_analyze_string_019() {
+    let regex = Regex::xpath("(banana)", "q").unwrap();
+    let result = regex.analyze("((banana))").unwrap().collect::<Vec<_>>();
+    assert_eq!(
+        result,
+        vec![
+            AnalyzeEntry::NonMatch("(".to_string()),
+            AnalyzeEntry::Match(vec![MatchEntry::String("(banana)".to_string())]),
+            AnalyzeEntry::NonMatch(")".to_string()),
+        ]
+    );
+}
 
-// <test-case name="analyzeString-028" covers="map-general">
-// <description> Result of analyze-string must have the right in-scope namespaces </description>
-// <created by="Michael Kay" on="2016-09-26"/>
-// <modified by="Tim Mills" on="2016-10-19" change="Reference map env"/>
-// <environment ref="map" />
-// <dependency type="spec" value="XQ31+"/>
-// <test>
-//    declare function local:namespaces($e as element(*)) as map(xs:string, xs:anyURI) {
-//      map:merge(in-scope-prefixes($e) ! map{. : namespace-uri-for-prefix(., $e)})
-//    };
-//    let $m := local:namespaces(analyze-string((), "abc"))
-//    return sort($m?*)
-// </test>
-// <result>
-//    <assert-deep-eq>"http://www.w3.org/2005/xpath-functions", "http://www.w3.org/XML/1998/namespace"</assert-deep-eq>
-// </result>
-// </test-case>
+// "." does NOT match CR in default mode
+#[test]
+fn test_analyze_string_026() {
+    let regex = Regex::xpath("y.J", "").unwrap();
+    let result = regex.analyze("Mary\rJones").unwrap().collect::<Vec<_>>();
+    assert_eq!(
+        result,
+        vec![AnalyzeEntry::NonMatch("Mary\rJones".to_string())]
+    );
+}
 
-// <test-case name="analyzeString-029" covers="map-general">
-// <description> Matching groups within repeated clause </description>
-// <created by="Michael Kay after Martin Honnen" on="2017-03-13"/>
-// <dependency type="spec" value="XQ30+"/>
-// <test><![CDATA[
-//    let $data :=
-//      <Root>
-//        <DATA>/OPDH/FLOWING SOLUTION/SGDE/Number0983713/EKPH/Sample test/some other keys/</DATA>
-//        <DATA>/some other keys/afdsf/SGDE/Number0983713/some other keys/PIHSAGA/OPDH/FLOWING SOLUTION/some other keys/No exception/EKPH/Sample test/some other keys/</DATA>
-//      </Root>
-//    return document{<out>{
-//      $data/DATA!analyze-string(., '(/OPDH/|/EKPH/|/SGDE/|/some other keys/)(.*?)(/OPDH/|/EKPH/|/SGDE/|/some other keys/)((.*?)(/OPDH/|/EKPH/|/SGDE/|/some other keys/))*')
-//    }</out>}
-// ]]></test>
-// <result>
-//    <all-of>
-//       <assert>$result/out/fn:analyze-string-result[1]/fn:match[1]/fn:group[@nr=1] = '/OPDH/'</assert>
-//       <assert>$result/out/fn:analyze-string-result[1]/fn:match[1]/fn:group[@nr=2] = 'FLOWING SOLUTION'</assert>
-//       <assert>$result/out/fn:analyze-string-result[1]/fn:match[1]/fn:group[@nr=3] = '/SGDE/'</assert>
-//       <assert>$result/out/fn:analyze-string-result[1]/fn:match[1]/fn:group[@nr=4] = 'Sample test/some other keys/'</assert>
-//       <assert>$result/out/fn:analyze-string-result[1]/fn:match[1]//fn:group[@nr=5][../@nr=4] = 'Sample test'</assert>
-//       <assert>$result/out/fn:analyze-string-result[1]/fn:match[1]//fn:group[@nr=6][../@nr=4] = '/some other keys/'</assert>
-//       <assert>$result/out/fn:analyze-string-result[2]/fn:match[1]/fn:group[@nr=1] = '/some other keys/'</assert>
-//       <assert>$result/out/fn:analyze-string-result[2]/fn:match[1]/fn:group[@nr=2] = 'afdsf'</assert>
-//       <assert>$result/out/fn:analyze-string-result[2]/fn:match[1]/fn:group[@nr=3] = '/SGDE/'</assert>
-//       <assert>$result/out/fn:analyze-string-result[2]/fn:match[1]/fn:group[@nr=4] = 'Sample test/some other keys/'</assert>
-//       <assert>$result/out/fn:analyze-string-result[2]/fn:match[1]//fn:group[@nr=5][../@nr=4] = 'Sample test'</assert>
-//       <assert>$result/out/fn:analyze-string-result[2]/fn:match[1]//fn:group[@nr=6][../@nr=4] = '/some other keys/'</assert>
-//    </all-of>
-// </result>
-// </test-case>
+// "." does NOT match CR in default mode
+#[test]
+fn test_analyze_string_027() {
+    let regex = Regex::xpath("y.J", "s").unwrap();
+    let result = &regex.analyze("Mary\rJones").unwrap().collect::<Vec<_>>()[1];
+    assert_eq!(
+        result,
+        &AnalyzeEntry::Match(vec![MatchEntry::String("y\rJ".to_string())])
+    );
+}
 
-// <test-case name="analyzeString-901">
-// <description> analyze-string, error, bad regex pattern</description>
-// <created by="Michael Kay" on="2009-10-18"/>
-// <modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>
-// <modified by="O'Neil Delpratt" on="2012-05-22" change="Bug fix related to bug #14936: Changed test first argument"/>
-// <test>analyze-string("abc", ")-(")</test>
-// <result>
-//       <error code="FORX0002"/>
-// </result>
-// </test-case>
-// <test-case name="analyzeString-902">
-// <description> analyze-string, error, bad flags </description>
-// <created by="Michael Kay" on="2009-10-18"/>
-// <modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>
-// <test>analyze-string("abc", "abc", "w")</test>
-// <result>
-//       <error code="FORX0001"/>
-// </result>
-// </test-case>
-// <test-case name="analyzeString-903">
-// <description> analyze-string, error, pattern matches a zero-length string </description>
-// <created by="Michael Kay" on="2009-10-18"/>
-// <modified by="Michael Kay" on="2011-11-17" change="fix bug 14822"/>
-// <test>analyze-string("abc", "a|b|c?")</test>
-// <result>
-//       <error code="FORX0003"/>
-// </result>
-// </test-case>
+// test 29 is so complex it's hard to decipher what it's really testing,
+// so skipped it
+
+// error, bad regex pattern
+#[test]
+fn test_analyze_string_901() {
+    let err = Regex::xpath(")-(", "").unwrap_err();
+    assert_eq!(err, Error::Syntax("Unmatched close paren".to_string()))
+}
+
+// error, bad flags
+#[test]
+fn test_analyze_string_902() {
+    let err = Regex::xpath("abc", "w").unwrap_err();
+    assert_eq!(
+        err,
+        Error::InvalidFlags("Unrecognized flag 'w'".to_string())
+    )
+}
+
+// analyze-string, error, pattern matches a zero-length string
+#[test]
+fn test_analyze_string_903() {
+    let regex = Regex::xpath("a|b|c?", "").unwrap();
+    let result = regex.analyze("abc").unwrap_err();
+    assert_eq!(result, Error::MatchesEmptyString);
+}

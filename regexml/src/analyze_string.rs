@@ -13,6 +13,7 @@ pub enum MatchEntry {
     Group { nr: usize, value: Vec<MatchEntry> },
 }
 
+#[derive(Debug)]
 pub struct AnalyzeIter<'a> {
     matcher: ReMatcher<'a>,
     next_substring: Option<Vec<char>>,
