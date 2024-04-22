@@ -54,11 +54,11 @@ impl OperationControl for Choice {
         CharacterClass::new(builder.build())
     }
 
-    fn optimize(&self, program: &ReProgram, flags: &ReFlags) -> Rc<Operation> {
+    fn optimize(&self, flags: &ReFlags) -> Rc<Operation> {
         let optimized_branches = self
             .branches
             .iter()
-            .map(|branch| branch.optimize(program, flags))
+            .map(|branch| branch.optimize(flags))
             .collect();
         Rc::new(Operation::from(Choice {
             branches: optimized_branches,

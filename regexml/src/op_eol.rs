@@ -1,9 +1,12 @@
+use std::rc::Rc;
+
 use crate::{
-    operation::{OperationControl, MATCHES_ZLS_AT_END},
+    operation::{Operation, OperationControl, MATCHES_ZLS_AT_END},
+    re_flags::ReFlags,
     re_matcher::ReMatcher,
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct Eol;
 
 impl OperationControl for Eol {
@@ -13,6 +16,10 @@ impl OperationControl for Eol {
 
     fn matches_empty_string(&self) -> u32 {
         MATCHES_ZLS_AT_END
+    }
+
+    fn optimize(&self, _flags: &ReFlags) -> Rc<Operation> {
+        Rc::new(Operation::from(self.clone()))
     }
 
     fn matches_iter(

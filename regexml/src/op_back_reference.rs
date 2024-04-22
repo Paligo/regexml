@@ -1,6 +1,12 @@
-use crate::{operation::OperationControl, re_matcher::ReMatcher};
+use std::rc::Rc;
 
-#[derive(Debug)]
+use crate::{
+    operation::{Operation, OperationControl},
+    re_flags::ReFlags,
+    re_matcher::ReMatcher,
+};
+
+#[derive(Debug, Clone)]
 pub(crate) struct BackReference {
     group_nr: usize,
 }
@@ -15,6 +21,10 @@ impl OperationControl for BackReference {
     fn matches_empty_string(&self) -> u32 {
         // no information available
         0
+    }
+
+    fn optimize(&self, _flags: &ReFlags) -> Rc<Operation> {
+        Rc::new(Operation::from(self.clone()))
     }
 
     fn matches_iter<'a>(

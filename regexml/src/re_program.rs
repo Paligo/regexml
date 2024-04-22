@@ -46,8 +46,6 @@ impl ReProgram {
         let mut optimization_flags = 0;
         let mut initial_char_class = None;
 
-        // TODO: optimize()
-
         let precondition_operation = if let Operation::Sequence(op) = operation.as_ref() {
             let first = op.operations.first().unwrap();
             match first.as_ref() {

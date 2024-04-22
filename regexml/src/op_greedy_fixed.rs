@@ -50,14 +50,14 @@ impl OperationControl for GreedyFixed {
         }
     }
 
-    fn optimize(&self, program: &ReProgram, flags: &ReFlags) -> Rc<Operation> {
+    fn optimize(&self, flags: &ReFlags) -> Rc<Operation> {
         if self.max == 0 {
             return Rc::new(Operation::from(Nothing));
         }
         if self.operation.get_match_length() == Some(0) {
             return self.operation.clone();
         }
-        let operation = self.operation.optimize(program, flags);
+        let operation = self.operation.optimize(flags);
         Rc::new(Operation::from(GreedyFixed {
             operation,
             min: self.min,

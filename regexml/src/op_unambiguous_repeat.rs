@@ -47,9 +47,9 @@ impl OperationControl for UnambiguousRepeat {
         }
     }
 
-    fn optimize(&self, program: &ReProgram, flags: &ReFlags) -> Rc<Operation> {
+    fn optimize(&self, flags: &ReFlags) -> Rc<Operation> {
         Rc::new(Operation::from(UnambiguousRepeat {
-            operation: self.operation.optimize(program, flags),
+            operation: self.operation.optimize(flags),
             min: self.min,
             max: self.max,
         }))

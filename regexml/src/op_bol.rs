@@ -1,7 +1,10 @@
-use crate::operation::{OperationControl, MATCHES_ZLS_AT_START};
+use std::rc::Rc;
+
+use crate::operation::{Operation, OperationControl, MATCHES_ZLS_AT_START};
+use crate::re_flags::ReFlags;
 use crate::re_matcher::ReMatcher;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct Bol;
 
 impl OperationControl for Bol {
@@ -11,6 +14,10 @@ impl OperationControl for Bol {
 
     fn matches_empty_string(&self) -> u32 {
         MATCHES_ZLS_AT_START
+    }
+
+    fn optimize(&self, _flags: &ReFlags) -> Rc<Operation> {
+        Rc::new(Operation::from(self.clone()))
     }
 
     fn matches_iter<'a>(

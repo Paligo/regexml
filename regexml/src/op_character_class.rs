@@ -1,6 +1,9 @@
+use std::rc::Rc;
+
 use crate::{
     character_class::CharacterClass,
-    operation::{OperationControl, MATCHES_ZLS_NEVER},
+    operation::{Operation, OperationControl, MATCHES_ZLS_NEVER},
+    re_flags::ReFlags,
 };
 
 #[derive(Debug, Clone)]
@@ -26,6 +29,10 @@ impl OperationControl for CharClass {
     fn get_initial_character_class(&self, _case_blind: bool) -> CharacterClass {
         // TODO: is this correct? can we just ignore case blind?
         self.character_class.clone()
+    }
+
+    fn optimize(&self, _flags: &ReFlags) -> Rc<Operation> {
+        Rc::new(Operation::from(self.clone()))
     }
 
     fn matches_iter<'b>(

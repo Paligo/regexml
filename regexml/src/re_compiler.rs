@@ -994,7 +994,7 @@ impl ReCompiler {
             let compiler_flags = vec![NODE_TOPLEVEL];
 
             // parse expression
-            let exp = self.parse_expr(&compiler_flags)?;
+            let operation = self.parse_expr(&compiler_flags)?;
 
             // should be at end of input
             if self.idx != self.len {
@@ -1003,10 +1003,11 @@ impl ReCompiler {
                 }
                 return Err(Error::syntax("Unexpected input remains"));
             }
+            let operation = operation.optimize(&self.re_flags);
 
             let mut program = ReProgram::new(
                 self.pattern,
-                Rc::new(exp),
+                operation,
                 Some(self.capturing_open_paren_count),
                 self.re_flags.clone(),
             );
@@ -1049,7 +1050,7 @@ mod tests {
     fn compiled(pattern: &str) -> ReProgram {
         let re_flags = ReFlags::new("", Language::XPath).unwrap();
         let pattern = pattern.chars().collect();
-        let mut re_compiler = ReCompiler::new(pattern, re_flags);
+        let re_compiler = ReCompiler::new(pattern, re_flags);
         re_compiler.compile().unwrap()
     }
 

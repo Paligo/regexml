@@ -1,9 +1,12 @@
+use std::rc::Rc;
+
 use crate::{
-    operation::{OperationControl, MATCHES_ZLS_ANYWHERE},
+    operation::{Operation, OperationControl, MATCHES_ZLS_ANYWHERE},
+    re_flags::ReFlags,
     re_matcher::ReMatcher,
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct Nothing;
 
 impl OperationControl for Nothing {
@@ -13,6 +16,10 @@ impl OperationControl for Nothing {
 
     fn matches_empty_string(&self) -> u32 {
         MATCHES_ZLS_ANYWHERE
+    }
+
+    fn optimize(&self, _flags: &ReFlags) -> Rc<Operation> {
+        Rc::new(Operation::from(self.clone()))
     }
 
     fn matches_iter(

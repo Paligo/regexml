@@ -32,10 +32,10 @@ impl OperationControl for Capture {
         self.child_op.matches_empty_string()
     }
 
-    fn optimize(&self, program: &ReProgram, flags: &ReFlags) -> Rc<Operation> {
+    fn optimize(&self, flags: &ReFlags) -> Rc<Operation> {
         Rc::new(Operation::from(Capture {
             group_nr: self.group_nr,
-            child_op: self.child_op.optimize(program, flags),
+            child_op: self.child_op.optimize(flags),
         }))
     }
 

@@ -52,7 +52,7 @@ impl OperationControl for Sequence {
         CharacterClass::new(builder.build())
     }
 
-    fn optimize(&self, program: &ReProgram, flags: &ReFlags) -> Rc<Operation> {
+    fn optimize(&self, flags: &ReFlags) -> Rc<Operation> {
         match self.operations.len() {
             0 => Rc::new(Operation::from(Nothing)),
             1 => self.operations[0].clone(),
@@ -62,9 +62,11 @@ impl OperationControl for Sequence {
                     .iter()
                     .enumerate()
                     .map(|(i, operation)| {
-                        let optimized = operation.optimize(program, flags);
+                        let optimized = operation.optimize(flags);
+                        dbg!(&optimized);
                         if let Operation::Repeat(repeat) = optimized.as_ref() {
                             let repeated_operation = repeat.operation.clone();
+
                             if matches!(
                                 repeated_operation.as_ref(),
                                 Operation::Atom(_) | Operation::CharClass(_)
@@ -86,7 +88,7 @@ impl OperationControl for Sequence {
                                 }
                             }
                         }
-                        operation.optimize(program, flags)
+                        operation.optimize(flags)
                     })
                     .collect();
                 Rc::new(Operation::from(Sequence { operations }))

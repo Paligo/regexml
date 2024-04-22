@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use icu_casemap::CaseMapCloser;
 use icu_collections::codepointinvlist::CodePointInversionListBuilder;
 
@@ -10,7 +12,7 @@ use crate::{
 };
 
 /// A match against a fixed string of any length, within a regular expression.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct Atom {
     pub(crate) atom: Vec<char>,
     len: usize,
@@ -51,6 +53,10 @@ impl OperationControl for Atom {
             cm.add_case_closure_to(self.atom[0], &mut builder);
         }
         CharacterClass::new(builder.build())
+    }
+
+    fn optimize(&self, _flags: &ReFlags) -> Rc<Operation> {
+        Rc::new(Operation::from(self.clone()))
     }
 
     fn matches_iter<'a>(

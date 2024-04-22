@@ -48,8 +48,8 @@ impl OperationControl for Repeat {
         self.operation.get_initial_character_class(case_blind)
     }
 
-    fn optimize(&self, program: &ReProgram, flags: &ReFlags) -> Rc<Operation> {
-        let operation = self.operation.optimize(program, flags);
+    fn optimize(&self, flags: &ReFlags) -> Rc<Operation> {
+        let operation = self.operation.optimize(flags);
         let min = if self.min == 0 && operation.matches_empty_string() == MATCHES_ZLS_ANYWHERE {
             1
         } else {
