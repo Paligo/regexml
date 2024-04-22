@@ -4,11 +4,16 @@ use icu_collections::codepointinvlist::CodePointInversionListBuilder;
 
 use crate::{
     character_class::CharacterClass,
+    op_nothing::Nothing,
+    op_unambiguous_repeat::UnambiguousRepeat,
     operation::{
         Operation, OperationControl, MATCHES_ZLS_ANYWHERE, MATCHES_ZLS_AT_END,
         MATCHES_ZLS_AT_START, MATCHES_ZLS_NEVER,
     },
+    re_compiler::ReCompiler,
+    re_flags::ReFlags,
     re_matcher::{CaptureState, ReMatcher},
+    re_program::ReProgram,
 };
 
 #[derive(Debug)]
@@ -45,6 +50,48 @@ impl OperationControl for Sequence {
             }
         }
         CharacterClass::new(builder.build())
+    }
+
+    fn optimize(&self, program: &ReProgram, flags: &ReFlags) -> Rc<Operation> {
+        match self.operations.len() {
+            0 => Rc::new(Operation::from(Nothing)),
+            1 => self.operations[0].clone(),
+            _ => {
+                let operations = self
+                    .operations
+                    .iter()
+                    .enumerate()
+                    .map(|(i, operation)| {
+                        let optimized = operation.optimize(program, flags);
+                        if let Operation::Repeat(repeat) = optimized.as_ref() {
+                            let repeated_operation = repeat.operation.clone();
+                            if matches!(
+                                repeated_operation.as_ref(),
+                                Operation::Atom(_) | Operation::CharClass(_)
+                            ) {
+                                let after = self.operations[i + 1].as_ref();
+                                if repeat.min == repeat.max
+                                    || ReCompiler::no_ambiguity(
+                                        repeated_operation.as_ref(),
+                                        after,
+                                        flags.is_case_independent(),
+                                        !repeat.greedy,
+                                    )
+                                {
+                                    return Rc::new(Operation::from(UnambiguousRepeat::new(
+                                        repeated_operation.clone(),
+                                        repeat.min,
+                                        repeat.max,
+                                    )));
+                                }
+                            }
+                        }
+                        operation.optimize(program, flags)
+                    })
+                    .collect();
+                Rc::new(Operation::from(Sequence { operations }))
+            }
+        }
     }
 
     fn matches_empty_string(&self) -> u32 {

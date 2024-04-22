@@ -5,7 +5,9 @@ use icu_collections::codepointinvlist::CodePointInversionListBuilder;
 use crate::{
     character_class::{CharacterClass, CharacterClassBuilder},
     operation::{Operation, OperationControl, MATCHES_ZLS_NEVER},
+    re_flags::ReFlags,
     re_matcher::ReMatcher,
+    re_program::ReProgram,
 };
 
 #[derive(Debug)]
@@ -50,6 +52,17 @@ impl OperationControl for Choice {
             builder.add_set(cc.as_code_point_inversion_list());
         }
         CharacterClass::new(builder.build())
+    }
+
+    fn optimize(&self, program: &ReProgram, flags: &ReFlags) -> Rc<Operation> {
+        let optimized_branches = self
+            .branches
+            .iter()
+            .map(|branch| branch.optimize(program, flags))
+            .collect();
+        Rc::new(Operation::from(Choice {
+            branches: optimized_branches,
+        }))
     }
 
     fn matches_empty_string(&self) -> u32 {

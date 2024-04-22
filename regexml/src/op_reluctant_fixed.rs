@@ -2,7 +2,9 @@ use std::rc::Rc;
 
 use crate::{
     operation::{Operation, OperationControl, RepeatOperation, MATCHES_ZLS_ANYWHERE},
+    re_flags::ReFlags,
     re_matcher::ReMatcher,
+    re_program::ReProgram,
 };
 
 #[derive(Debug, Clone)]
@@ -48,6 +50,16 @@ impl OperationControl for ReluctantFixed {
     fn contains_capturing_expressions(&self) -> bool {
         matches!(self.operation.as_ref(), Operation::Capture(_))
             || self.operation.contains_capturing_expressions()
+    }
+
+    fn optimize(&self, program: &ReProgram, flags: &ReFlags) -> Rc<Operation> {
+        let operation = self.operation.optimize(program, flags);
+        Rc::new(Operation::from(ReluctantFixed {
+            operation,
+            min: self.min,
+            max: self.max,
+            len: self.len,
+        }))
     }
 
     fn matches_iter<'a>(

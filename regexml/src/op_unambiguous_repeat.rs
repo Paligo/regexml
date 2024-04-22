@@ -2,7 +2,9 @@ use std::rc::Rc;
 
 use crate::{
     operation::{Operation, OperationControl, RepeatOperation, MATCHES_ZLS_ANYWHERE},
+    re_flags::ReFlags,
     re_matcher::ReMatcher,
+    re_program::ReProgram,
 };
 
 #[derive(Debug, Clone)]
@@ -43,6 +45,14 @@ impl OperationControl for UnambiguousRepeat {
         } else {
             self.operation.matches_empty_string()
         }
+    }
+
+    fn optimize(&self, program: &ReProgram, flags: &ReFlags) -> Rc<Operation> {
+        Rc::new(Operation::from(UnambiguousRepeat {
+            operation: self.operation.optimize(program, flags),
+            min: self.min,
+            max: self.max,
+        }))
     }
 
     fn contains_capturing_expressions(&self) -> bool {

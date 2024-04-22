@@ -2,8 +2,9 @@ use std::rc::Rc;
 
 use crate::{
     operation::{Operation, OperationControl},
+    re_flags::ReFlags,
     re_matcher::ReMatcher,
-    re_program::OPT_HASBACKREFS,
+    re_program::{ReProgram, OPT_HASBACKREFS},
 };
 
 #[derive(Debug)]
@@ -31,9 +32,12 @@ impl OperationControl for Capture {
         self.child_op.matches_empty_string()
     }
 
-    // fn optimize(&mut self, program: &ReProgram, flags: &ReFlags) {
-    //     self.child_op.optimize(program, flags);
-    // }
+    fn optimize(&self, program: &ReProgram, flags: &ReFlags) -> Rc<Operation> {
+        Rc::new(Operation::from(Capture {
+            group_nr: self.group_nr,
+            child_op: self.child_op.optimize(program, flags),
+        }))
+    }
 
     fn matches_iter<'a>(
         &self,

@@ -1,8 +1,11 @@
 use std::rc::Rc;
 
 use crate::{
+    op_nothing::Nothing,
     operation::{Operation, OperationControl, RepeatOperation, MATCHES_ZLS_ANYWHERE},
+    re_flags::ReFlags,
     re_matcher::ReMatcher,
+    re_program::ReProgram,
 };
 
 /// Handle a greedy repetition (with possible min and max) where the size of the
@@ -45,6 +48,22 @@ impl OperationControl for GreedyFixed {
         } else {
             self.operation.matches_empty_string()
         }
+    }
+
+    fn optimize(&self, program: &ReProgram, flags: &ReFlags) -> Rc<Operation> {
+        if self.max == 0 {
+            return Rc::new(Operation::from(Nothing));
+        }
+        if self.operation.get_match_length() == Some(0) {
+            return self.operation.clone();
+        }
+        let operation = self.operation.optimize(program, flags);
+        Rc::new(Operation::from(GreedyFixed {
+            operation,
+            min: self.min,
+            max: self.max,
+            len: self.len,
+        }))
     }
 
     fn contains_capturing_expressions(&self) -> bool {

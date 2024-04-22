@@ -18,7 +18,9 @@ use crate::op_repeat::Repeat;
 use crate::op_sequence::Sequence;
 use crate::op_unambiguous_repeat::UnambiguousRepeat;
 
+use crate::re_flags::ReFlags;
 use crate::re_matcher::ReMatcher;
+use crate::re_program::ReProgram;
 
 pub(crate) const MATCHES_ZLS_AT_START: u32 = 1;
 pub(crate) const MATCHES_ZLS_AT_END: u32 = 2;
@@ -44,8 +46,13 @@ pub(crate) trait OperationControl {
     /// Character class must match every character that can legitimately appear
     /// at the start of the matched string, but it can also match other
     /// characters).
-    fn get_initial_character_class(&self, case_blind: bool) -> CharacterClass {
+    fn get_initial_character_class(&self, _case_blind: bool) -> CharacterClass {
         CharacterClass::all()
+    }
+
+    /// Get an optimized version of this operation.
+    fn optimize(&self, program: &ReProgram, flags: &ReFlags) -> Rc<Operation> {
+        todo!()
     }
 
     /// Ask whether the regular expression is known, after static analysis, to
@@ -81,8 +88,6 @@ pub(crate) trait OperationControl {
         matcher: &'a ReMatcher<'a>,
         position: usize,
     ) -> Box<dyn Iterator<Item = usize> + 'a>;
-
-    // fn optimize(&mut self, program: &ReProgram, flags: &ReFlags) {}
 
     /// Ask whether the expression contains any capturing sub-expressions
     /// Returns true if the expression contains any capturing sub-expressions

@@ -5,15 +5,17 @@ use crate::{
     operation::{
         ForceProgressIterator, Operation, OperationControl, RepeatOperation, MATCHES_ZLS_ANYWHERE,
     },
+    re_flags::ReFlags,
     re_matcher::ReMatcher,
+    re_program::ReProgram,
 };
 
 #[derive(Debug, Clone)]
 pub(crate) struct Repeat {
     pub(crate) operation: Rc<Operation>,
     pub(crate) min: usize,
-    max: usize,
-    greedy: bool,
+    pub(crate) max: usize,
+    pub(crate) greedy: bool,
 }
 
 impl Repeat {
@@ -44,6 +46,21 @@ impl OperationControl for Repeat {
 
     fn get_initial_character_class(&self, case_blind: bool) -> CharacterClass {
         self.operation.get_initial_character_class(case_blind)
+    }
+
+    fn optimize(&self, program: &ReProgram, flags: &ReFlags) -> Rc<Operation> {
+        let operation = self.operation.optimize(program, flags);
+        let min = if self.min == 0 && operation.matches_empty_string() == MATCHES_ZLS_ANYWHERE {
+            1
+        } else {
+            self.min
+        };
+        Rc::new(Operation::from(Repeat {
+            operation,
+            min,
+            max: self.max,
+            greedy: self.greedy,
+        }))
     }
 
     fn matches_empty_string(&self) -> u32 {
