@@ -1,6 +1,8 @@
 use icu_collections::codepointinvlist::{CodePointInversionList, CodePointInversionListBuilder};
 use icu_properties::{sets, GeneralCategoryGroup};
 
+const IS_DISJOINT_CHECK_THRESHOLD: usize = 100;
+
 #[derive(Debug, Clone)]
 pub(crate) struct CharacterClass(CodePointInversionList<'static>);
 
@@ -9,12 +11,48 @@ impl CharacterClass {
         Self(code_point_inversion_list)
     }
 
+    pub(crate) fn as_code_point_inversion_list(&self) -> &CodePointInversionList<'static> {
+        &self.0
+    }
+
+    pub(crate) fn empty() -> Self {
+        let code_point_inversion_list_builder = CodePointInversionListBuilder::new();
+        Self(code_point_inversion_list_builder.build())
+    }
+
     pub(crate) fn all() -> Self {
         Self(CodePointInversionList::all())
     }
 
     pub(crate) fn contains(&self, c: char) -> bool {
         self.0.contains(c)
+    }
+
+    /// Gives a hint whether the character class is disjoint with
+    /// another.
+    ///
+    /// This may not give false positives, but if it's prohibitively
+    /// expensive to determine whether they are disjoint, may provide
+    /// a false negative. This is okay as it's only used to trigger
+    /// optimizations.
+    pub(crate) fn is_disjoint(&self, other: &Self) -> bool {
+        // if any character is in both code point inversion lists,
+        // then it's not disjoint. This is not as simple as checking
+        // whether a range is contained in the other, as the ranges may
+        // not fully overlap. We therefore have to go through each character
+        // in one and check the other. But if the counter reaches a
+        // threshold we give up.
+        let mut count = 0;
+        for r in other.0.iter_chars() {
+            if self.0.contains(r) {
+                return false;
+            }
+            count += 1;
+            if count > IS_DISJOINT_CHECK_THRESHOLD {
+                return false;
+            }
+        }
+        true
     }
 }
 
@@ -36,6 +74,10 @@ impl From<CodePointInversionListBuilder> for CharacterClassBuilder {
 }
 
 impl CharacterClassBuilder {
+    pub(crate) fn empty() -> Self {
+        CharacterClassBuilder::CodePointInversionListBuilder(CodePointInversionListBuilder::new())
+    }
+
     pub(crate) fn from_char(c: char) -> Self {
         CharacterClassBuilder::Char(c)
     }

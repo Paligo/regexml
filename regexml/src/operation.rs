@@ -2,6 +2,7 @@ use std::rc::Rc;
 
 use enum_dispatch::enum_dispatch;
 
+use crate::character_class::CharacterClass;
 use crate::op_atom::Atom;
 use crate::op_back_reference::BackReference;
 use crate::op_bol::Bol;
@@ -35,6 +36,16 @@ pub(crate) trait OperationControl {
     /// Get the minimum length of the matches returned by this operation.
     fn get_minimum_match_length(&self) -> usize {
         self.get_match_length().unwrap_or(0)
+    }
+
+    /// Get a character class identifying the set of the characters that can
+    /// appear as the first character of a non-empty string that matches this
+    /// term. This is allowed to be an over-estimate (that is, the returned
+    /// Character class must match every character that can legitimately appear
+    /// at the start of the matched string, but it can also match other
+    /// characters).
+    fn get_initial_character_class(&self, case_blind: bool) -> CharacterClass {
+        CharacterClass::all()
     }
 
     /// Ask whether the regular expression is known, after static analysis, to
@@ -111,37 +122,6 @@ pub(crate) enum Operation {
     ReluctantFixed,
     UnambiguousRepeat,
 }
-
-// blanket implementation for references
-// impl<T: Operation> Operation for &T {
-//     fn get_match_length(&self) -> Option<usize> {
-//         (*self).get_match_length()
-//     }
-
-//     fn get_minimum_match_length(&self) -> usize {
-//         (*self).get_minimum_match_length()
-//     }
-
-//     fn matches_empty_string(&self) -> u32 {
-//         (*self).matches_empty_string()
-//     }
-
-//     fn matches_iter<'a>(
-//         &self,
-//         matcher: &'a ReMatcher<'a>,
-//         position: usize,
-//     ) -> Box<dyn Iterator<Item = usize> + 'a> {
-//         (*self).matches_iter(matcher, position)
-//     }
-
-//     // fn optimize(&mut self, program: &ReProgram, flags: &ReFlags) {
-//     //     (*self).optimize(program, flags)
-//     // }
-
-//     fn display(&self) -> String {
-//         (*self).display()
-//     }
-// }
 
 // The ForceProgressIterator is used to protect against non-termination;
 // specifically, iterators that return an infinite number of zero-length

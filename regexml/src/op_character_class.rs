@@ -23,6 +23,11 @@ impl OperationControl for CharClass {
         MATCHES_ZLS_NEVER
     }
 
+    fn get_initial_character_class(&self, _case_blind: bool) -> CharacterClass {
+        // TODO: is this correct? can we just ignore case blind?
+        self.character_class.clone()
+    }
+
     fn matches_iter<'b>(
         &self,
         matcher: &'b crate::re_matcher::ReMatcher,

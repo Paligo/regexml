@@ -1,4 +1,8 @@
+use icu_casemap::CaseMapCloser;
+use icu_collections::codepointinvlist::CodePointInversionListBuilder;
+
 use crate::{
+    character_class::{CharacterClass, CharacterClassBuilder},
     operation::{OperationControl, MATCHES_ZLS_ANYWHERE, MATCHES_ZLS_NEVER},
     re_matcher::ReMatcher,
 };
@@ -32,10 +36,20 @@ impl OperationControl for Atom {
         }
     }
 
-    // // TODO
-    // fn get_initial_character_class(case_blind: bool) -> CharacterClass {
+    fn get_initial_character_class(&self, case_blind: bool) -> CharacterClass {
+        if self.len == 0 {
+            return CharacterClass::empty();
+        }
 
-    // }
+        let mut builder = CodePointInversionListBuilder::new();
+        if case_blind {
+            // create a character class that has all case variants of the first character
+
+            let cm = CaseMapCloser::new();
+            cm.add_case_closure_to(self.atom[0], &mut builder);
+        }
+        CharacterClass::new(builder.build())
+    }
 
     fn matches_iter<'a>(
         &self,

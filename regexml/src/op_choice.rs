@@ -1,6 +1,9 @@
 use std::rc::Rc;
 
+use icu_collections::codepointinvlist::CodePointInversionListBuilder;
+
 use crate::{
+    character_class::{CharacterClass, CharacterClassBuilder},
     operation::{Operation, OperationControl, MATCHES_ZLS_NEVER},
     re_matcher::ReMatcher,
 };
@@ -38,6 +41,15 @@ impl OperationControl for Choice {
             }
         }
         min
+    }
+
+    fn get_initial_character_class(&self, case_blind: bool) -> CharacterClass {
+        let mut builder = CodePointInversionListBuilder::new();
+        for o in &self.branches {
+            let cc = o.get_initial_character_class(case_blind);
+            builder.add_set(cc.as_code_point_inversion_list());
+        }
+        CharacterClassBuilder::CodePointInversionListBuilder(builder).build()
     }
 
     fn matches_empty_string(&self) -> u32 {
@@ -93,7 +105,6 @@ impl<'a> ChoiceIterator<'a> {
             position,
             branches_iter: Box::new(branches.into_iter()),
             current_iter: None,
-            // current_iter,
         }
     }
 
@@ -127,28 +138,6 @@ impl<'a> Iterator for ChoiceIterator<'a> {
         }
     }
 }
-
-// impl<'a> Iterator for ChoiceIterator<'a> {
-//     type Item = usize;
-
-//     fn next(&mut self) -> Option<Self::Item> {
-//         loop {
-//             if self.current_iter.is_none() {
-//                 if let Some(next) = self.branches_iter.next() {
-//                     self.matcher.clear_captured_groups_beyond(self.position);
-//                     self.current_iter = Some(next.matches_iter(self.matcher, self.position));
-//                 } else {
-//                     return None;
-//                 }
-//             }
-//             if let Some(current_iter) = &mut self.current_iter {
-//                 return current_iter.next();
-//             } else {
-//                 self.current_iter = None;
-//             }
-//         }
-//     }
-// }
 
 #[cfg(test)]
 mod tests {

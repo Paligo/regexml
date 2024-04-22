@@ -22,6 +22,7 @@ use crate::{
     op_sequence::Sequence,
     operation::{Operation, OperationControl, MATCHES_ZLS_ANYWHERE},
     re_flags::{Language, ReFlags},
+    re_matcher::ReMatcher,
     re_program::{ReProgram, OPT_HASBACKREFS},
 };
 
@@ -1014,6 +1015,28 @@ impl ReCompiler {
             }
             Ok(program)
         }
+    }
+
+    pub(crate) fn no_ambiguity(
+        op0: &Operation,
+        op1: &Operation,
+        case_blind: bool,
+        reluctant: bool,
+    ) -> bool {
+        if matches!(op1, Operation::EndProgram(_)) {
+            return !reluctant;
+        }
+        if matches!(op1, Operation::Bol(_)) || matches!(op1, Operation::Eol(_)) {
+            return true;
+        }
+        if let Operation::Repeat(repeat) = op1 {
+            if repeat.min == 0 {
+                return false;
+            }
+        }
+        let c0 = op0.get_initial_character_class(case_blind);
+        let c1 = op1.get_initial_character_class(case_blind);
+        c0.is_disjoint(&c1)
     }
 }
 
