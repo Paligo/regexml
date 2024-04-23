@@ -62,10 +62,8 @@ impl OperationControl for Sequence {
                     .enumerate()
                     .map(|(i, operation)| {
                         let optimized = operation.optimize(flags);
-                        dbg!(&optimized);
                         if let Operation::Repeat(repeat) = optimized.as_ref() {
                             let repeated_operation = repeat.operation.clone();
-
                             if matches!(
                                 repeated_operation.as_ref(),
                                 Operation::Atom(_) | Operation::CharClass(_)

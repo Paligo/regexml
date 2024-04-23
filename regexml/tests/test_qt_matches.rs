@@ -522,13 +522,9 @@ fn test_matches_57() {
 #[test]
 fn test_matches_58() {
     let regex = Regex::xpath("^((az?){3,}?)b", "").unwrap();
-    dbg!(&regex);
     let found: Vec<bool> = ["b", "ab", "aab", "aaab", "aaazab", "aaaaab"]
         .iter()
-        .map(|s| {
-            dbg!(s);
-            regex.is_match(s)
-        })
+        .map(|s| regex.is_match(s))
         .collect();
     assert_eq!(found, [false, false, false, true, true, true]);
 }

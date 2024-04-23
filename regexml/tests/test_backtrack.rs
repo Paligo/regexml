@@ -63,12 +63,10 @@ fn test_star_outside_capture_group() {
     assert!(regex.is_match(r#"AB"#));
 }
 
-
 #[test]
 fn test_star_inside_and_outside_capture_group() {
     let regex = Regex::xpath(r#"^(.?)*B"#, "");
     let regex = regex.unwrap();
-    dbg!(&regex);
     assert!(regex.is_match(r#"AB"#));
 }
 
@@ -83,7 +81,6 @@ fn test_whatever() {
 fn test_plus_inside_and_star_inside_capture_group() {
     let regex = Regex::xpath(r#"^(.*)+B"#, "");
     let regex = regex.unwrap();
-    dbg!(&regex);
     assert!(regex.is_match(r#"AB"#));
 }
 
@@ -91,7 +88,6 @@ fn test_plus_inside_and_star_inside_capture_group() {
 fn test_question_mark_outside_capture_group() {
     let regex = Regex::xpath(r#"^(.*)?B"#, "");
     let regex = regex.unwrap();
-    dbg!(&regex);
     assert!(regex.is_match(r#"AB"#));
 }
 
@@ -99,7 +95,6 @@ fn test_question_mark_outside_capture_group() {
 fn test_choice_plus() {
     let regex = Regex::xpath(r#"(WORDS|WORLD|WORD)+S"#, "");
     let regex = regex.unwrap();
-    dbg!(&regex);
     assert!(regex.is_match(r#"WORDS"#));
 }
 
@@ -107,7 +102,6 @@ fn test_choice_plus() {
 fn test_another_backtrack() {
     let regex = Regex::xpath(r#"^(.+)?B"#, "");
     let regex = regex.unwrap();
-    dbg!(&regex);
     assert!(regex.is_match(r#"AB"#));
 }
 
@@ -115,7 +109,6 @@ fn test_another_backtrack() {
 fn test_backtrack_no_nesting() {
     let regex = Regex::xpath(r#"^([AB]+)?B"#, "");
     let regex = regex.unwrap();
-    dbg!(&regex);
     assert!(regex.is_match(r#"AB"#));
 }
 
@@ -123,6 +116,5 @@ fn test_backtrack_no_nesting() {
 fn test_simple_capture() {
     let regex = Regex::xpath(r#"^(.+)?B"#, "");
     let regex = regex.unwrap();
-    dbg!(&regex);
     assert!(regex.is_match(r#"AB"#));
 }

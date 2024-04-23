@@ -6,6 +6,16 @@ use crate::{
     re_matcher::ReMatcher,
 };
 
+// Handle a repetition where there is no ambiguity; if the repeated
+// term is matched in the string, then it cannot match anything other than
+// the repeated term. It is also used when the number of occurrences is
+// fixed. In this situation there will never be any need for
+// backtracking, so there is no need to keep any information to support
+// backtracking, and in addition, there is no distinction between greedy
+// and reluctant matching. This operation is used only for a repeated
+// atom or CharClass, which also means that if the repeated term matches
+// then it can only match in one way; a typical example is the term "A*"
+// in the regex "A*B".
 #[derive(Debug, Clone)]
 pub(crate) struct UnambiguousRepeat {
     operation: Rc<Operation>,
