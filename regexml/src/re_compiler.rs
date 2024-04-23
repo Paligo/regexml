@@ -52,8 +52,6 @@ pub(crate) struct ReCompiler {
     has_back_references: bool,
 
     re_flags: ReFlags,
-
-    warning: Vec<String>,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -100,7 +98,6 @@ impl ReCompiler {
             captures: HashSet::new(),
             has_back_references: false,
             re_flags,
-            warning: Vec::new(),
         }
     }
 
@@ -287,7 +284,9 @@ impl ReCompiler {
                     }
                 } else if block.starts_with(&['I', 's']) {
                     let name = block[2..].iter().collect::<String>();
-                    // TODO: obey isAllowUnknownBlockNames to follow XSD spec (which doesn't make this an error)
+                    // TODO: obey isAllowUnknownBlockNames to follow XSD spec
+                    // (which doesn't make this an error; original source code
+                    // issues a warning)
                     let cc = CharacterClassBuilder::CodePointInversionListBuilder(category::block(
                         &name,
                     )?);
