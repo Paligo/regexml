@@ -22,50 +22,11 @@ pub(crate) struct ReMatcher<'a> {
 }
 
 #[derive(Debug)]
-pub(crate) struct History {
-    zero_length_matches: HashMap<Operation, HashSet<usize>>,
-}
-
-impl History {
-    pub(crate) fn new() -> Self {
-        Self {
-            zero_length_matches: HashMap::new(),
-        }
-    }
-
-    pub(crate) fn is_duplicate_zero_length_match(
-        &mut self,
-        _operation: Operation,
-        _position: usize,
-    ) -> bool {
-        // TODO: make this hashable
-        false
-
-        // TODO: hashing an operation; how can that work with enum dispatch?
-        // let positions = self.zero_length_matches.get_mut(&operation);
-        // if let Some(positions) = positions {
-        //     if positions.contains(&position) {
-        //         true
-        //     } else {
-        //         positions.insert(position);
-        //         false
-        //     }
-        // } else {
-        //     let mut positions = HashSet::new();
-        //     positions.insert(position);
-        //     self.zero_length_matches.insert(operation, positions);
-        //     false
-        // }
-    }
-}
-
-#[derive(Debug)]
 pub(crate) struct State {
     pub(crate) start_backref: Vec<Option<usize>>,
     pub(crate) end_backref: Vec<Option<usize>>,
     pub(crate) capture_state: CaptureState,
     pub(crate) anchored_match: bool,
-    pub(crate) history: History,
 }
 
 impl State {
@@ -75,7 +36,6 @@ impl State {
             end_backref: vec![],
             capture_state: CaptureState::new(),
             anchored_match: false,
-            history: History::new(),
         }
     }
 }
@@ -449,17 +409,6 @@ impl<'a> ReMatcher<'a> {
 
     pub(crate) fn anchored_match(&self) -> bool {
         self.state.borrow().anchored_match
-    }
-
-    pub(crate) fn is_duplicate_zero_length_match(
-        &self,
-        operation: Operation,
-        position: usize,
-    ) -> bool {
-        self.state
-            .borrow_mut()
-            .history
-            .is_duplicate_zero_length_match(operation, position)
     }
 
     // capture state related
