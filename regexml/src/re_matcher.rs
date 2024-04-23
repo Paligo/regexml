@@ -138,8 +138,8 @@ impl<'a> ReMatcher<'a> {
                         }
                     }
                 } else {
-                    for k in 0..prefix_length {
-                        if self.search[k + j] != prefix[k] {
+                    for (k, prefix) in prefix.iter().enumerate() {
+                        if self.search[k + j] != *prefix {
                             prefix_ok = false;
                             break;
                         }
