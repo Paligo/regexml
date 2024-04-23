@@ -7,6 +7,7 @@ use crate::{
     re_program::OPT_HASBACKREFS,
 };
 
+// Open paren (captured group) within a regular expression
 #[derive(Debug)]
 pub(crate) struct Capture {
     group_nr: usize,

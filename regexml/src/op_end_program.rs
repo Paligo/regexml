@@ -6,6 +6,7 @@ use crate::{
     re_matcher::ReMatcher,
 };
 
+// End of program in a regular expression
 #[derive(Debug, Clone)]
 pub(crate) struct EndProgram;
 

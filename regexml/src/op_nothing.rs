@@ -6,6 +6,7 @@ use crate::{
     re_matcher::ReMatcher,
 };
 
+// Match empty string within a regular expression
 #[derive(Debug, Clone)]
 pub(crate) struct Nothing;
 

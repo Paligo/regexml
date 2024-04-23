@@ -9,6 +9,7 @@ use crate::{
     re_matcher::ReMatcher,
 };
 
+// A choice of several branches within a regular expression.
 #[derive(Debug)]
 pub(crate) struct Choice {
     branches: Vec<Rc<Operation>>,

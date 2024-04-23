@@ -9,6 +9,8 @@ use crate::{
     re_matcher::ReMatcher,
 };
 
+// Handle a repetition (with possible min and max) where the
+// size of the repeated unit is variable.
 #[derive(Debug, Clone)]
 pub(crate) struct Repeat {
     pub(crate) operation: Rc<Operation>,

@@ -6,6 +6,8 @@ use crate::{
     re_flags::ReFlags,
 };
 
+// A match of a single character in the input against a set of permitted
+// characters
 #[derive(Debug, Clone)]
 pub(crate) struct CharClass {
     pub(crate) character_class: CharacterClass,

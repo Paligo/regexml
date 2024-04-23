@@ -6,6 +6,7 @@ use crate::{
     re_matcher::ReMatcher,
 };
 
+// A back-reference in a regular expression.
 #[derive(Debug, Clone)]
 pub(crate) struct BackReference {
     group_nr: usize,

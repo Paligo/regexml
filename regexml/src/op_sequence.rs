@@ -15,6 +15,7 @@ use crate::{
     re_matcher::{CaptureState, ReMatcher},
 };
 
+// A sequence of multiple pieces in a regular expression.
 #[derive(Debug)]
 pub(crate) struct Sequence {
     pub(crate) operations: Vec<Rc<Operation>>,

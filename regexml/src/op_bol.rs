@@ -4,6 +4,7 @@ use crate::operation::{Operation, OperationControl, MATCHES_ZLS_AT_START};
 use crate::re_flags::ReFlags;
 use crate::re_matcher::ReMatcher;
 
+// Beginning of Line (^) in a regular expression
 #[derive(Debug, Clone)]
 pub(crate) struct Bol;
 
