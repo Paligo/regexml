@@ -131,8 +131,8 @@ impl<'a> ReMatcher<'a> {
             for j in i..self.search.len() + 1 - prefix_length {
                 let mut prefix_ok = true;
                 if ignore_case {
-                    for k in 0..prefix_length {
-                        if !self.equal_case_blind(self.search[k + j], prefix[k]) {
+                    for (k, prefix) in prefix.iter().enumerate() {
+                        if !self.equal_case_blind(self.search[k + j], *prefix) {
                             prefix_ok = false;
                             break;
                         }
