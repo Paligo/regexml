@@ -126,9 +126,8 @@ impl<'a> ReMatcher<'a> {
         // can we optimize the search by looking for a prefix string?
         if let Some(prefix) = &self.program.prefix {
             // prefixed-anchored matching is possible
-            let prefix_length = prefix.len();
             let ignore_case = self.program.flags.is_case_independent();
-            for j in i..self.search.len() + 1 - prefix_length {
+            for j in i..self.search.len() + 1 - prefix.len() {
                 let mut prefix_ok = true;
                 if ignore_case {
                     for (k, prefix) in prefix.iter().enumerate() {
