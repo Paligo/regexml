@@ -26,7 +26,6 @@ pub(crate) struct ReProgram {
     pub(crate) initial_char_class: Option<CharacterClass>,
     pub(crate) preconditions: Vec<RegexPrecondition>,
     pub(crate) minimum_length: usize,
-    pub(crate) fixed_length: Option<usize>,
     pub(crate) optimization_flags: u32,
     pub(crate) max_parens: Option<usize>,
     pub(crate) backtracking_limit: Option<usize>,
@@ -40,7 +39,6 @@ impl ReProgram {
         flags: ReFlags,
     ) -> Self {
         let minimum_length = operation.get_minimum_match_length();
-        let fixed_length = operation.get_match_length();
 
         let mut prefix = None;
         let mut optimization_flags = 0;
@@ -73,26 +71,12 @@ impl ReProgram {
             optimization_flags,
             max_parens,
             minimum_length,
-            fixed_length,
             backtracking_limit: None,
         };
         if let Some(precondition_operation) = precondition_operation {
             r.add_precondition(precondition_operation, None, 0);
         }
         r
-    }
-
-    pub(crate) fn initial_character_class(&self) -> Option<&CharacterClass> {
-        if let Operation::Sequence(op) = self.operation.as_ref() {
-            let first = op.operations.first().unwrap();
-            if let Operation::CharClass(op) = first.as_ref() {
-                Some(&op.character_class)
-            } else {
-                None
-            }
-        } else {
-            None
-        }
     }
 
     pub(crate) fn add_precondition(
