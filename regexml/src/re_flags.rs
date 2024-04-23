@@ -107,11 +107,15 @@ impl ReFlags {
         self.language
     }
 
-    pub(crate) fn is_debug(&self) -> bool {
-        self.debug
-    }
+    // This appears to do nothing in the Java original; it's triggered
+    // by the 'g' flag
+    // pub(crate) fn is_debug(&self) -> bool {
+    //     self.debug
+    // }
 
-    pub(crate) fn is_allow_unknown_block_names(&self) -> bool {
-        self.allow_unknown_block_names
-    }
+    // We haven't implemented this support yet; in the Java original it
+    // gives a warning.
+    // pub(crate) fn is_allow_unknown_block_names(&self) -> bool {
+    //     self.allow_unknown_block_names
+    // }
 }

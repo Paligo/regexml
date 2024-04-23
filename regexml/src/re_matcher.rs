@@ -15,7 +15,6 @@ pub(crate) struct ReMatcher<'a> {
     pub(crate) program: &'a ReProgram,
     // string being matched against
     pub(crate) search: Vec<char>,
-    pub(crate) max_paren: Option<usize>,
 
     case_mapper: CaseMapper,
     // parenthesized subexpressions
@@ -84,11 +83,9 @@ impl State {
 impl<'a> ReMatcher<'a> {
     pub(crate) fn new(program: &'a ReProgram, search: &str) -> Self {
         let search = search.chars().collect::<Vec<_>>();
-        let max_paren = program.max_parens;
         Self {
             program,
             search,
-            max_paren,
             state: RefCell::new(State::new()),
             case_mapper: CaseMapper::new(),
         }
