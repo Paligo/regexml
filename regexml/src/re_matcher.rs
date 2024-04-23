@@ -1,10 +1,14 @@
-use std::{cell::RefCell, rc::Rc};
+use std::cell::RefCell;
 
-use ahash::{HashMap, HashMapExt, HashSet};
 use icu_casemap::CaseMapper;
 
+#[cfg(test)]
+use crate::operation::Operation;
+#[cfg(test)]
+use std::rc::Rc;
+
 use crate::{
-    operation::{Operation, OperationControl},
+    operation::OperationControl,
     re_compiler::Error,
     re_program::{ReProgram, OPT_HASBACKREFS, OPT_HASBOL},
 };
@@ -73,11 +77,6 @@ impl<'a> ReMatcher<'a> {
             self.state.borrow_mut().capture_state.paren_count = 0;
             false
         }
-    }
-
-    // an 'is' function that mutates self? weird
-    pub(crate) fn is_anchored_match(&mut self) -> bool {
-        self.match_at(0, true)
     }
 
     pub(crate) fn matches(&mut self, i: usize) -> bool {
@@ -364,6 +363,7 @@ impl<'a> ReMatcher<'a> {
         self.search[i] == '\n'
     }
 
+    #[cfg(test)]
     pub(crate) fn operation_matches(&self, op: Rc<Operation>) -> Vec<String> {
         let start_position = 0;
         let positions = op.matches_iter(self, start_position);
