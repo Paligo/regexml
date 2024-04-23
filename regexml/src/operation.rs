@@ -128,6 +128,18 @@ pub(crate) enum Operation {
     UnambiguousRepeat,
 }
 
+impl Operation {
+    pub(crate) fn is_repeating(&self) -> bool {
+        matches!(
+            self,
+            Operation::Repeat(_)
+                | Operation::GreedyFixed(_)
+                | Operation::ReluctantFixed(_)
+                | Operation::UnambiguousRepeat(_)
+        )
+    }
+}
+
 // The ForceProgressIterator is used to protect against non-termination;
 // specifically, iterators that return an infinite number of zero-length
 // matches. After getting a certain number of zero-length matches at the same
