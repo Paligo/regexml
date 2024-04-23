@@ -5,7 +5,6 @@ use crate::{
     operation::{Operation, OperationControl, RepeatOperation, MATCHES_ZLS_ANYWHERE},
     re_flags::ReFlags,
     re_matcher::ReMatcher,
-    re_program::ReProgram,
 };
 
 /// Handle a greedy repetition (with possible min and max) where the size of the

@@ -13,7 +13,6 @@ use crate::{
     re_compiler::ReCompiler,
     re_flags::ReFlags,
     re_matcher::{CaptureState, ReMatcher},
-    re_program::ReProgram,
 };
 
 #[derive(Debug)]

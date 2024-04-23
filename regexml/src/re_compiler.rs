@@ -22,7 +22,6 @@ use crate::{
     op_sequence::Sequence,
     operation::{Operation, OperationControl, MATCHES_ZLS_ANYWHERE},
     re_flags::{Language, ReFlags},
-    re_matcher::ReMatcher,
     re_program::{ReProgram, OPT_HASBACKREFS},
 };
 

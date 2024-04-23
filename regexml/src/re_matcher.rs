@@ -1,6 +1,6 @@
 use std::{cell::RefCell, rc::Rc};
 
-use ahash::{HashMap, HashMapExt, HashSet, HashSetExt};
+use ahash::{HashMap, HashMapExt, HashSet};
 use icu_casemap::CaseMapper;
 
 use crate::{
@@ -36,8 +36,8 @@ impl History {
 
     pub(crate) fn is_duplicate_zero_length_match(
         &mut self,
-        operation: Operation,
-        position: usize,
+        _operation: Operation,
+        _position: usize,
     ) -> bool {
         // TODO: make this hashable
         false

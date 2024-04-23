@@ -4,7 +4,6 @@ use crate::{
     operation::{Operation, OperationControl, RepeatOperation, MATCHES_ZLS_ANYWHERE},
     re_flags::ReFlags,
     re_matcher::ReMatcher,
-    re_program::ReProgram,
 };
 
 #[derive(Debug, Clone)]

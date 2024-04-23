@@ -7,7 +7,6 @@ use crate::{
     },
     re_flags::ReFlags,
     re_matcher::ReMatcher,
-    re_program::ReProgram,
 };
 
 #[derive(Debug, Clone)]

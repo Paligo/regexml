@@ -22,8 +22,6 @@ mod re_flags;
 mod re_matcher;
 mod re_program;
 mod regex;
-mod regex_iterator;
-mod regular_expression;
 
 pub use crate::analyze_string::{AnalyzeEntry, MatchEntry};
 pub use crate::re_compiler::Error;

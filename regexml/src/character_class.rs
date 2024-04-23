@@ -1,5 +1,4 @@
 use icu_collections::codepointinvlist::{CodePointInversionList, CodePointInversionListBuilder};
-use icu_properties::{sets, GeneralCategoryGroup};
 
 const IS_DISJOINT_CHECK_THRESHOLD: usize = 100;
 
@@ -74,10 +73,6 @@ impl From<CodePointInversionListBuilder> for CharacterClassBuilder {
 }
 
 impl CharacterClassBuilder {
-    pub(crate) fn empty() -> Self {
-        CharacterClassBuilder::CodePointInversionListBuilder(CodePointInversionListBuilder::new())
-    }
-
     pub(crate) fn from_char(c: char) -> Self {
         CharacterClassBuilder::Char(c)
     }

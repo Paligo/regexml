@@ -4,11 +4,10 @@ use icu_casemap::CaseMapCloser;
 use icu_collections::codepointinvlist::CodePointInversionListBuilder;
 
 use crate::{
-    character_class::{CharacterClass, CharacterClassBuilder},
+    character_class::CharacterClass,
     operation::{Operation, OperationControl, MATCHES_ZLS_ANYWHERE, MATCHES_ZLS_NEVER},
     re_flags::ReFlags,
     re_matcher::ReMatcher,
-    re_program::ReProgram,
 };
 
 /// A match against a fixed string of any length, within a regular expression.

@@ -180,6 +180,7 @@ impl ReProgram {
         }
     }
 
+    #[cfg(test)]
     pub(crate) fn path(&self, path: &str) -> Rc<Operation> {
         // path is numbers separated by / and goes into the children of the operation
         // so 0/1/2 would go into the 0th child, then the 1st child of that, then the 2nd child of that

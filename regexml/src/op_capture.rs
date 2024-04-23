@@ -4,7 +4,7 @@ use crate::{
     operation::{Operation, OperationControl},
     re_flags::ReFlags,
     re_matcher::ReMatcher,
-    re_program::{ReProgram, OPT_HASBACKREFS},
+    re_program::OPT_HASBACKREFS,
 };
 
 #[derive(Debug)]

@@ -20,7 +20,6 @@ use crate::op_unambiguous_repeat::UnambiguousRepeat;
 
 use crate::re_flags::ReFlags;
 use crate::re_matcher::ReMatcher;
-use crate::re_program::ReProgram;
 
 pub(crate) const MATCHES_ZLS_AT_START: u32 = 1;
 pub(crate) const MATCHES_ZLS_AT_END: u32 = 2;
