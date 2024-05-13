@@ -47,9 +47,10 @@ impl OperationControl for Atom {
         let mut builder = CodePointInversionListBuilder::new();
         if case_blind {
             // create a character class that has all case variants of the first character
-
             let cm = CaseMapCloser::new();
             cm.add_case_closure_to(self.atom[0], &mut builder);
+        } else {
+            builder.add_char(self.atom[0]);
         }
         CharacterClass::new(builder.build())
     }

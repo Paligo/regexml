@@ -1,12 +1,12 @@
 ---
-source: src/re_compiler.rs
+source: regexml/src/re_compiler.rs
 expression: "compiled(\"a*\").operation"
 ---
 Sequence(
     Sequence {
         operations: [
-            GreedyFixed(
-                GreedyFixed {
+            UnambiguousRepeat(
+                UnambiguousRepeat {
                     operation: Atom(
                         Atom {
                             atom: [
@@ -17,7 +17,6 @@ Sequence(
                     ),
                     min: 0,
                     max: 18446744073709551615,
-                    len: 1,
                 },
             ),
             EndProgram(

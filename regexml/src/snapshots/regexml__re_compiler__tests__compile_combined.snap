@@ -1,5 +1,5 @@
 ---
-source: src/re_compiler.rs
+source: regexml/src/re_compiler.rs
 expression: "compiled(\"^a?b+c*$\").operation"
 ---
 Sequence(
@@ -38,8 +38,8 @@ Sequence(
                     len: 1,
                 },
             ),
-            GreedyFixed(
-                GreedyFixed {
+            UnambiguousRepeat(
+                UnambiguousRepeat {
                     operation: Atom(
                         Atom {
                             atom: [
@@ -50,7 +50,6 @@ Sequence(
                     ),
                     min: 0,
                     max: 18446744073709551615,
-                    len: 1,
                 },
             ),
             Eol(

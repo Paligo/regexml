@@ -107,4 +107,12 @@ impl RepeatOperation for UnambiguousRepeat {
     fn min(&self) -> usize {
         self.min
     }
+
+    fn max(&self) -> usize {
+        self.max
+    }
+
+    fn greedy(&self) -> bool {
+        true
+    }
 }

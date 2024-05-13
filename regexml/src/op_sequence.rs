@@ -61,32 +61,48 @@ impl OperationControl for Sequence {
                     .operations
                     .iter()
                     .enumerate()
-                    .map(|(i, operation)| {
-                        let optimized = operation.optimize(flags);
-                        if let Operation::Repeat(repeat) = optimized.as_ref() {
-                            let repeated_operation = repeat.operation.clone();
+                    .map(|(i, o)| {
+                        let optimized = o.optimize(flags);
+                        // we can never further optimize the last operation,
+                        // as it has no adjacent operation
+                        if i == self.operations.len() - 1 {
+                            return optimized;
+                        }
+                        // now if this is a repeat operation, we may be able
+                        // to optimize it further
+                        if let Some(repeat_operation) = optimized.repeat_operation() {
+                            // if the repeated operation is an atom or a charclass,
+                            // we may be able to make an optimization
+                            let repeated_operation = repeat_operation.child().clone();
                             if matches!(
                                 repeated_operation.as_ref(),
                                 Operation::Atom(_) | Operation::CharClass(_)
                             ) {
-                                let after = self.operations[i + 1].as_ref();
-                                if repeat.min == repeat.max
-                                    || ReCompiler::no_ambiguity(
-                                        repeated_operation.as_ref(),
-                                        after,
-                                        flags.is_case_independent(),
-                                        !repeat.greedy,
-                                    )
-                                {
+                                if repeat_operation.min() == repeat_operation.max() {
+                                    // we can optimize this to an unambiguous repeat
                                     return Rc::new(Operation::from(UnambiguousRepeat::new(
                                         repeated_operation.clone(),
-                                        repeat.min,
-                                        repeat.max,
+                                        repeat_operation.min(),
+                                        repeat_operation.max(),
+                                    )));
+                                }
+                                // get the adjacent operation
+                                let next_operation = &self.operations[i + 1];
+                                if ReCompiler::no_ambiguity(
+                                    repeated_operation.as_ref(),
+                                    next_operation,
+                                    flags.is_case_independent(),
+                                    !repeat_operation.greedy(),
+                                ) {
+                                    return Rc::new(Operation::from(UnambiguousRepeat::new(
+                                        repeated_operation.clone(),
+                                        repeat_operation.min(),
+                                        repeat_operation.max(),
                                     )));
                                 }
                             }
                         }
-                        operation.optimize(flags)
+                        optimized
                     })
                     .collect();
                 Rc::new(Operation::from(Sequence { operations }))

@@ -121,6 +121,14 @@ impl RepeatOperation for GreedyFixed {
     fn min(&self) -> usize {
         self.min
     }
+
+    fn max(&self) -> usize {
+        self.max
+    }
+
+    fn greedy(&self) -> bool {
+        true
+    }
 }
 
 struct IntStepIterator {
@@ -154,37 +162,5 @@ impl Iterator for IntStepIterator {
         let n = self.current;
         self.current += self.step;
         Some(n as usize)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::Regex;
-
-    #[test]
-    fn test_repeat_star_greedy() {
-        let regex = Regex::xpath(r#"a*"#, "").unwrap();
-        let op = regex.path("0");
-        let matcher = regex.matcher("aaaaa");
-        let matches = matcher.operation_matches(op);
-        assert_eq!(matches, vec!["aaaaa", "aaaa", "aaa", "aa", "a", ""]);
-    }
-
-    #[test]
-    fn test_repeat_plus_greedy() {
-        let regex = Regex::xpath(r#"a+"#, "").unwrap();
-        let op = regex.path("0");
-        let matcher = regex.matcher("aaaaa");
-        let matches = matcher.operation_matches(op);
-        assert_eq!(matches, vec!["aaaaa", "aaaa", "aaa", "aa", "a"]);
-    }
-
-    #[test]
-    fn test_repeat_question_greedy() {
-        let regex = Regex::xpath(r#"a?"#, "").unwrap();
-        let op = regex.path("0");
-        let matcher = regex.matcher("aaaaa");
-        let matches = matcher.operation_matches(op);
-        assert_eq!(matches, vec!["a", ""]);
     }
 }

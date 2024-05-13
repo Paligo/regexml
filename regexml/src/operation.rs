@@ -107,6 +107,8 @@ pub(crate) trait OperationControl {
 pub(crate) trait RepeatOperation {
     fn child(&self) -> Rc<Operation>;
     fn min(&self) -> usize;
+    fn max(&self) -> usize;
+    fn greedy(&self) -> bool;
 }
 
 #[enum_dispatch(OperationControl)]
@@ -129,14 +131,14 @@ pub(crate) enum Operation {
 }
 
 impl Operation {
-    pub(crate) fn is_repeating(&self) -> bool {
-        matches!(
-            self,
-            Operation::Repeat(_)
-                | Operation::GreedyFixed(_)
-                | Operation::ReluctantFixed(_)
-                | Operation::UnambiguousRepeat(_)
-        )
+    pub(crate) fn repeat_operation(&self) -> Option<&dyn RepeatOperation> {
+        match self {
+            Operation::Repeat(repeat) => Some(repeat),
+            Operation::GreedyFixed(greedy_fixed) => Some(greedy_fixed),
+            Operation::ReluctantFixed(reluctant_fixed) => Some(reluctant_fixed),
+            Operation::UnambiguousRepeat(unambiguous_repeat) => Some(unambiguous_repeat),
+            _ => None,
+        }
     }
 }
 

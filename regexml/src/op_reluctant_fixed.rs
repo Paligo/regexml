@@ -90,6 +90,14 @@ impl RepeatOperation for ReluctantFixed {
     fn min(&self) -> usize {
         self.min
     }
+
+    fn max(&self) -> usize {
+        self.max
+    }
+
+    fn greedy(&self) -> bool {
+        false
+    }
 }
 
 struct ReluctantFixedIterator<'a> {

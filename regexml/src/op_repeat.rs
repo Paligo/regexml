@@ -52,6 +52,7 @@ impl OperationControl for Repeat {
     fn optimize(&self, flags: &ReFlags) -> Rc<Operation> {
         let operation = self.operation.optimize(flags);
         let min = if self.min == 0 && operation.matches_empty_string() == MATCHES_ZLS_ANYWHERE {
+            // turns (a?)* into (a?)+
             1
         } else {
             self.min
@@ -142,6 +143,14 @@ impl RepeatOperation for Repeat {
 
     fn min(&self) -> usize {
         self.min
+    }
+
+    fn max(&self) -> usize {
+        self.max
+    }
+
+    fn greedy(&self) -> bool {
+        self.greedy
     }
 }
 

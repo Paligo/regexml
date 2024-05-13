@@ -1028,8 +1028,8 @@ impl ReCompiler {
         if matches!(op1, Operation::Bol(_)) || matches!(op1, Operation::Eol(_)) {
             return true;
         }
-        if let Operation::Repeat(repeat) = op1 {
-            if repeat.min == 0 {
+        if let Some(repeat_operation) = op1.repeat_operation() {
+            if repeat_operation.min() == 0 {
                 return false;
             }
         }
