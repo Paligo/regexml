@@ -142,10 +142,9 @@ impl<'a> Iterator for ChoiceIterator<'a> {
                 let next = current_iter.next();
                 if let Some(next) = next {
                     return Some(next);
-                } else if !self.next_branch() {
-                    return None;
                 }
-            } else if !self.next_branch() {
+            }
+            if !self.next_branch() {
                 return None;
             }
         }
