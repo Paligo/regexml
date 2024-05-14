@@ -67,13 +67,11 @@ impl OperationControl for Choice {
 
     fn matches_empty_string(&self) -> u32 {
         self.branches.iter().fold(0, |acc, branch| {
-            acc | {
-                let b = branch.matches_empty_string();
-                if b != MATCHES_ZLS_NEVER {
-                    acc | b
-                } else {
-                    acc
-                }
+            let b = branch.matches_empty_string();
+            if b != MATCHES_ZLS_NEVER {
+                acc | b
+            } else {
+                acc
             }
         })
     }
@@ -122,8 +120,10 @@ impl<'a> ChoiceIterator<'a> {
     }
 
     fn next_branch(&mut self) -> bool {
+        // look for the next branch
         let next_op = self.branches_iter.next();
         if let Some(next_op) = next_op {
+            // if there is one, set the current iter to that one
             self.matcher.clear_captured_groups_beyond(self.position);
             self.current_iter = Some(next_op.matches_iter(self.matcher, self.position));
             true
@@ -138,13 +138,17 @@ impl<'a> Iterator for ChoiceIterator<'a> {
 
     fn next(&mut self) -> Option<Self::Item> {
         loop {
+            // take values from current iter as long as we can
             if let Some(current_iter) = &mut self.current_iter {
                 let next = current_iter.next();
                 if let Some(next) = next {
                     return Some(next);
                 }
             }
-            if !self.next_branch() {
+            // if the current iter wasn't set yet, or is empty, pick the next
+            // branch
+            let has_next_branch = self.next_branch();
+            if !has_next_branch {
                 return None;
             }
         }
@@ -163,5 +167,31 @@ mod tests {
         assert_eq!(matches, vec!["a"]);
         let matches = regex.matcher("d").operation_matches(op);
         assert!(matches.is_empty());
+    }
+
+    #[test]
+    fn test_choice2() {
+        let regex = Regex::xpath(r#"a?|b"#, "").unwrap();
+        let op = regex.path("0");
+        let matches = regex.matcher("a").operation_matches(op.clone());
+        assert_eq!(matches, vec!["a", ""]);
+        let matches = regex.matcher("b").operation_matches(op.clone());
+        assert_eq!(matches, vec!["", "b"]);
+        let matches = regex.matcher("d").operation_matches(op);
+        assert_eq!(matches, vec![""]);
+        // assert!(matches.is_empty());
+    }
+
+    #[test]
+    fn test_choice3() {
+        let regex = Regex::xpath(r#"a|b?"#, "").unwrap();
+        let op = regex.path("0");
+        let matches = regex.matcher("a").operation_matches(op.clone());
+        assert_eq!(matches, vec!["a", ""]);
+        let matches = regex.matcher("b").operation_matches(op.clone());
+        assert_eq!(matches, vec!["b", ""]);
+        let matches = regex.matcher("d").operation_matches(op);
+        assert_eq!(matches, vec![""]);
+        // assert!(matches.is_empty());
     }
 }
