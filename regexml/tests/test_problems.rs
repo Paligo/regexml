@@ -29,3 +29,37 @@ fn test_l_category_membership() {
     let regex = regex.unwrap();
     assert!(regex.is_match(r#"㐀"#));
 }
+
+// #[test]
+// fn test_re00036_match_failure() {
+//     let matches_regex = Regex::xpath(
+//         r"^(?:(((((boy)|(girl))[0-1][x-z]{2})?)|(man|woman)[0-1]?[y|n])*)$",
+//         "",
+//     )
+//     .unwrap();
+
+//     let matches_regex = Regex::xpath(r"^((((girl)?)|(man|woman)[0-1]?[y|n])*)$", "").unwrap();
+
+//     let matches_regex = Regex::xpath(r"^(?:(?:girl)?|man)*$", "").unwrap();
+
+//     let matches_regex = Regex::xpath(r"^(?:(?:girl)?|man)*$", "").unwrap();
+
+//     let matches_regex = Regex::xpath(r"^(?:(?:girl)?|man)*$", "").unwrap();
+
+//     // let matches_regex = Regex::xpath(r"^(?:man|(?:girl)?)*$", "").unwrap();
+
+//     dbg!(&matches_regex);
+//     // the capturing group doesn't seem to be a problem
+
+//     // let matches_regex = Regex::xpath(
+//     //     r"^((((((boy)|(girl))[0-1][x-z]{2})?)|(man|woman)[0-1]?[y|n])*)$",
+//     //     "",
+//     // )
+//     // .unwrap();
+//     // assert!(matches_regex.is_match("many"));
+//     // assert!(matches_regex.is_match("boy0xxwoman1ygirl1xygirl1xy"));
+//     // assert!(matches_regex.is_match("girlgirl"));
+//     assert!(matches_regex.is_match("mangirlman"));
+//     // assert!(matches_regex.is_match("girlmangirl"));
+//     // assert!(matches_regex.is_match("boy0woman1ygirl1many"));
+// }

@@ -703,19 +703,24 @@ impl ReCompiler {
 
         let quantifier_type = self.pattern[self.idx];
 
-        match quantifier_type {
+        let matched = match quantifier_type {
             '?' | '*' | '+' => {
                 // eat quantifier character
                 self.idx += 1;
+                true
             }
-            '{' => self.bracket()?,
-            _ => {}
-        }
+            '{' => {
+                self.bracket()?;
+                true
+            }
+            _ => false,
+        };
 
         let mut quantifier_type = Some(quantifier_type);
+        if matched {
+            // TODO: reluctant quantifiers are not allowed in XSD logic
 
-        match ret {
-            Operation::Bol(_) | Operation::Eol(_) => {
+            if matches!(ret, Operation::Bol(_) | Operation::Eol(_)) {
                 // pretty meaningless but legal. If the quantifier allows zero
                 // occurrences, ignore the instruction. Otherwise, ignore the
                 // quantifier.
@@ -727,25 +732,25 @@ impl ReCompiler {
                 } else {
                     quantifier_type = None
                 }
-                if ret.matches_empty_string() == MATCHES_ZLS_ANYWHERE {
-                    match quantifier_type {
-                        Some('?') => {
-                            // can ignore the quantifier
-                            quantifier_type = None
-                        }
-                        Some('+') => {
-                            // '*' and '+' are equivalent
-                            quantifier_type = Some('*');
-                        }
-                        Some('{') => {
-                            // bounds are meaningless
-                            quantifier_type = Some('*')
-                        }
-                        _ => {}
+            }
+
+            if ret.matches_empty_string() == MATCHES_ZLS_ANYWHERE {
+                match quantifier_type {
+                    Some('?') => {
+                        // can ignore the quantifier
+                        quantifier_type = None
                     }
+                    Some('+') => {
+                        // '*' and '+' are equivalent
+                        quantifier_type = Some('*');
+                    }
+                    Some('{') => {
+                        // bounds are meaningless
+                        quantifier_type = Some('*')
+                    }
+                    _ => {}
                 }
             }
-            _ => {}
         }
 
         let mut greedy = true;
