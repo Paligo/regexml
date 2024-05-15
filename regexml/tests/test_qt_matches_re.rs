@@ -3,7 +3,6 @@
 
 use regexml::Regex;
 
-// Test regex syntax
 #[test]
 fn test_re00036() {
     let regex = Regex::xpath(",", "").unwrap();

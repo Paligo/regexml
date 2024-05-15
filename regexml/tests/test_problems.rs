@@ -36,3 +36,10 @@ fn test_re00036_match_failure() {
 
     assert!(matches_regex.is_match("barfoobar"));
 }
+
+#[test]
+fn test_low_surrogates() {
+    let matches_regex = Regex::xpath(r"^(?:\p{IsLowSurrogates}?)$", "").unwrap();
+
+    assert!(matches_regex.is_match(""));
+}

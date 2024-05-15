@@ -149,16 +149,16 @@ impl BlockLookup {
     fn new() -> Self {
         let mut blocks = HashMap::new();
         for block in block::ALL_BLOCKS {
-            //  As per spec, we exclude th eHighSurrogates, LowSurrogates and
-            //  HighPrivateUseSurrogates blocks. These blocks identify
-            //  "surrogate" characters, which do not occur at the level of the
-            //  "character abstraction" that XML instance documents operate on.
-            if block.name == "High Surrogates"
-                || block.name == "Low Surrogates"
-                || block.name == "High Private Use Surrogates"
-            {
-                continue;
-            }
+            // In XSD 1.0 we needed to exclude HighSurrogates, LowSurrogates and
+            // HighPrivateUseSurrogates blocks. But it appears that the XSD 1.1 specification
+            // does not maintain this rule.
+            // https://github.com/w3c/qt3tests/issues/61
+            // if block.name == "High Surrogates"
+            //     || block.name == "Low Surrogates"
+            //     || block.name == "High Private Use Surrogates"
+            // {
+            //     continue;
+            // }
             let lookup_name = block.name.replace([' ', '_'], "");
             blocks.insert(lookup_name, block);
         }
