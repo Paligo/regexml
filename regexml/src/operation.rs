@@ -99,6 +99,8 @@ pub(crate) trait OperationControl {
 
     /// Access child information so we can structurally dive into
     /// a regex, mostly for testing purposes.
+    /// allow unused code to exist as we do use it in the tests
+    #[allow(dead_code)]
     fn children(&self) -> Vec<Rc<Operation>> {
         Vec::new()
     }

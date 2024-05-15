@@ -88,7 +88,14 @@ impl OperationControl for Repeat {
         let bound = self.max.min(matcher.search.len() - position + 1);
         let mut p = position;
         if self.greedy {
-            // Prime the arrays first with iterators up to the maximum length, stopping if there is no match
+            // Prime the arrays first with iterators up to the maximum length,
+            // stopping if there is no match
+
+            // Porting note: is_duplicate_zero_length_match can be dedicated to
+            // the Repeat (and not the various subclasses in the original Java
+            // code, i.e. GreedyFixed, ReluctantFixed, UnambiguousRepeat),
+            // because each of these subclasses overrides matches_iter anyway,
+            // so this code can never be reached.
             if self.min == 0 && !matcher.is_duplicate_zero_length_match(self, position) {
                 // add a match at the current position if zero occurrences are allowed
                 iterators.push(Box::new(std::iter::once(position)));
@@ -99,14 +106,15 @@ impl OperationControl for Repeat {
                 if let Some(next) = it.next() {
                     p = next;
                     iterators.push(it);
-                    positions.push(next);
+                    positions.push(p);
                 } else if iterators.is_empty() {
                     return Box::new(std::iter::empty());
                 } else {
                     break;
                 }
             }
-            // Now return an iterator which returns all the matching positions in order
+            // Now return an iterator which returns all the matching positions
+            // in order
             Box::new(ForceProgressIterator::new(Box::new(
                 GreedyRepeatIterator::new(
                     matcher,
@@ -196,14 +204,13 @@ impl<'a> Iterator for GreedyRepeatIterator<'a> {
         } else {
             loop {
                 let top = self.iterators.last_mut().unwrap();
-                let p = top.next();
-                if let Some(p) = p {
+                if let Some(mut p) = top.next() {
                     self.positions.pop();
                     self.positions.push(p);
                     while self.iterators.len() < self.bound {
-                        let operation = &self.operation;
-                        let mut it = operation.matches_iter(self.matcher, p);
-                        if let Some(p) = it.next() {
+                        let mut it = self.operation.matches_iter(self.matcher, p);
+                        if let Some(next) = it.next() {
+                            p = next;
                             self.iterators.push(it);
                             self.positions.push(p)
                         } else {
@@ -319,22 +326,31 @@ mod tests {
         assert_eq!(matches, vec!["bab", "ba", "b", ""]);
     }
 
-    // #[test]
-    // fn test_repeat_choice_with_option() {
-    //     let regex = Regex::xpath(r#"(?:a?|b)*"#, "").unwrap();
-    //     let op = regex.path("0");
+    #[test]
+    fn test_repeat_choice_with_option_first() {
+        let regex = Regex::xpath(r#"(?:a?|b)*"#, "").unwrap();
+        let op = regex.path("0");
 
-    //     // dbg!(&op);
+        let matches = regex.matcher("bab").operation_matches(op);
+        assert!(matches.contains(&"bab".to_string()));
+    }
 
-    //     // let matches = regex.matcher("").operation_matches(op.clone());
-    //     // assert_eq!(matches, vec![""]);
+    #[test]
+    fn test_repeat_option() {
+        let regex = Regex::xpath(r#"(?:a?)*"#, "").unwrap();
+        let op = regex.path("0");
 
-    //     // let matches = regex.matcher("a").operation_matches(op.clone());
-    //     // assert_eq!(matches, vec!["a", ""]);
-    //     // let matches = regex.matcher("aba").operation_matches(op.clone());
-    //     // assert_eq!(matches, vec!["aba", "ab", "a", ""]);
+        let matches = regex.matcher("aaa").operation_matches(op);
 
-    //     let matches = regex.matcher("bab").operation_matches(op);
-    //     assert_eq!(matches, vec!["bab", "ba", "b", ""]);
-    // }
+        assert!(matches.contains(&"aaa".to_string()));
+    }
+
+    #[test]
+    fn test_repeat_choice_with_option_last() {
+        let regex = Regex::xpath(r#"(?:b|a?)*"#, "").unwrap();
+        let op = regex.path("0");
+
+        let matches = regex.matcher("bab").operation_matches(op);
+        assert_eq!(matches[0], "bab");
+    }
 }

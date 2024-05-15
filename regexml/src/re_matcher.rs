@@ -2,7 +2,7 @@ use std::cell::RefCell;
 
 use icu_casemap::CaseMapper;
 
-use crate::{history::History, op_repeat::Repeat, operation::Operation};
+use crate::{history::History, op_repeat::Repeat};
 #[cfg(test)]
 use std::rc::Rc;
 
