@@ -77,12 +77,16 @@ fn test_whatever() {
     assert!(regex.is_match(r#"AS"#));
 }
 
-// #[test]
-// fn test_plus_inside_and_star_inside_capture_group() {
-//     let regex = Regex::xpath(r#"^(.*)+B"#, "");
-//     let regex = regex.unwrap();
-//     assert!(regex.is_match(r#"AB"#));
-// }
+#[test]
+fn test_plus_inside_and_star_inside_capture_group() {
+    let regex = Regex::xpath(r#"^(.*)+B"#, "");
+    let regex = regex.unwrap();
+    // surprisingly this one is false. saxon also evaluates it as
+    // false
+    // I've brought this up with the test suite
+    // https://github.com/w3c/qt3tests/issues/59
+    assert!(!regex.is_match(r#"AB"#));
+}
 
 #[test]
 fn test_question_mark_outside_capture_group() {
