@@ -7,7 +7,7 @@ use crate::{
 };
 
 // End of Line ($) in a regular expression
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone)]
 pub(crate) struct Eol;
 
 impl OperationControl for Eol {

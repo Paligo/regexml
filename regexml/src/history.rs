@@ -1,10 +1,10 @@
 use ahash::{HashMap, HashMapExt, HashSet, HashSetExt};
 
-use crate::operation::Operation;
+use crate::op_repeat::Repeat;
 
 #[derive(Debug)]
 pub(crate) struct History {
-    zero_length_matches: HashMap<Operation, HashSet<usize>>,
+    zero_length_matches: HashMap<*const Repeat, HashSet<usize>>,
 }
 
 impl History {
@@ -16,22 +16,19 @@ impl History {
 
     pub(crate) fn is_duplicate_zero_length_match(
         &mut self,
-        operation: Operation,
+        repeat: &Repeat,
         position: usize,
     ) -> bool {
-        // TODO: hashing an operation; how can that work with enum dispatch?
-        let positions = self.zero_length_matches.get_mut(&operation);
+        // we take the address of the repeat operation as a cache key
+        let cache_key = repeat as *const Repeat;
+
+        let positions = self.zero_length_matches.get_mut(&cache_key);
         if let Some(positions) = positions {
-            if positions.contains(&position) {
-                true
-            } else {
-                positions.insert(position);
-                false
-            }
+            !positions.insert(position)
         } else {
             let mut positions = HashSet::new();
             positions.insert(position);
-            self.zero_length_matches.insert(operation, positions);
+            self.zero_length_matches.insert(cache_key, positions);
             false
         }
     }

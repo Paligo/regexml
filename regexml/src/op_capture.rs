@@ -8,7 +8,7 @@ use crate::{
 };
 
 // Open paren (captured group) within a regular expression
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug)]
 pub(crate) struct Capture {
     group_nr: usize,
     pub(crate) child_op: Rc<Operation>,

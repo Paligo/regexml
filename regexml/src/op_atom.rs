@@ -11,7 +11,7 @@ use crate::{
 };
 
 /// A match against a fixed string of any length, within a regular expression.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone)]
 pub(crate) struct Atom {
     pub(crate) atom: Vec<char>,
     len: usize,

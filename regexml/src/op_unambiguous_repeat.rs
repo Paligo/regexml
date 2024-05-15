@@ -16,7 +16,7 @@ use crate::{
 // atom or CharClass, which also means that if the repeated term matches
 // then it can only match in one way; a typical example is the term "A*"
 // in the regex "A*B".
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone)]
 pub(crate) struct UnambiguousRepeat {
     operation: Rc<Operation>,
     pub(crate) min: usize,

@@ -2,8 +2,7 @@ use std::cell::RefCell;
 
 use icu_casemap::CaseMapper;
 
-#[cfg(test)]
-use crate::operation::Operation;
+use crate::{history::History, op_repeat::Repeat, operation::Operation};
 #[cfg(test)]
 use std::rc::Rc;
 
@@ -31,6 +30,7 @@ pub(crate) struct State {
     pub(crate) end_backref: Vec<Option<usize>>,
     pub(crate) capture_state: CaptureState,
     pub(crate) anchored_match: bool,
+    pub(crate) history: History,
 }
 
 impl State {
@@ -40,6 +40,7 @@ impl State {
             end_backref: vec![],
             capture_state: CaptureState::new(),
             anchored_match: false,
+            history: History::new(),
         }
     }
 }
@@ -408,6 +409,13 @@ impl<'a> ReMatcher<'a> {
 
     pub(crate) fn anchored_match(&self) -> bool {
         self.state.borrow().anchored_match
+    }
+
+    pub(crate) fn is_duplicate_zero_length_match(&self, repeat: &Repeat, position: usize) -> bool {
+        self.state
+            .borrow_mut()
+            .history
+            .is_duplicate_zero_length_match(repeat, position)
     }
 
     // capture state related

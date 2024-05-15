@@ -5,7 +5,7 @@ use crate::re_flags::ReFlags;
 use crate::re_matcher::ReMatcher;
 
 // Beginning of Line (^) in a regular expression
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone)]
 pub(crate) struct Bol;
 
 impl OperationControl for Bol {

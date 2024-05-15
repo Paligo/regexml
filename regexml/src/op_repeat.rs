@@ -11,7 +11,7 @@ use crate::{
 
 // Handle a repetition (with possible min and max) where the
 // size of the repeated unit is variable.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone)]
 pub(crate) struct Repeat {
     pub(crate) operation: Rc<Operation>,
     pub(crate) min: usize,
@@ -89,7 +89,7 @@ impl OperationControl for Repeat {
         let mut p = position;
         if self.greedy {
             // Prime the arrays first with iterators up to the maximum length, stopping if there is no match
-            if self.min == 0 {
+            if self.min == 0 && !matcher.is_duplicate_zero_length_match(self, position) {
                 // add a match at the current position if zero occurrences are allowed
                 iterators.push(Box::new(std::iter::once(position)));
                 positions.push(p);

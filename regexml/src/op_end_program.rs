@@ -7,7 +7,7 @@ use crate::{
 };
 
 // End of program in a regular expression
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone)]
 pub(crate) struct EndProgram;
 
 impl OperationControl for EndProgram {

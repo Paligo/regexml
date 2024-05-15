@@ -7,7 +7,7 @@ use crate::{
 };
 
 // Match empty string within a regular expression
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone)]
 pub(crate) struct Nothing;
 
 impl OperationControl for Nothing {

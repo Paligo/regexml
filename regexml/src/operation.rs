@@ -112,7 +112,7 @@ pub(crate) trait RepeatOperation {
 }
 
 #[enum_dispatch(OperationControl)]
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Debug)]
 pub(crate) enum Operation {
     Bol,
     Atom,

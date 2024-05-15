@@ -16,7 +16,7 @@ use crate::{
 };
 
 // A sequence of multiple pieces in a regular expression.
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug)]
 pub(crate) struct Sequence {
     pub(crate) operations: Vec<Rc<Operation>>,
 }

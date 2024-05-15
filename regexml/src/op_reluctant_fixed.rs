@@ -8,7 +8,7 @@ use crate::{
 
 // Handle a reluctant repetition (with possible min and max) where the size of
 // the repeated unit is fixed.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone)]
 pub(crate) struct ReluctantFixed {
     operation: Rc<Operation>,
     pub(crate) min: usize,

@@ -10,7 +10,7 @@ use crate::{
 };
 
 // A choice of several branches within a regular expression.
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug)]
 pub(crate) struct Choice {
     branches: Vec<Rc<Operation>>,
 }
