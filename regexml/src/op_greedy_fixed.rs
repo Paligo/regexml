@@ -131,6 +131,7 @@ impl RepeatOperation for GreedyFixed {
     }
 }
 
+#[derive(Debug)]
 struct IntStepIterator {
     current: i64,
     step: i64,

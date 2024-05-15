@@ -703,7 +703,7 @@ impl ReCompiler {
 
         let quantifier_type = self.pattern[self.idx];
 
-        let matched = match quantifier_type {
+        let has_quantifier = match quantifier_type {
             '?' | '*' | '+' => {
                 // eat quantifier character
                 self.idx += 1;
@@ -717,7 +717,7 @@ impl ReCompiler {
         };
 
         let mut quantifier_type = Some(quantifier_type);
-        if matched {
+        if has_quantifier {
             // TODO: reluctant quantifiers are not allowed in XSD logic
 
             if matches!(ret, Operation::Bol(_) | Operation::Eol(_)) {
