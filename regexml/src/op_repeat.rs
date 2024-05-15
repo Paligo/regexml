@@ -332,6 +332,7 @@ mod tests {
         let op = regex.path("0");
 
         let matches = regex.matcher("bab").operation_matches(op);
+
         assert!(matches.contains(&"bab".to_string()));
     }
 
@@ -353,4 +354,13 @@ mod tests {
         let matches = regex.matcher("bab").operation_matches(op);
         assert_eq!(matches[0], "bab");
     }
+
+    // #[test]
+    // fn test_repeat_with_atom_behind() {
+    //     let regex = Regex::xpath(r#"^(.*)+B"#, "").unwrap();
+    //     let op = regex.path("0");
+
+    //     let matches = regex.matcher("AB").operation_matches(op);
+    //     assert_eq!(matches, vec!["AB"]);
+    // }
 }
