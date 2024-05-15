@@ -180,6 +180,17 @@ fn block_lookup() -> &'static BlockLookup {
 }
 
 pub(crate) fn block(name: &str) -> Result<CodePointInversionListBuilder, Error> {
+    // backward compatibility, see XSD 1.1 part 2, section G 4.2.3
+    // the other backwards compatibility blocks are handled in the block lookup,
+    // but PrivateUse stretches three different ranges, so need special handling
+    if name == "PrivateUse" {
+        let mut builder = CodePointInversionListBuilder::new();
+        builder.add_range_u32(&(0xE000..=0xF8FF));
+        builder.add_range_u32(&(0xF0000..=0xFFFFD));
+        builder.add_range_u32(&(0x100000..=0x10FFFD));
+        return Ok(builder);
+    }
+
     let lookup = block_lookup();
     let block = lookup.lookup(name)?;
     let mut builder = CodePointInversionListBuilder::new();
