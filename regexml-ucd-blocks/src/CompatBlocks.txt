@@ -1,0 +1,7 @@
+# block names maintained for backwards compatibility
+# see section G.4.2.3 in XSD 1.1 part 2
+# Note that PrivateUse is not included in this list because
+# they span multiple ranges and need special handling
+
+0370..03FF; Greek
+20D0..20FF; CombiningMarksforSymbols
