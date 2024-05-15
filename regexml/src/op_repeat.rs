@@ -11,7 +11,7 @@ use crate::{
 
 // Handle a repetition (with possible min and max) where the
 // size of the repeated unit is variable.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub(crate) struct Repeat {
     pub(crate) operation: Rc<Operation>,
     pub(crate) min: usize,
@@ -283,4 +283,58 @@ impl<'a> Iterator for ReluctantRepeatIterator<'a> {
         }
         self.position
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::Regex;
+
+    #[test]
+    fn test_repeat_simple() {
+        let regex = Regex::xpath(r#"a*"#, "").unwrap();
+        let op = regex.path("0");
+
+        // unambiguous repeat
+        let matches = regex.matcher("a").operation_matches(op.clone());
+        assert_eq!(matches, vec!["a"]);
+
+        let matches = regex.matcher("").operation_matches(op);
+        assert_eq!(matches, vec![""]);
+    }
+
+    #[test]
+    fn test_repeat_choice() {
+        let regex = Regex::xpath(r#"(?:a|b)*"#, "").unwrap();
+        let op = regex.path("0");
+
+        let matches = regex.matcher("").operation_matches(op.clone());
+        assert_eq!(matches, vec![""]);
+
+        let matches = regex.matcher("a").operation_matches(op.clone());
+        assert_eq!(matches, vec!["a", ""]);
+        let matches = regex.matcher("aba").operation_matches(op.clone());
+        assert_eq!(matches, vec!["aba", "ab", "a", ""]);
+
+        let matches = regex.matcher("bab").operation_matches(op);
+        assert_eq!(matches, vec!["bab", "ba", "b", ""]);
+    }
+
+    // #[test]
+    // fn test_repeat_choice_with_option() {
+    //     let regex = Regex::xpath(r#"(?:a?|b)*"#, "").unwrap();
+    //     let op = regex.path("0");
+
+    //     // dbg!(&op);
+
+    //     // let matches = regex.matcher("").operation_matches(op.clone());
+    //     // assert_eq!(matches, vec![""]);
+
+    //     // let matches = regex.matcher("a").operation_matches(op.clone());
+    //     // assert_eq!(matches, vec!["a", ""]);
+    //     // let matches = regex.matcher("aba").operation_matches(op.clone());
+    //     // assert_eq!(matches, vec!["aba", "ab", "a", ""]);
+
+    //     let matches = regex.matcher("bab").operation_matches(op);
+    //     assert_eq!(matches, vec!["bab", "ba", "b", ""]);
+    // }
 }

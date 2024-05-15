@@ -59,6 +59,8 @@ fn test_l_category_membership() {
 //     // assert!(matches_regex.is_match("many"));
 //     // assert!(matches_regex.is_match("boy0xxwoman1ygirl1xygirl1xy"));
 //     // assert!(matches_regex.is_match("girlgirl"));
+//     assert!(matches_regex.is_match("man"));
+//     assert!(matches_regex.is_match("mangirl"));
 //     assert!(matches_regex.is_match("mangirlman"));
 //     // assert!(matches_regex.is_match("girlmangirl"));
 //     // assert!(matches_regex.is_match("boy0woman1ygirl1many"));

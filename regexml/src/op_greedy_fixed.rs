@@ -9,7 +9,7 @@ use crate::{
 
 // Handle a greedy repetition (with possible min and max) where the size of the
 // repeated unit is fixed.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub(crate) struct GreedyFixed {
     operation: Rc<Operation>,
     pub(crate) min: usize,

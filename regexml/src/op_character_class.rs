@@ -8,7 +8,7 @@ use crate::{
 
 // A match of a single character in the input against a set of permitted
 // characters
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub(crate) struct CharClass {
     pub(crate) character_class: CharacterClass,
 }

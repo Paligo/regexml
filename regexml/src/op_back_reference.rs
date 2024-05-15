@@ -7,7 +7,7 @@ use crate::{
 };
 
 // A back-reference in a regular expression.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub(crate) struct BackReference {
     group_nr: usize,
 }

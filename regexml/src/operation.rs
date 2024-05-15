@@ -112,7 +112,7 @@ pub(crate) trait RepeatOperation {
 }
 
 #[enum_dispatch(OperationControl)]
-#[derive(Debug)]
+#[derive(Debug, Hash, PartialEq, Eq)]
 pub(crate) enum Operation {
     Bol,
     Atom,
@@ -145,7 +145,7 @@ impl Operation {
 // The ForceProgressIterator is used to protect against non-termination;
 // specifically, iterators that return an infinite number of zero-length
 // matches. After getting a certain number of zero-length matches at the same
-// position, hasNext() returns false. (Potentially this gives problems with an
+// position, next returns None. (Potentially this gives problems with an
 // expression such as (a?|b?|c?|d) that can legitimately return more than one
 // zero-length match).
 pub(crate) struct ForceProgressIterator<'a> {

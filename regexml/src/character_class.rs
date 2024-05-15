@@ -2,8 +2,15 @@ use icu_collections::codepointinvlist::{CodePointInversionList, CodePointInversi
 
 const IS_DISJOINT_CHECK_THRESHOLD: usize = 100;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct CharacterClass(CodePointInversionList<'static>);
+
+// implement a hash for CharacterClass
+impl std::hash::Hash for CharacterClass {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        todo!();
+    }
+}
 
 impl CharacterClass {
     pub(crate) fn new(code_point_inversion_list: CodePointInversionList<'static>) -> Self {
