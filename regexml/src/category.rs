@@ -124,8 +124,7 @@ pub(crate) fn decimal_number() -> CodePointInversionListBuilder {
 pub(crate) fn word_char() -> CodePointInversionListBuilder {
     let mut builder = CodePointInversionListBuilder::new();
 
-    // now everything should be in the builder
-    builder.complement();
+    builder.add_range_u32(&(0x0000..=0x10FFFF));
 
     let punctuation_group = builder_for_group(GeneralCategoryGroup::Punctuation).build();
     let separator_group = builder_for_group(GeneralCategoryGroup::Separator).build();
