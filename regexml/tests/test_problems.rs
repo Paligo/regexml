@@ -52,3 +52,40 @@ fn test_syntax() {
         Error::Syntax("Nothing before subtraction operator".to_string())
     )
 }
+
+// this mimics matches.re.xml re00984 to discover why it is
+// failing with regexml. The reason is that two characters,
+// 8968 and 8969 are inaccurately considered as in \w by the test,
+// but they cannot be as they're punctuation characters.
+// https://github.com/w3c/qt3tests/issues/62
+#[test]
+fn test_word_characters() {
+    // load characters from file
+    let characters = include_str!("characters.txt");
+    let entries = characters.split(',');
+    let characters = entries.map(|entry| {
+        let entry = entry.trim();
+        if entry.starts_with("&#") {
+            let value = entry[2..entry.len() - 1].parse::<u32>().unwrap();
+            // now the value is a character code
+            std::char::from_u32(value).unwrap()
+        } else if entry.len() == 1 {
+            entry.chars().next().unwrap()
+        } else {
+            panic!("weird entry")
+        }
+    });
+    let regex = Regex::xpath(r"^(?:[\w])$", "").unwrap();
+    let mut failed = false;
+    for c in characters {
+        // skip these so the test will pass;
+        if c as u32 == 8968 || c as u32 == 8969 {
+            continue;
+        }
+        if !regex.is_match(&c.to_string()) {
+            failed = true;
+            println!("failed for {} (integer {})", c, c as u32);
+        }
+    }
+    assert!(!failed);
+}
