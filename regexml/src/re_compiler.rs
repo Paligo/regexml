@@ -381,7 +381,7 @@ impl ReCompiler {
         let mut subtrahend = None;
 
         if self.there_follows("^") {
-            if self.there_follows("&-[") {
+            if self.there_follows("^-[") {
                 return Err(Error::syntax("Nothing before subtraction operator"));
             } else if self.there_follows("^]") {
                 return Err(Error::syntax("Empty negative character group"));

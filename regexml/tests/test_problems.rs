@@ -1,6 +1,6 @@
 use icu_collections::codepointinvlist::CodePointInversionListBuilder;
 use icu_properties::{sets, GeneralCategoryGroup};
-use regexml::Regex;
+use regexml::{Error, Regex};
 
 #[test]
 fn test_infinite_loop() {
@@ -42,4 +42,13 @@ fn test_low_surrogates() {
     let matches_regex = Regex::xpath(r"^(?:\p{IsLowSurrogates}?)$", "").unwrap();
 
     assert!(matches_regex.is_match(""));
+}
+
+#[test]
+fn test_syntax() {
+    let err = Regex::xpath(r"[^-[bc]]$", "").unwrap_err();
+    assert_eq!(
+        err,
+        Error::Syntax("Nothing before subtraction operator".to_string())
+    )
 }
