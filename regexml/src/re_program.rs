@@ -1,9 +1,7 @@
-use std::{rc::Rc, sync::Arc};
-
 use crate::{
     character_class::CharacterClass,
     op_repeat::Repeat,
-    operation::{Operation, OperationControl, RcOperation, RepeatOperation},
+    operation::{Operation, OperationControl, RepeatOperation},
     re_flags::ReFlags,
 };
 
@@ -12,7 +10,7 @@ pub(crate) const OPT_HASBOL: u32 = 2;
 
 #[derive(Debug)]
 pub(crate) struct RegexPrecondition {
-    pub(crate) operation: RcOperation,
+    pub(crate) operation: Operation,
     pub(crate) fixed_position: Option<usize>,
     pub(crate) min_position: usize,
 }
@@ -20,7 +18,7 @@ pub(crate) struct RegexPrecondition {
 #[derive(Debug)]
 pub(crate) struct ReProgram {
     pub(crate) pattern: Vec<char>,
-    pub(crate) operation: RcOperation,
+    pub(crate) operation: Operation,
     pub(crate) flags: ReFlags,
     pub(crate) prefix: Option<Vec<char>>,
     pub(crate) initial_char_class: Option<CharacterClass>,
@@ -34,7 +32,7 @@ pub(crate) struct ReProgram {
 impl ReProgram {
     pub(crate) fn new(
         pattern: Vec<char>,
-        operation: RcOperation,
+        operation: Operation,
         max_parens: Option<usize>,
         flags: ReFlags,
     ) -> Self {
@@ -81,7 +79,7 @@ impl ReProgram {
 
     pub(crate) fn add_precondition(
         &mut self,
-        op: RcOperation,
+        op: Operation,
         fixed_position: Option<usize>,
         min_position: usize,
     ) {
@@ -132,7 +130,7 @@ impl ReProgram {
 
     fn add_repeat_precondition<R: RepeatOperation>(
         &mut self,
-        op: RcOperation,
+        op: Operation,
         repeat: &R,
         fixed_position: Option<usize>,
         min_position: usize,
@@ -167,7 +165,7 @@ impl ReProgram {
     }
 
     #[cfg(test)]
-    pub(crate) fn path(&self, path: &str) -> RcOperation {
+    pub(crate) fn path(&self, path: &str) -> Operation {
         // path is numbers separated by / and goes into the children of the operation
         // so 0/1/2 would go into the 0th child, then the 1st child of that, then the 2nd child of that
         let steps = path

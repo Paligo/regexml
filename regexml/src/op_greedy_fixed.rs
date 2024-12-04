@@ -1,8 +1,6 @@
-use std::rc::Rc;
-
 use crate::{
     op_nothing::Nothing,
-    operation::{Operation, OperationControl, RcOperation, RepeatOperation, MATCHES_ZLS_ANYWHERE},
+    operation::{Operation, OperationControl, RepeatOperation, MATCHES_ZLS_ANYWHERE},
     re_flags::ReFlags,
     re_matcher::ReMatcher,
 };
@@ -11,14 +9,14 @@ use crate::{
 // repeated unit is fixed.
 #[derive(Debug, Clone)]
 pub(crate) struct GreedyFixed {
-    operation: Box<RcOperation>,
+    operation: Box<Operation>,
     pub(crate) min: usize,
     max: usize,
     len: usize,
 }
 
 impl GreedyFixed {
-    pub(crate) fn new(operation: RcOperation, min: usize, max: usize, len: usize) -> Self {
+    pub(crate) fn new(operation: Operation, min: usize, max: usize, len: usize) -> Self {
         Self {
             operation: operation.into(),
             min,
@@ -49,7 +47,7 @@ impl OperationControl for GreedyFixed {
         }
     }
 
-    fn optimize(&self, flags: &ReFlags) -> RcOperation {
+    fn optimize(&self, flags: &ReFlags) -> Operation {
         if self.max == 0 {
             return Operation::from(Nothing);
         }
@@ -108,13 +106,13 @@ impl OperationControl for GreedyFixed {
         ))
     }
 
-    fn children(&self) -> Vec<RcOperation> {
+    fn children(&self) -> Vec<Operation> {
         vec![self.operation.as_ref().clone()]
     }
 }
 
 impl RepeatOperation for GreedyFixed {
-    fn child(&self) -> RcOperation {
+    fn child(&self) -> Operation {
         self.operation.as_ref().clone()
     }
 

@@ -1,10 +1,7 @@
-use std::rc::Rc;
-
 use crate::{
     character_class::CharacterClass,
     operation::{
-        ForceProgressIterator, Operation, OperationControl, RcOperation, RepeatOperation,
-        MATCHES_ZLS_ANYWHERE,
+        ForceProgressIterator, Operation, OperationControl, RepeatOperation, MATCHES_ZLS_ANYWHERE,
     },
     re_flags::ReFlags,
     re_matcher::ReMatcher,
@@ -14,14 +11,14 @@ use crate::{
 // size of the repeated unit is variable.
 #[derive(Debug, Clone)]
 pub(crate) struct Repeat {
-    pub(crate) operation: Box<RcOperation>,
+    pub(crate) operation: Box<Operation>,
     pub(crate) min: usize,
     pub(crate) max: usize,
     pub(crate) greedy: bool,
 }
 
 impl Repeat {
-    pub(crate) fn new(operation: RcOperation, min: usize, max: usize, greedy: bool) -> Self {
+    pub(crate) fn new(operation: Operation, min: usize, max: usize, greedy: bool) -> Self {
         Self {
             operation: Box::new(operation),
             min,
@@ -50,7 +47,7 @@ impl OperationControl for Repeat {
         self.operation.get_initial_character_class(case_blind)
     }
 
-    fn optimize(&self, flags: &ReFlags) -> RcOperation {
+    fn optimize(&self, flags: &ReFlags) -> Operation {
         let operation = self.operation.optimize(flags);
         let min = if self.min == 0 && operation.matches_empty_string() == MATCHES_ZLS_ANYWHERE {
             // turns (a?)* into (a?)+
@@ -140,13 +137,13 @@ impl OperationControl for Repeat {
         }
     }
 
-    fn children(&self) -> Vec<RcOperation> {
+    fn children(&self) -> Vec<Operation> {
         vec![self.operation.as_ref().clone()]
     }
 }
 
 impl RepeatOperation for Repeat {
-    fn child(&self) -> RcOperation {
+    fn child(&self) -> Operation {
         self.operation.as_ref().clone()
     }
 
@@ -166,7 +163,7 @@ impl RepeatOperation for Repeat {
 struct GreedyRepeatIterator<'a> {
     primed: bool,
     matcher: &'a crate::re_matcher::ReMatcher<'a>,
-    operation: &'a RcOperation,
+    operation: &'a Operation,
     min: usize,
     iterators: Vec<Box<dyn Iterator<Item = usize> + 'a>>,
     positions: Vec<usize>,
@@ -176,7 +173,7 @@ struct GreedyRepeatIterator<'a> {
 impl<'a> GreedyRepeatIterator<'a> {
     fn new(
         matcher: &'a ReMatcher<'a>,
-        operation: &'a RcOperation,
+        operation: &'a Operation,
         iterators: Vec<Box<dyn Iterator<Item = usize> + 'a>>,
         positions: Vec<usize>,
         bound: usize,
@@ -239,7 +236,7 @@ impl<'a> Iterator for GreedyRepeatIterator<'a> {
 
 struct ReluctantRepeatIterator<'a> {
     matcher: &'a crate::re_matcher::ReMatcher<'a>,
-    operation: &'a RcOperation,
+    operation: &'a Operation,
     min: usize,
     max: usize,
     counter: usize,
@@ -249,7 +246,7 @@ struct ReluctantRepeatIterator<'a> {
 impl<'a> ReluctantRepeatIterator<'a> {
     fn new(
         matcher: &'a ReMatcher<'a>,
-        operation: &'a RcOperation,
+        operation: &'a Operation,
         position: usize,
         min: usize,
         max: usize,

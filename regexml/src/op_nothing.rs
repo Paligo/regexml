@@ -1,7 +1,5 @@
-use std::rc::Rc;
-
 use crate::{
-    operation::{Operation, OperationControl, RcOperation, MATCHES_ZLS_ANYWHERE},
+    operation::{Operation, OperationControl, MATCHES_ZLS_ANYWHERE},
     re_flags::ReFlags,
     re_matcher::ReMatcher,
 };
@@ -19,7 +17,7 @@ impl OperationControl for Nothing {
         MATCHES_ZLS_ANYWHERE
     }
 
-    fn optimize(&self, _flags: &ReFlags) -> RcOperation {
+    fn optimize(&self, _flags: &ReFlags) -> Operation {
         Operation::from(self.clone())
     }
 

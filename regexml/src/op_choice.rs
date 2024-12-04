@@ -1,10 +1,8 @@
-use std::rc::Rc;
-
 use icu_collections::codepointinvlist::CodePointInversionListBuilder;
 
 use crate::{
     character_class::CharacterClass,
-    operation::{Operation, OperationControl, RcOperation, MATCHES_ZLS_NEVER},
+    operation::{Operation, OperationControl, MATCHES_ZLS_NEVER},
     re_flags::ReFlags,
     re_matcher::ReMatcher,
 };
@@ -12,11 +10,11 @@ use crate::{
 // A choice of several branches within a regular expression.
 #[derive(Debug, Clone)]
 pub(crate) struct Choice {
-    branches: Vec<RcOperation>,
+    branches: Vec<Operation>,
 }
 
 impl Choice {
-    pub(crate) fn new(branches: Vec<RcOperation>) -> Self {
+    pub(crate) fn new(branches: Vec<Operation>) -> Self {
         Self { branches }
     }
 }
@@ -54,7 +52,7 @@ impl OperationControl for Choice {
         CharacterClass::new(builder.build())
     }
 
-    fn optimize(&self, flags: &ReFlags) -> RcOperation {
+    fn optimize(&self, flags: &ReFlags) -> Operation {
         let optimized_branches = self
             .branches
             .iter()
@@ -93,7 +91,7 @@ impl OperationControl for Choice {
         Box::new(ChoiceIterator::new(matcher, position, &self.branches))
     }
 
-    fn children(&self) -> Vec<RcOperation> {
+    fn children(&self) -> Vec<Operation> {
         self.branches.clone()
     }
 }
@@ -101,16 +99,16 @@ impl OperationControl for Choice {
 struct ChoiceIterator<'a> {
     matcher: &'a ReMatcher<'a>,
     position: usize,
-    branches_iter: Box<dyn Iterator<Item = &'a RcOperation> + 'a>,
+    branches_iter: Box<dyn Iterator<Item = &'a Operation> + 'a>,
     current_iter: Option<Box<dyn Iterator<Item = usize> + 'a>>,
 }
 
 impl<'a> ChoiceIterator<'a> {
-    fn new(matcher: &'a ReMatcher<'a>, position: usize, branches: &'a [RcOperation]) -> Self {
+    fn new(matcher: &'a ReMatcher<'a>, position: usize, branches: &'a [Operation]) -> Self {
         Self {
             matcher,
             position,
-            branches_iter: Box::new(branches.into_iter()),
+            branches_iter: Box::new(branches.iter()),
             current_iter: None,
         }
     }

@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use ahash::{HashSet, HashSetExt};
 use icu_casemap::CaseMapCloser;
 use icu_collections::codepointinvlist::CodePointInversionListBuilder;

@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use enum_dispatch::enum_dispatch;
 
 use crate::character_class::CharacterClass;
@@ -53,7 +51,7 @@ pub(crate) trait OperationControl {
 
     // TODO: I don't know how to spell a generic one for this, which just
     // clones the operation, so I've replicated them for the various structs.
-    fn optimize(&self, _flags: &ReFlags) -> RcOperation;
+    fn optimize(&self, _flags: &ReFlags) -> Operation;
 
     /// Ask whether the regular expression is known, after static analysis, to
     /// match a zero-length string.
@@ -101,13 +99,13 @@ pub(crate) trait OperationControl {
     /// a regex, mostly for testing purposes.
     /// allow unused code to exist as we do use it in the tests
     #[allow(dead_code)]
-    fn children(&self) -> Vec<RcOperation> {
+    fn children(&self) -> Vec<Operation> {
         Vec::new()
     }
 }
 
 pub(crate) trait RepeatOperation {
-    fn child(&self) -> RcOperation;
+    fn child(&self) -> Operation;
     fn min(&self) -> usize;
     fn max(&self) -> usize;
     fn greedy(&self) -> bool;
@@ -143,8 +141,6 @@ impl Operation {
         }
     }
 }
-
-pub(crate) type RcOperation = Operation;
 
 // The ForceProgressIterator is used to protect against non-termination;
 // specifically, iterators that return an infinite number of zero-length

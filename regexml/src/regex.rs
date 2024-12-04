@@ -1,11 +1,9 @@
 #[cfg(test)]
-use crate::operation::RcOperation;
+use crate::operation::Operation;
 use crate::re_compiler::ReCompiler;
 use crate::re_flags::ReFlags;
 use crate::re_matcher::ReMatcher;
 use crate::re_program::ReProgram;
-#[cfg(test)]
-use std::rc::Rc;
 
 pub use crate::analyze_string::AnalyzeIter;
 pub use crate::re_compiler::Error;
@@ -93,7 +91,7 @@ impl Regex {
     }
 
     #[cfg(test)]
-    pub(crate) fn path(&self, s: &str) -> RcOperation {
+    pub(crate) fn path(&self, s: &str) -> Operation {
         self.re_program.path(s)
     }
 

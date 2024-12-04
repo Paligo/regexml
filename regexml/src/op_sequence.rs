@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use icu_collections::codepointinvlist::CodePointInversionListBuilder;
 
 use crate::{
@@ -7,7 +5,7 @@ use crate::{
     op_nothing::Nothing,
     op_unambiguous_repeat::UnambiguousRepeat,
     operation::{
-        Operation, OperationControl, RcOperation, MATCHES_ZLS_ANYWHERE, MATCHES_ZLS_AT_END,
+        Operation, OperationControl, MATCHES_ZLS_ANYWHERE, MATCHES_ZLS_AT_END,
         MATCHES_ZLS_AT_START, MATCHES_ZLS_NEVER,
     },
     re_compiler::ReCompiler,
@@ -18,11 +16,11 @@ use crate::{
 // A sequence of multiple pieces in a regular expression.
 #[derive(Debug, Clone)]
 pub(crate) struct Sequence {
-    pub(crate) operations: Vec<RcOperation>,
+    pub(crate) operations: Vec<Operation>,
 }
 
 impl Sequence {
-    pub(crate) fn new(operations: Vec<RcOperation>) -> Self {
+    pub(crate) fn new(operations: Vec<Operation>) -> Self {
         Self { operations }
     }
 }
@@ -52,7 +50,7 @@ impl OperationControl for Sequence {
         CharacterClass::new(builder.build())
     }
 
-    fn optimize(&self, flags: &ReFlags) -> RcOperation {
+    fn optimize(&self, flags: &ReFlags) -> Operation {
         match self.operations.len() {
             0 => Operation::from(Nothing),
             1 => self.operations[0].clone(),
@@ -179,14 +177,14 @@ impl OperationControl for Sequence {
         ))
     }
 
-    fn children(&self) -> Vec<RcOperation> {
+    fn children(&self) -> Vec<Operation> {
         self.operations.clone()
     }
 }
 
 struct SequenceIterator<'a> {
     iterators: Vec<Box<dyn Iterator<Item = usize> + 'a>>,
-    operations: &'a [RcOperation],
+    operations: &'a [Operation],
     backtracking_limit: Option<usize>,
     matcher: &'a ReMatcher<'a>,
     saved_state: Option<CaptureState>,
@@ -195,7 +193,7 @@ struct SequenceIterator<'a> {
 impl<'a> SequenceIterator<'a> {
     fn new(
         matcher: &'a ReMatcher<'a>,
-        operations: &'a [RcOperation],
+        operations: &'a [Operation],
         position: usize,
         contains_capturing_expressions: bool,
     ) -> Self {

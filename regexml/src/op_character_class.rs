@@ -1,8 +1,6 @@
-use std::rc::Rc;
-
 use crate::{
     character_class::CharacterClass,
-    operation::{Operation, OperationControl, RcOperation, MATCHES_ZLS_NEVER},
+    operation::{Operation, OperationControl, MATCHES_ZLS_NEVER},
     re_flags::ReFlags,
 };
 
@@ -33,7 +31,7 @@ impl OperationControl for CharClass {
         self.character_class.clone()
     }
 
-    fn optimize(&self, _flags: &ReFlags) -> RcOperation {
+    fn optimize(&self, _flags: &ReFlags) -> Operation {
         Operation::from(self.clone())
     }
 

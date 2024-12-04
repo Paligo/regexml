@@ -1,7 +1,5 @@
-use std::rc::Rc;
-
 use crate::{
-    operation::{Operation, OperationControl, RcOperation, RepeatOperation, MATCHES_ZLS_ANYWHERE},
+    operation::{Operation, OperationControl, RepeatOperation, MATCHES_ZLS_ANYWHERE},
     re_flags::ReFlags,
     re_matcher::ReMatcher,
 };
@@ -10,14 +8,14 @@ use crate::{
 // the repeated unit is fixed.
 #[derive(Debug, Clone)]
 pub(crate) struct ReluctantFixed {
-    operation: Box<RcOperation>,
+    operation: Box<Operation>,
     pub(crate) min: usize,
     max: usize,
     len: usize,
 }
 
 impl ReluctantFixed {
-    pub(crate) fn new(operation: RcOperation, min: usize, max: usize, len: usize) -> Self {
+    pub(crate) fn new(operation: Operation, min: usize, max: usize, len: usize) -> Self {
         Self {
             operation: operation.into(),
             min,
@@ -53,7 +51,7 @@ impl OperationControl for ReluctantFixed {
             || self.operation.contains_capturing_expressions()
     }
 
-    fn optimize(&self, flags: &ReFlags) -> RcOperation {
+    fn optimize(&self, flags: &ReFlags) -> Operation {
         let operation = self.operation.optimize(flags);
         Operation::from(ReluctantFixed {
             operation: operation.into(),
@@ -77,13 +75,13 @@ impl OperationControl for ReluctantFixed {
         ))
     }
 
-    fn children(&self) -> Vec<RcOperation> {
+    fn children(&self) -> Vec<Operation> {
         vec![self.operation.as_ref().clone()]
     }
 }
 
 impl RepeatOperation for ReluctantFixed {
-    fn child(&self) -> RcOperation {
+    fn child(&self) -> Operation {
         self.operation.as_ref().clone()
     }
 
@@ -101,7 +99,7 @@ impl RepeatOperation for ReluctantFixed {
 }
 
 struct ReluctantFixedIterator<'a> {
-    op: &'a RcOperation,
+    op: &'a Operation,
     matcher: &'a ReMatcher<'a>,
     position: usize,
     count: usize,
@@ -113,7 +111,7 @@ struct ReluctantFixedIterator<'a> {
 
 impl<'a> ReluctantFixedIterator<'a> {
     fn new(
-        op: &'a RcOperation,
+        op: &'a Operation,
         matcher: &'a ReMatcher<'a>,
         position: usize,
         min: usize,

@@ -1,7 +1,5 @@
-use std::rc::Rc;
-
 use crate::{
-    operation::{Operation, OperationControl, RcOperation},
+    operation::{Operation, OperationControl},
     re_flags::ReFlags,
     re_matcher::ReMatcher,
     re_program::OPT_HASBACKREFS,
@@ -11,11 +9,11 @@ use crate::{
 #[derive(Debug, Clone)]
 pub(crate) struct Capture {
     group_nr: usize,
-    pub(crate) child_op: Box<RcOperation>,
+    pub(crate) child_op: Box<Operation>,
 }
 
 impl Capture {
-    pub(crate) fn new(group_nr: usize, child_op: RcOperation) -> Self {
+    pub(crate) fn new(group_nr: usize, child_op: Operation) -> Self {
         Self {
             group_nr,
             child_op: Box::new(child_op),
@@ -36,7 +34,7 @@ impl OperationControl for Capture {
         self.child_op.matches_empty_string()
     }
 
-    fn optimize(&self, flags: &ReFlags) -> RcOperation {
+    fn optimize(&self, flags: &ReFlags) -> Operation {
         Operation::from(Capture {
             group_nr: self.group_nr,
             child_op: Box::new(self.child_op.optimize(flags)),
@@ -61,7 +59,7 @@ impl OperationControl for Capture {
         ))
     }
 
-    fn children(&self) -> Vec<RcOperation> {
+    fn children(&self) -> Vec<Operation> {
         vec![self.child_op.as_ref().clone()]
     }
 }
