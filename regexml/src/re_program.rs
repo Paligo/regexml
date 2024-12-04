@@ -1,9 +1,9 @@
-use std::rc::Rc;
+use std::{rc::Rc, sync::Arc};
 
 use crate::{
     character_class::CharacterClass,
     op_repeat::Repeat,
-    operation::{Operation, OperationControl, RepeatOperation},
+    operation::{Operation, OperationControl, RcOperation, RepeatOperation},
     re_flags::ReFlags,
 };
 
@@ -12,7 +12,7 @@ pub(crate) const OPT_HASBOL: u32 = 2;
 
 #[derive(Debug)]
 pub(crate) struct RegexPrecondition {
-    pub(crate) operation: Rc<Operation>,
+    pub(crate) operation: RcOperation,
     pub(crate) fixed_position: Option<usize>,
     pub(crate) min_position: usize,
 }
@@ -20,7 +20,7 @@ pub(crate) struct RegexPrecondition {
 #[derive(Debug)]
 pub(crate) struct ReProgram {
     pub(crate) pattern: Vec<char>,
-    pub(crate) operation: Rc<Operation>,
+    pub(crate) operation: RcOperation,
     pub(crate) flags: ReFlags,
     pub(crate) prefix: Option<Vec<char>>,
     pub(crate) initial_char_class: Option<CharacterClass>,
@@ -34,7 +34,7 @@ pub(crate) struct ReProgram {
 impl ReProgram {
     pub(crate) fn new(
         pattern: Vec<char>,
-        operation: Rc<Operation>,
+        operation: RcOperation,
         max_parens: Option<usize>,
         flags: ReFlags,
     ) -> Self {
@@ -44,9 +44,9 @@ impl ReProgram {
         let mut optimization_flags = 0;
         let mut initial_char_class = None;
 
-        let precondition_operation = if let Operation::Sequence(op) = operation.as_ref() {
+        let precondition_operation = if let Operation::Sequence(op) = operation.clone() {
             let first = op.operations.first().unwrap();
-            match first.as_ref() {
+            match first {
                 Operation::Bol(_) => {
                     optimization_flags |= OPT_HASBOL;
                 }
@@ -81,11 +81,11 @@ impl ReProgram {
 
     pub(crate) fn add_precondition(
         &mut self,
-        op: Rc<Operation>,
+        op: RcOperation,
         fixed_position: Option<usize>,
         min_position: usize,
     ) {
-        match op.as_ref() {
+        match &op {
             Operation::Atom(_) | Operation::CharClass(_) => {
                 self.preconditions.push(RegexPrecondition {
                     operation: op.clone(),
@@ -105,14 +105,16 @@ impl ReProgram {
             Operation::UnambiguousRepeat(repeat) if repeat.min >= 1 => {
                 self.add_repeat_precondition(op.clone(), repeat, fixed_position, min_position)
             }
-            Operation::Capture(capture) => {
-                self.add_precondition(capture.child_op.clone(), fixed_position, min_position)
-            }
+            Operation::Capture(capture) => self.add_precondition(
+                capture.child_op.as_ref().clone(),
+                fixed_position,
+                min_position,
+            ),
             Operation::Sequence(sequence) => {
                 let mut fp = fixed_position;
                 let mut mp = min_position;
                 for o in &sequence.operations {
-                    if matches!(o.as_ref(), Operation::Bol(_)) {
+                    if matches!(o, Operation::Bol(_)) {
                         fp = Some(0);
                     }
                     self.add_precondition(o.clone(), fp, mp);
@@ -130,13 +132,13 @@ impl ReProgram {
 
     fn add_repeat_precondition<R: RepeatOperation>(
         &mut self,
-        op: Rc<Operation>,
+        op: RcOperation,
         repeat: &R,
         fixed_position: Option<usize>,
         min_position: usize,
     ) {
         let child = &repeat.child();
-        match child.as_ref() {
+        match child {
             Operation::Atom(_) | Operation::CharClass(_) => {
                 if repeat.min() == 1 {
                     self.preconditions.push(RegexPrecondition {
@@ -152,7 +154,7 @@ impl ReProgram {
                         true,
                     ));
                     self.preconditions.push(RegexPrecondition {
-                        operation: Rc::new(repeat),
+                        operation: repeat,
                         fixed_position,
                         min_position,
                     });
@@ -165,7 +167,7 @@ impl ReProgram {
     }
 
     #[cfg(test)]
-    pub(crate) fn path(&self, path: &str) -> Rc<Operation> {
+    pub(crate) fn path(&self, path: &str) -> RcOperation {
         // path is numbers separated by / and goes into the children of the operation
         // so 0/1/2 would go into the 0th child, then the 1st child of that, then the 2nd child of that
         let steps = path

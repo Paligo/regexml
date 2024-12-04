@@ -53,7 +53,7 @@ pub(crate) trait OperationControl {
 
     // TODO: I don't know how to spell a generic one for this, which just
     // clones the operation, so I've replicated them for the various structs.
-    fn optimize(&self, _flags: &ReFlags) -> Rc<Operation>;
+    fn optimize(&self, _flags: &ReFlags) -> RcOperation;
 
     /// Ask whether the regular expression is known, after static analysis, to
     /// match a zero-length string.
@@ -84,7 +84,7 @@ pub(crate) trait OperationControl {
     ///
     /// The position is the start position to seek a match.
     fn matches_iter<'a>(
-        &self,
+        &'a self,
         matcher: &'a ReMatcher<'a>,
         position: usize,
     ) -> Box<dyn Iterator<Item = usize> + 'a>;
@@ -101,20 +101,20 @@ pub(crate) trait OperationControl {
     /// a regex, mostly for testing purposes.
     /// allow unused code to exist as we do use it in the tests
     #[allow(dead_code)]
-    fn children(&self) -> Vec<Rc<Operation>> {
+    fn children(&self) -> Vec<RcOperation> {
         Vec::new()
     }
 }
 
 pub(crate) trait RepeatOperation {
-    fn child(&self) -> Rc<Operation>;
+    fn child(&self) -> RcOperation;
     fn min(&self) -> usize;
     fn max(&self) -> usize;
     fn greedy(&self) -> bool;
 }
 
 #[enum_dispatch(OperationControl)]
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) enum Operation {
     Bol,
     Atom,
@@ -143,6 +143,8 @@ impl Operation {
         }
     }
 }
+
+pub(crate) type RcOperation = Operation;
 
 // The ForceProgressIterator is used to protect against non-termination;
 // specifically, iterators that return an infinite number of zero-length

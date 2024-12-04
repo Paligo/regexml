@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::{
-    operation::{Operation, OperationControl, RepeatOperation, MATCHES_ZLS_ANYWHERE},
+    operation::{Operation, OperationControl, RcOperation, RepeatOperation, MATCHES_ZLS_ANYWHERE},
     re_flags::ReFlags,
     re_matcher::ReMatcher,
 };
@@ -10,16 +10,16 @@ use crate::{
 // the repeated unit is fixed.
 #[derive(Debug, Clone)]
 pub(crate) struct ReluctantFixed {
-    operation: Rc<Operation>,
+    operation: Box<RcOperation>,
     pub(crate) min: usize,
     max: usize,
     len: usize,
 }
 
 impl ReluctantFixed {
-    pub(crate) fn new(operation: Rc<Operation>, min: usize, max: usize, len: usize) -> Self {
+    pub(crate) fn new(operation: RcOperation, min: usize, max: usize, len: usize) -> Self {
         Self {
-            operation,
+            operation: operation.into(),
             min,
             max,
             len,
@@ -53,23 +53,23 @@ impl OperationControl for ReluctantFixed {
             || self.operation.contains_capturing_expressions()
     }
 
-    fn optimize(&self, flags: &ReFlags) -> Rc<Operation> {
+    fn optimize(&self, flags: &ReFlags) -> RcOperation {
         let operation = self.operation.optimize(flags);
-        Rc::new(Operation::from(ReluctantFixed {
-            operation,
+        Operation::from(ReluctantFixed {
+            operation: operation.into(),
             min: self.min,
             max: self.max,
             len: self.len,
-        }))
+        })
     }
 
     fn matches_iter<'a>(
-        &self,
+        &'a self,
         matcher: &'a ReMatcher,
         position: usize,
     ) -> Box<dyn Iterator<Item = usize> + 'a> {
         Box::new(ReluctantFixedIterator::new(
-            self.operation.clone(),
+            self.operation.as_ref(),
             matcher,
             position,
             self.min,
@@ -77,14 +77,14 @@ impl OperationControl for ReluctantFixed {
         ))
     }
 
-    fn children(&self) -> Vec<Rc<Operation>> {
-        vec![self.operation.clone()]
+    fn children(&self) -> Vec<RcOperation> {
+        vec![self.operation.as_ref().clone()]
     }
 }
 
 impl RepeatOperation for ReluctantFixed {
-    fn child(&self) -> Rc<Operation> {
-        self.operation.clone()
+    fn child(&self) -> RcOperation {
+        self.operation.as_ref().clone()
     }
 
     fn min(&self) -> usize {
@@ -101,7 +101,7 @@ impl RepeatOperation for ReluctantFixed {
 }
 
 struct ReluctantFixedIterator<'a> {
-    op: Rc<Operation>,
+    op: &'a RcOperation,
     matcher: &'a ReMatcher<'a>,
     position: usize,
     count: usize,
@@ -113,7 +113,7 @@ struct ReluctantFixedIterator<'a> {
 
 impl<'a> ReluctantFixedIterator<'a> {
     fn new(
-        op: Rc<Operation>,
+        op: &'a RcOperation,
         matcher: &'a ReMatcher<'a>,
         position: usize,
         min: usize,

@@ -1,22 +1,25 @@
 use std::rc::Rc;
 
 use crate::{
-    operation::{Operation, OperationControl},
+    operation::{Operation, OperationControl, RcOperation},
     re_flags::ReFlags,
     re_matcher::ReMatcher,
     re_program::OPT_HASBACKREFS,
 };
 
 // Open paren (captured group) within a regular expression
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct Capture {
     group_nr: usize,
-    pub(crate) child_op: Rc<Operation>,
+    pub(crate) child_op: Box<RcOperation>,
 }
 
 impl Capture {
-    pub(crate) fn new(group_nr: usize, child_op: Rc<Operation>) -> Self {
-        Self { group_nr, child_op }
+    pub(crate) fn new(group_nr: usize, child_op: RcOperation) -> Self {
+        Self {
+            group_nr,
+            child_op: Box::new(child_op),
+        }
     }
 }
 
@@ -33,15 +36,15 @@ impl OperationControl for Capture {
         self.child_op.matches_empty_string()
     }
 
-    fn optimize(&self, flags: &ReFlags) -> Rc<Operation> {
-        Rc::new(Operation::from(Capture {
+    fn optimize(&self, flags: &ReFlags) -> RcOperation {
+        Operation::from(Capture {
             group_nr: self.group_nr,
-            child_op: self.child_op.optimize(flags),
-        }))
+            child_op: Box::new(self.child_op.optimize(flags)),
+        })
     }
 
     fn matches_iter<'a>(
-        &self,
+        &'a self,
         matcher: &'a ReMatcher<'a>,
         position: usize,
     ) -> Box<dyn Iterator<Item = usize> + 'a> {
@@ -58,8 +61,8 @@ impl OperationControl for Capture {
         ))
     }
 
-    fn children(&self) -> Vec<Rc<Operation>> {
-        vec![self.child_op.clone()]
+    fn children(&self) -> Vec<RcOperation> {
+        vec![self.child_op.as_ref().clone()]
     }
 }
 

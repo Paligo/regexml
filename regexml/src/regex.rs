@@ -1,5 +1,5 @@
 #[cfg(test)]
-use crate::operation::Operation;
+use crate::operation::RcOperation;
 use crate::re_compiler::ReCompiler;
 use crate::re_flags::ReFlags;
 use crate::re_matcher::ReMatcher;
@@ -93,7 +93,7 @@ impl Regex {
     }
 
     #[cfg(test)]
-    pub(crate) fn path(&self, s: &str) -> Rc<Operation> {
+    pub(crate) fn path(&self, s: &str) -> RcOperation {
         self.re_program.path(s)
     }
 

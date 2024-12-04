@@ -1,7 +1,7 @@
 use std::cell::RefCell;
 
 #[cfg(test)]
-use crate::operation::Operation;
+use crate::operation::RcOperation;
 use icu_casemap::CaseMapper;
 
 use crate::{history::History, op_repeat::Repeat};
@@ -366,7 +366,7 @@ impl<'a> ReMatcher<'a> {
     }
 
     #[cfg(test)]
-    pub(crate) fn operation_matches(&self, op: Rc<Operation>) -> Vec<String> {
+    pub(crate) fn operation_matches(&self, op: RcOperation) -> Vec<String> {
         let start_position = 0;
         let positions = op.matches_iter(self, start_position);
         let ranges = positions.map(|e| start_position..e);

@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use crate::{
     op_nothing::Nothing,
-    operation::{Operation, OperationControl, RepeatOperation, MATCHES_ZLS_ANYWHERE},
+    operation::{Operation, OperationControl, RcOperation, RepeatOperation, MATCHES_ZLS_ANYWHERE},
     re_flags::ReFlags,
     re_matcher::ReMatcher,
 };
@@ -11,16 +11,16 @@ use crate::{
 // repeated unit is fixed.
 #[derive(Debug, Clone)]
 pub(crate) struct GreedyFixed {
-    operation: Rc<Operation>,
+    operation: Box<RcOperation>,
     pub(crate) min: usize,
     max: usize,
     len: usize,
 }
 
 impl GreedyFixed {
-    pub(crate) fn new(operation: Rc<Operation>, min: usize, max: usize, len: usize) -> Self {
+    pub(crate) fn new(operation: RcOperation, min: usize, max: usize, len: usize) -> Self {
         Self {
-            operation,
+            operation: operation.into(),
             min,
             max,
             len,
@@ -49,20 +49,20 @@ impl OperationControl for GreedyFixed {
         }
     }
 
-    fn optimize(&self, flags: &ReFlags) -> Rc<Operation> {
+    fn optimize(&self, flags: &ReFlags) -> RcOperation {
         if self.max == 0 {
-            return Rc::new(Operation::from(Nothing));
+            return Operation::from(Nothing);
         }
         if self.operation.get_match_length() == Some(0) {
-            return self.operation.clone();
+            return self.operation.as_ref().clone();
         }
         let operation = self.operation.optimize(flags);
-        Rc::new(Operation::from(GreedyFixed {
-            operation,
+        Operation::from(GreedyFixed {
+            operation: operation.into(),
             min: self.min,
             max: self.max,
             len: self.len,
-        }))
+        })
     }
 
     fn contains_capturing_expressions(&self) -> bool {
@@ -108,14 +108,14 @@ impl OperationControl for GreedyFixed {
         ))
     }
 
-    fn children(&self) -> Vec<Rc<Operation>> {
-        vec![self.operation.clone()]
+    fn children(&self) -> Vec<RcOperation> {
+        vec![self.operation.as_ref().clone()]
     }
 }
 
 impl RepeatOperation for GreedyFixed {
-    fn child(&self) -> Rc<Operation> {
-        self.operation.clone()
+    fn child(&self) -> RcOperation {
+        self.operation.as_ref().clone()
     }
 
     fn min(&self) -> usize {

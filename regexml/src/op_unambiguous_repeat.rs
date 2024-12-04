@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::{
-    operation::{Operation, OperationControl, RepeatOperation, MATCHES_ZLS_ANYWHERE},
+    operation::{Operation, OperationControl, RcOperation, RepeatOperation, MATCHES_ZLS_ANYWHERE},
     re_flags::ReFlags,
     re_matcher::ReMatcher,
 };
@@ -18,15 +18,15 @@ use crate::{
 // in the regex "A*B".
 #[derive(Debug, Clone)]
 pub(crate) struct UnambiguousRepeat {
-    operation: Rc<Operation>,
+    operation: Box<RcOperation>,
     pub(crate) min: usize,
     max: usize,
 }
 
 impl UnambiguousRepeat {
-    pub(crate) fn new(operation: Rc<Operation>, min: usize, max: usize) -> Self {
+    pub(crate) fn new(operation: RcOperation, min: usize, max: usize) -> Self {
         Self {
-            operation,
+            operation: operation.into(),
             min,
             max,
         }
@@ -56,12 +56,12 @@ impl OperationControl for UnambiguousRepeat {
         }
     }
 
-    fn optimize(&self, flags: &ReFlags) -> Rc<Operation> {
-        Rc::new(Operation::from(UnambiguousRepeat {
-            operation: self.operation.optimize(flags),
+    fn optimize(&self, flags: &ReFlags) -> RcOperation {
+        Operation::from(UnambiguousRepeat {
+            operation: self.operation.optimize(flags).into(),
             min: self.min,
             max: self.max,
-        }))
+        })
     }
 
     fn contains_capturing_expressions(&self) -> bool {
@@ -94,14 +94,14 @@ impl OperationControl for UnambiguousRepeat {
         }
     }
 
-    fn children(&self) -> Vec<Rc<Operation>> {
-        vec![self.operation.clone()]
+    fn children(&self) -> Vec<RcOperation> {
+        vec![self.operation.as_ref().clone()]
     }
 }
 
 impl RepeatOperation for UnambiguousRepeat {
-    fn child(&self) -> Rc<Operation> {
-        self.operation.clone()
+    fn child(&self) -> RcOperation {
+        self.operation.as_ref().clone()
     }
 
     fn min(&self) -> usize {

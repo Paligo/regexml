@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::operation::{Operation, OperationControl, MATCHES_ZLS_AT_START};
+use crate::operation::{Operation, OperationControl, RcOperation, MATCHES_ZLS_AT_START};
 use crate::re_flags::ReFlags;
 use crate::re_matcher::ReMatcher;
 
@@ -17,8 +17,8 @@ impl OperationControl for Bol {
         MATCHES_ZLS_AT_START
     }
 
-    fn optimize(&self, _flags: &ReFlags) -> Rc<Operation> {
-        Rc::new(Operation::from(self.clone()))
+    fn optimize(&self, _flags: &ReFlags) -> RcOperation {
+        Operation::from(self.clone())
     }
 
     fn matches_iter<'a>(

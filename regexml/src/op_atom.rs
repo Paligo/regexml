@@ -5,7 +5,9 @@ use icu_collections::codepointinvlist::CodePointInversionListBuilder;
 
 use crate::{
     character_class::CharacterClass,
-    operation::{Operation, OperationControl, MATCHES_ZLS_ANYWHERE, MATCHES_ZLS_NEVER},
+    operation::{
+        Operation, OperationControl, RcOperation, MATCHES_ZLS_ANYWHERE, MATCHES_ZLS_NEVER,
+    },
     re_flags::ReFlags,
     re_matcher::ReMatcher,
 };
@@ -55,8 +57,8 @@ impl OperationControl for Atom {
         CharacterClass::new(builder.build())
     }
 
-    fn optimize(&self, _flags: &ReFlags) -> Rc<Operation> {
-        Rc::new(Operation::from(self.clone()))
+    fn optimize(&self, _flags: &ReFlags) -> RcOperation {
+        Operation::from(self.clone())
     }
 
     fn matches_iter<'a>(

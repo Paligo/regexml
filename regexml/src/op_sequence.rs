@@ -7,7 +7,7 @@ use crate::{
     op_nothing::Nothing,
     op_unambiguous_repeat::UnambiguousRepeat,
     operation::{
-        Operation, OperationControl, MATCHES_ZLS_ANYWHERE, MATCHES_ZLS_AT_END,
+        Operation, OperationControl, RcOperation, MATCHES_ZLS_ANYWHERE, MATCHES_ZLS_AT_END,
         MATCHES_ZLS_AT_START, MATCHES_ZLS_NEVER,
     },
     re_compiler::ReCompiler,
@@ -16,13 +16,13 @@ use crate::{
 };
 
 // A sequence of multiple pieces in a regular expression.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct Sequence {
-    pub(crate) operations: Vec<Rc<Operation>>,
+    pub(crate) operations: Vec<RcOperation>,
 }
 
 impl Sequence {
-    pub(crate) fn new(operations: Vec<Rc<Operation>>) -> Self {
+    pub(crate) fn new(operations: Vec<RcOperation>) -> Self {
         Self { operations }
     }
 }
@@ -52,9 +52,9 @@ impl OperationControl for Sequence {
         CharacterClass::new(builder.build())
     }
 
-    fn optimize(&self, flags: &ReFlags) -> Rc<Operation> {
+    fn optimize(&self, flags: &ReFlags) -> RcOperation {
         match self.operations.len() {
-            0 => Rc::new(Operation::from(Nothing)),
+            0 => Operation::from(Nothing),
             1 => self.operations[0].clone(),
             _ => {
                 let operations = self
@@ -75,37 +75,37 @@ impl OperationControl for Sequence {
                             // we may be able to make an optimization
                             let repeated_operation = repeat_operation.child().clone();
                             if matches!(
-                                repeated_operation.as_ref(),
+                                repeated_operation,
                                 Operation::Atom(_) | Operation::CharClass(_)
                             ) {
                                 if repeat_operation.min() == repeat_operation.max() {
                                     // we can optimize this to an unambiguous repeat
-                                    return Rc::new(Operation::from(UnambiguousRepeat::new(
+                                    return Operation::from(UnambiguousRepeat::new(
                                         repeated_operation.clone(),
                                         repeat_operation.min(),
                                         repeat_operation.max(),
-                                    )));
+                                    ));
                                 }
                                 // get the adjacent operation
                                 let next_operation = &self.operations[i + 1];
                                 if ReCompiler::no_ambiguity(
-                                    repeated_operation.as_ref(),
+                                    &repeated_operation,
                                     next_operation,
                                     flags.is_case_independent(),
                                     !repeat_operation.greedy(),
                                 ) {
-                                    return Rc::new(Operation::from(UnambiguousRepeat::new(
+                                    return Operation::from(UnambiguousRepeat::new(
                                         repeated_operation.clone(),
                                         repeat_operation.min(),
                                         repeat_operation.max(),
-                                    )));
+                                    ));
                                 }
                             }
                         }
                         optimized
                     })
                     .collect();
-                Rc::new(Operation::from(Sequence { operations }))
+                Operation::from(Sequence { operations })
             }
         }
     }
@@ -159,7 +159,7 @@ impl OperationControl for Sequence {
 
     fn contains_capturing_expressions(&self) -> bool {
         for o in &self.operations {
-            if (matches!(o.as_ref(), Operation::Capture(_)) || o.contains_capturing_expressions()) {
+            if (matches!(o, Operation::Capture(_)) || o.contains_capturing_expressions()) {
                 return true;
             }
         }
@@ -167,26 +167,26 @@ impl OperationControl for Sequence {
     }
 
     fn matches_iter<'a>(
-        &self,
+        &'a self,
         matcher: &'a ReMatcher<'a>,
         position: usize,
     ) -> Box<dyn Iterator<Item = usize> + 'a> {
         Box::new(SequenceIterator::new(
             matcher,
-            self.operations.clone(),
+            &self.operations,
             position,
             self.contains_capturing_expressions(),
         ))
     }
 
-    fn children(&self) -> Vec<Rc<Operation>> {
+    fn children(&self) -> Vec<RcOperation> {
         self.operations.clone()
     }
 }
 
 struct SequenceIterator<'a> {
     iterators: Vec<Box<dyn Iterator<Item = usize> + 'a>>,
-    operations: Vec<Rc<Operation>>,
+    operations: &'a [RcOperation],
     backtracking_limit: Option<usize>,
     matcher: &'a ReMatcher<'a>,
     saved_state: Option<CaptureState>,
@@ -195,7 +195,7 @@ struct SequenceIterator<'a> {
 impl<'a> SequenceIterator<'a> {
     fn new(
         matcher: &'a ReMatcher<'a>,
-        operations: Vec<Rc<Operation>>,
+        operations: &'a [RcOperation],
         position: usize,
         contains_capturing_expressions: bool,
     ) -> Self {
