@@ -461,12 +461,10 @@ impl ReCompiler {
                 // actually create a range if the range is ok
                 if let (Some(start), Some(end)) = (range_start, range_end) {
                     if start > end {
-                        let start_d = start.to_digit(10).unwrap();
-                        let end_d = end.to_digit(10).unwrap();
                         // format start as hex
                         return Err(Error::syntax(format!(
-                            "Bad character range: start ({:X}) > end ({:X})",
-                            start_d, end_d
+                            "Bad character range: start ({:?}) > end ({:?})",
+                            start, end
                         )));
                         // Technically this is not an error in XSD, merely a
                         // no-op; but it is so utterly pointless that it is
