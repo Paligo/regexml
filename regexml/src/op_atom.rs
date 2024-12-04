@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use icu_casemap::CaseMapCloser;
 use icu_collections::codepointinvlist::CodePointInversionListBuilder;
 
@@ -55,8 +53,8 @@ impl OperationControl for Atom {
         CharacterClass::new(builder.build())
     }
 
-    fn optimize(&self, _flags: &ReFlags) -> Rc<Operation> {
-        Rc::new(Operation::from(self.clone()))
+    fn optimize(self, _flags: &ReFlags) -> Operation {
+        Operation::from(self)
     }
 
     fn matches_iter<'a>(

@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use crate::{
     operation::{Operation, OperationControl},
     re_flags::ReFlags,
@@ -24,8 +22,8 @@ impl OperationControl for BackReference {
         0
     }
 
-    fn optimize(&self, _flags: &ReFlags) -> Rc<Operation> {
-        Rc::new(Operation::from(self.clone()))
+    fn optimize(self, _flags: &ReFlags) -> Operation {
+        Operation::from(self)
     }
 
     fn matches_iter<'a>(

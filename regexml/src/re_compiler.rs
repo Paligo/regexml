@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use ahash::{HashSet, HashSetExt};
 use icu_casemap::CaseMapCloser;
 use icu_collections::codepointinvlist::CodePointInversionListBuilder;
@@ -795,7 +793,7 @@ impl ReCompiler {
             if let Some(match_length) = ret.get_match_length() {
                 if match_length > 0 {
                     Ok(Operation::from(GreedyFixed::new(
-                        Rc::new(ret),
+                        ret,
                         min,
                         max,
                         match_length,
@@ -805,17 +803,17 @@ impl ReCompiler {
                     Ok(Operation::from(Nothing))
                 }
             } else {
-                Ok(Operation::from(Repeat::new(Rc::new(ret), min, max, true)))
+                Ok(Operation::from(Repeat::new(ret, min, max, true)))
             }
         } else if let Some(match_length) = ret.get_match_length() {
             Ok(Operation::from(ReluctantFixed::new(
-                Rc::new(ret),
+                ret,
                 min,
                 max,
                 match_length,
             )))
         } else {
-            Ok(Operation::from(Repeat::new(Rc::new(ret), min, max, false)))
+            Ok(Operation::from(Repeat::new(ret, min, max, false)))
         }
     }
 
@@ -882,7 +880,7 @@ impl ReCompiler {
         let mut op = if branches.len() == 1 {
             branches.remove(0)
         } else {
-            Operation::from(Choice::new(branches.into_iter().map(Rc::new).collect()))
+            Operation::from(Choice::new(branches.into_iter().collect()))
         };
 
         // create an ending node (either a close paren or an OP_END)
@@ -893,7 +891,7 @@ impl ReCompiler {
                 return Err(Error::syntax("Missing close paren"));
             }
             if capturing {
-                op = Operation::from(Capture::new(group, Rc::new(op)));
+                op = Operation::from(Capture::new(group, op));
                 self.captures.insert(close_parens);
             }
         } else {
@@ -928,17 +926,17 @@ impl ReCompiler {
             }
             (Operation::Sequence(o1), o2) => {
                 let mut list = o1.operations.clone();
-                list.push(Rc::new(o2));
+                list.push(o2);
                 Operation::Sequence(Sequence::new(list))
             }
             (o1, Operation::Sequence(o2)) => {
                 let mut list = Vec::with_capacity(o2.operations.len() + 1);
-                list.push(Rc::new(o1));
+                list.push(o1);
                 list.extend(o2.operations);
                 Operation::Sequence(Sequence::new(list))
             }
             (o1, o2) => {
-                let list = vec![Rc::new(o1), Rc::new(o2)];
+                let list = vec![o1, o2];
                 Operation::Sequence(Sequence::new(list))
             }
         }
@@ -953,7 +951,7 @@ impl ReCompiler {
             let seq = Self::make_sequence(ret, end_node);
             Ok(ReProgram::new(
                 self.pattern,
-                Rc::new(seq),
+                seq,
                 Some(self.capturing_open_paren_count),
                 self.re_flags.clone(),
             ))

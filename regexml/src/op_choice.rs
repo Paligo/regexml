@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use icu_collections::codepointinvlist::CodePointInversionListBuilder;
 
 use crate::{
@@ -10,13 +8,13 @@ use crate::{
 };
 
 // A choice of several branches within a regular expression.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct Choice {
-    branches: Vec<Rc<Operation>>,
+    branches: Vec<Operation>,
 }
 
 impl Choice {
-    pub(crate) fn new(branches: Vec<Rc<Operation>>) -> Self {
+    pub(crate) fn new(branches: Vec<Operation>) -> Self {
         Self { branches }
     }
 }
@@ -54,15 +52,15 @@ impl OperationControl for Choice {
         CharacterClass::new(builder.build())
     }
 
-    fn optimize(&self, flags: &ReFlags) -> Rc<Operation> {
+    fn optimize(self, flags: &ReFlags) -> Operation {
         let optimized_branches = self
             .branches
-            .iter()
+            .into_iter()
             .map(|branch| branch.optimize(flags))
             .collect();
-        Rc::new(Operation::from(Choice {
+        Operation::from(Choice {
             branches: optimized_branches,
-        }))
+        })
     }
 
     fn matches_empty_string(&self) -> u32 {
@@ -78,7 +76,7 @@ impl OperationControl for Choice {
 
     fn contains_capturing_expressions(&self) -> bool {
         for o in &self.branches {
-            if matches!(o.as_ref(), Operation::Capture(_)) || o.contains_capturing_expressions() {
+            if matches!(o, Operation::Capture(_)) || o.contains_capturing_expressions() {
                 return true;
             }
         }
@@ -86,18 +84,14 @@ impl OperationControl for Choice {
     }
 
     fn matches_iter<'a>(
-        &self,
+        &'a self,
         matcher: &'a ReMatcher<'a>,
         position: usize,
     ) -> Box<dyn Iterator<Item = usize> + 'a> {
-        Box::new(ChoiceIterator::new(
-            matcher,
-            position,
-            self.branches.clone(),
-        ))
+        Box::new(ChoiceIterator::new(matcher, position, &self.branches))
     }
 
-    fn children(&self) -> Vec<Rc<Operation>> {
+    fn children(&self) -> Vec<Operation> {
         self.branches.clone()
     }
 }
@@ -105,16 +99,16 @@ impl OperationControl for Choice {
 struct ChoiceIterator<'a> {
     matcher: &'a ReMatcher<'a>,
     position: usize,
-    branches_iter: Box<dyn Iterator<Item = Rc<Operation>> + 'a>,
+    branches_iter: Box<dyn Iterator<Item = &'a Operation> + 'a>,
     current_iter: Option<Box<dyn Iterator<Item = usize> + 'a>>,
 }
 
 impl<'a> ChoiceIterator<'a> {
-    fn new(matcher: &'a ReMatcher<'a>, position: usize, branches: Vec<Rc<Operation>>) -> Self {
+    fn new(matcher: &'a ReMatcher<'a>, position: usize, branches: &'a [Operation]) -> Self {
         Self {
             matcher,
             position,
-            branches_iter: Box::new(branches.into_iter()),
+            branches_iter: Box::new(branches.iter()),
             current_iter: None,
         }
     }

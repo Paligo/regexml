@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use crate::{
     operation::{Operation, OperationControl, MATCHES_ZLS_ANYWHERE},
     re_flags::ReFlags,
@@ -19,8 +17,8 @@ impl OperationControl for Nothing {
         MATCHES_ZLS_ANYWHERE
     }
 
-    fn optimize(&self, _flags: &ReFlags) -> Rc<Operation> {
-        Rc::new(Operation::from(self.clone()))
+    fn optimize(self, _flags: &ReFlags) -> Operation {
+        Operation::from(self)
     }
 
     fn matches_iter(

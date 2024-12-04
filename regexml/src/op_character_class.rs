@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use crate::{
     character_class::CharacterClass,
     operation::{Operation, OperationControl, MATCHES_ZLS_NEVER},
@@ -33,8 +31,8 @@ impl OperationControl for CharClass {
         self.character_class.clone()
     }
 
-    fn optimize(&self, _flags: &ReFlags) -> Rc<Operation> {
-        Rc::new(Operation::from(self.clone()))
+    fn optimize(self, _flags: &ReFlags) -> Operation {
+        Operation::from(self)
     }
 
     fn matches_iter<'b>(
