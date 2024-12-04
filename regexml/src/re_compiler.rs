@@ -371,7 +371,7 @@ impl ReCompiler {
         let mut simple_char;
         let mut positive = true;
         let mut defining_range = false;
-        let mut range_start = None;
+        let mut range_start: Option<char> = None;
         let mut range_end;
 
         let mut builder = CodePointInversionListBuilder::new();
@@ -461,7 +461,13 @@ impl ReCompiler {
                 // actually create a range if the range is ok
                 if let (Some(start), Some(end)) = (range_start, range_end) {
                     if start > end {
-                        return Err(Error::syntax("Bad character range: start > end"));
+                        let start_d = start.to_digit(10).unwrap();
+                        let end_d = end.to_digit(10).unwrap();
+                        // format start as hex
+                        return Err(Error::syntax(format!(
+                            "Bad character range: start ({:X}) > end ({:X})",
+                            start_d, end_d
+                        )));
                         // Technically this is not an error in XSD, merely a
                         // no-op; but it is so utterly pointless that it is
                         // almost certainly a mistake; and we have no way of
