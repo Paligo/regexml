@@ -1,5 +1,3 @@
-use std::cell::RefCell;
-
 #[cfg(test)]
 use crate::operation::Operation;
 use crate::re_compiler::ReCompiler;
@@ -17,7 +15,7 @@ pub use crate::re_flags::Language;
 #[derive(Debug)]
 pub struct Regex {
     re_program: ReProgram,
-    matches_empty_string: RefCell<Option<bool>>,
+    matches_empty_string: bool,
 }
 
 impl Regex {
@@ -26,9 +24,12 @@ impl Regex {
         let pattern = re.chars().collect();
         let re_compiler = ReCompiler::new(pattern, re_flags);
         let re_program = re_compiler.compile()?;
+        // we need to check if the regex matches the empty string
+        let mut matcher = ReMatcher::new(&re_program, "");
+        let matches_empty_string = matcher.is_match();
         Ok(Self {
             re_program,
-            matches_empty_string: RefCell::new(None),
+            matches_empty_string,
         })
     }
 
@@ -51,23 +52,10 @@ impl Regex {
     // returns an error if this regex is known to match an empty string.
     // caches the last result so it doesn't have to do the match again.
     fn check_matches_empty_string(&self) -> Result<(), Error> {
-        let matches_empty_string = *self.matches_empty_string.borrow();
-        if let Some(matches_empty_string) = matches_empty_string {
-            if !matches_empty_string {
-                Ok(())
-            } else {
-                Err(Error::MatchesEmptyString)
-            }
+        if !self.matches_empty_string {
+            Ok(())
         } else {
-            // we need to check if the regex matches the empty string
-            let mut matcher = self.matcher("");
-            let matches_empty_string = matcher.is_match();
-            *self.matches_empty_string.borrow_mut() = Some(matches_empty_string);
-            if matches_empty_string {
-                Err(Error::MatchesEmptyString)
-            } else {
-                Ok(())
-            }
+            Err(Error::MatchesEmptyString)
         }
     }
 
