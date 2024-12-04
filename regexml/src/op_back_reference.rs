@@ -22,8 +22,8 @@ impl OperationControl for BackReference {
         0
     }
 
-    fn optimize(&self, _flags: &ReFlags) -> Operation {
-        Operation::from(self.clone())
+    fn optimize(self, _flags: &ReFlags) -> Operation {
+        Operation::from(self)
     }
 
     fn matches_iter<'a>(

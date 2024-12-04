@@ -50,20 +50,23 @@ impl OperationControl for Sequence {
         CharacterClass::new(builder.build())
     }
 
-    fn optimize(&self, flags: &ReFlags) -> Operation {
+    fn optimize(self, flags: &ReFlags) -> Operation {
         match self.operations.len() {
             0 => Operation::from(Nothing),
-            1 => self.operations[0].clone(),
+            1 => self.operations.into_iter().next().unwrap(),
             _ => {
+                let l = self.operations.len();
+                // cannot avoid clone here as we are referring to the operations
                 let operations = self
                     .operations
                     .iter()
+                    .cloned()
                     .enumerate()
                     .map(|(i, o)| {
                         let optimized = o.optimize(flags);
                         // we can never further optimize the last operation,
                         // as it has no adjacent operation
-                        if i == self.operations.len() - 1 {
+                        if i == l - 1 {
                             return optimized;
                         }
                         // now if this is a repeat operation, we may be able

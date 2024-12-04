@@ -52,10 +52,10 @@ impl OperationControl for Choice {
         CharacterClass::new(builder.build())
     }
 
-    fn optimize(&self, flags: &ReFlags) -> Operation {
+    fn optimize(self, flags: &ReFlags) -> Operation {
         let optimized_branches = self
             .branches
-            .iter()
+            .into_iter()
             .map(|branch| branch.optimize(flags))
             .collect();
         Operation::from(Choice {

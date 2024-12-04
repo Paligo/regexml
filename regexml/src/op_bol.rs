@@ -15,8 +15,8 @@ impl OperationControl for Bol {
         MATCHES_ZLS_AT_START
     }
 
-    fn optimize(&self, _flags: &ReFlags) -> Operation {
-        Operation::from(self.clone())
+    fn optimize(self, _flags: &ReFlags) -> Operation {
+        Operation::from(self)
     }
 
     fn matches_iter<'a>(

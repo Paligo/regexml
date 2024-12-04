@@ -53,8 +53,8 @@ impl OperationControl for Atom {
         CharacterClass::new(builder.build())
     }
 
-    fn optimize(&self, _flags: &ReFlags) -> Operation {
-        Operation::from(self.clone())
+    fn optimize(self, _flags: &ReFlags) -> Operation {
+        Operation::from(self)
     }
 
     fn matches_iter<'a>(

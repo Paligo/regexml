@@ -17,8 +17,8 @@ impl OperationControl for EndProgram {
         MATCHES_ZLS_ANYWHERE
     }
 
-    fn optimize(&self, _flags: &ReFlags) -> Operation {
-        Operation::from(self.clone())
+    fn optimize(self, _flags: &ReFlags) -> Operation {
+        Operation::from(self)
     }
 
     fn matches_iter(

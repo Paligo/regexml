@@ -51,7 +51,7 @@ impl OperationControl for ReluctantFixed {
             || self.operation.contains_capturing_expressions()
     }
 
-    fn optimize(&self, flags: &ReFlags) -> Operation {
+    fn optimize(self, flags: &ReFlags) -> Operation {
         let operation = self.operation.optimize(flags);
         Operation::from(ReluctantFixed {
             operation: operation.into(),

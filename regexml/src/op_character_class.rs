@@ -31,8 +31,8 @@ impl OperationControl for CharClass {
         self.character_class.clone()
     }
 
-    fn optimize(&self, _flags: &ReFlags) -> Operation {
-        Operation::from(self.clone())
+    fn optimize(self, _flags: &ReFlags) -> Operation {
+        Operation::from(self)
     }
 
     fn matches_iter<'b>(

@@ -47,12 +47,12 @@ impl OperationControl for GreedyFixed {
         }
     }
 
-    fn optimize(&self, flags: &ReFlags) -> Operation {
+    fn optimize(self, flags: &ReFlags) -> Operation {
         if self.max == 0 {
             return Operation::from(Nothing);
         }
         if self.operation.get_match_length() == Some(0) {
-            return self.operation.as_ref().clone();
+            return *self.operation;
         }
         let operation = self.operation.optimize(flags);
         Operation::from(GreedyFixed {

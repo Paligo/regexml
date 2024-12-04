@@ -17,8 +17,8 @@ impl OperationControl for Eol {
         MATCHES_ZLS_AT_END
     }
 
-    fn optimize(&self, _flags: &ReFlags) -> Operation {
-        Operation::from(self.clone())
+    fn optimize(self, _flags: &ReFlags) -> Operation {
+        Operation::from(self)
     }
 
     fn matches_iter(

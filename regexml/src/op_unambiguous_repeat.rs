@@ -54,7 +54,7 @@ impl OperationControl for UnambiguousRepeat {
         }
     }
 
-    fn optimize(&self, flags: &ReFlags) -> Operation {
+    fn optimize(self, flags: &ReFlags) -> Operation {
         Operation::from(UnambiguousRepeat {
             operation: self.operation.optimize(flags).into(),
             min: self.min,

@@ -34,7 +34,7 @@ impl OperationControl for Capture {
         self.child_op.matches_empty_string()
     }
 
-    fn optimize(&self, flags: &ReFlags) -> Operation {
+    fn optimize(self, flags: &ReFlags) -> Operation {
         Operation::from(Capture {
             group_nr: self.group_nr,
             child_op: Box::new(self.child_op.optimize(flags)),

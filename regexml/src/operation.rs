@@ -51,7 +51,7 @@ pub(crate) trait OperationControl {
 
     // TODO: I don't know how to spell a generic one for this, which just
     // clones the operation, so I've replicated them for the various structs.
-    fn optimize(&self, _flags: &ReFlags) -> Operation;
+    fn optimize(self, _flags: &ReFlags) -> Operation;
 
     /// Ask whether the regular expression is known, after static analysis, to
     /// match a zero-length string.
