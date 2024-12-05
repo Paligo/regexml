@@ -1,0 +1,8 @@
+# Credits
+
+This is a port of a Java project by Michael Kay, made as part of the Saxon project.
+
+This in turn is an extension of the Jakarta Regexp project, made by the Jakarta
+project.
+
+This port was made possible thanks to the generous support by [Paligo](https://paligo.net).

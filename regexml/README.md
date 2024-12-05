@@ -55,5 +55,3 @@ The Java code has been translated by hand into Rust. There are some differences:
 Now that the port is complete we expect this package to evolve separately
 wherever it may go - no 1 to 1 mapping with the original Java code is going to
 be maintained.
-
-See also the `PORT_NOTES.md` for some further nodes on porting.
