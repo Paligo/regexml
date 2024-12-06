@@ -215,7 +215,7 @@ impl<'a> SequenceIterator<'a> {
     }
 }
 
-impl<'a> Iterator for SequenceIterator<'a> {
+impl Iterator for SequenceIterator<'_> {
     type Item = usize;
 
     // Advance the current iterator if possible. Get the first match for all

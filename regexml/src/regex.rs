@@ -118,7 +118,7 @@ pub struct TokenIter<'a> {
     prev_end: Option<usize>,
 }
 
-impl<'a> Iterator for TokenIter<'a> {
+impl Iterator for TokenIter<'_> {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {

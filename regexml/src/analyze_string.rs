@@ -197,7 +197,7 @@ impl<'a> AnalyzeIter<'a> {
     }
 }
 
-impl<'a> Iterator for AnalyzeIter<'a> {
+impl Iterator for AnalyzeIter<'_> {
     type Item = AnalyzeEntry;
 
     fn next(&mut self) -> Option<Self::Item> {

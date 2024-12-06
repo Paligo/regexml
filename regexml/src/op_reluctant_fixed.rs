@@ -130,7 +130,7 @@ impl<'a> ReluctantFixedIterator<'a> {
     }
 }
 
-impl<'a> Iterator for ReluctantFixedIterator<'a> {
+impl Iterator for ReluctantFixedIterator<'_> {
     type Item = usize;
 
     fn next(&mut self) -> Option<Self::Item> {

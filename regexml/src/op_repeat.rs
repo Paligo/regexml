@@ -191,7 +191,7 @@ impl<'a> GreedyRepeatIterator<'a> {
     }
 }
 
-impl<'a> Iterator for GreedyRepeatIterator<'a> {
+impl Iterator for GreedyRepeatIterator<'_> {
     type Item = usize;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -262,7 +262,7 @@ impl<'a> ReluctantRepeatIterator<'a> {
     }
 }
 
-impl<'a> Iterator for ReluctantRepeatIterator<'a> {
+impl Iterator for ReluctantRepeatIterator<'_> {
     type Item = usize;
 
     fn next(&mut self) -> Option<Self::Item> {

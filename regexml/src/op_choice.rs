@@ -127,7 +127,7 @@ impl<'a> ChoiceIterator<'a> {
     }
 }
 
-impl<'a> Iterator for ChoiceIterator<'a> {
+impl Iterator for ChoiceIterator<'_> {
     type Item = usize;
 
     fn next(&mut self) -> Option<Self::Item> {

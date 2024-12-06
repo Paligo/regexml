@@ -87,7 +87,7 @@ impl<'a> CaptureGroupIterator<'a> {
     }
 }
 
-impl<'a> Iterator for CaptureGroupIterator<'a> {
+impl Iterator for CaptureGroupIterator<'_> {
     type Item = usize;
 
     fn next(&mut self) -> Option<Self::Item> {

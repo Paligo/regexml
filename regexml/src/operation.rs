@@ -48,7 +48,7 @@ pub(crate) trait OperationControl {
     }
 
     /// Get an optimized version of this operation.
-
+    ///
     // TODO: I don't know how to spell a generic one for this, which just
     // clones the operation, so I've replicated them for the various structs.
     fn optimize(self, _flags: &ReFlags) -> Operation;
@@ -163,7 +163,7 @@ impl<'a> ForceProgressIterator<'a> {
         }
     }
 }
-impl<'a> Iterator for ForceProgressIterator<'a> {
+impl Iterator for ForceProgressIterator<'_> {
     type Item = usize;
 
     fn next(&mut self) -> Option<Self::Item> {
