@@ -6,11 +6,11 @@ authors = ["Regexml contributors"]
 license = "Apache-2.0"
 
 [dependencies]
-ahash = "0.8.3"
-enum_dispatch = "0.3.12"
-icu_casemap = "1.4.0"
-icu_collections = "1.4.0"
-icu_properties = "1.4.0"
+ahash = "0.8.11"
+enum_dispatch = "0.3.13"
+icu_casemap = "1.5.1"
+icu_collections = "1.5.0"
+icu_properties = "1.5.1"
 
 [dev-dependencies]
-insta = { version = "1.29.0", features = ["yaml", "glob"] }
+insta = { version = "1.42.2", features = ["yaml", "glob"] }
