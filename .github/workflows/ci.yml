@@ -26,7 +26,7 @@ jobs:
       # caching
       - uses: Swatinem/rust-cache@v2
 
-      - run: cargo check --locked
-      - run: cargo test --verbose --locked
-      - run: cargo build --verbose --locked
+      - run: cargo check --frozen
+      - run: cargo test --verbose --frozen
+      - run: cargo build --verbose --frozen
       
