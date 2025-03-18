@@ -21,7 +21,7 @@ Note: "Secondary Licenses" is defined by the MPL 2.0 as one of the GPL licenses.
 
 ## Apache 2.0 license
 
-The Saxon Regex engine is an extension of the jakarata-regexml project,
+The Saxon Regex engine is an extension of the jakarta-regexml project,
 a project archived here:
 
 https://attic.apache.org/projects/jakarta-regexp.html
