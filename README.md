@@ -1,6 +1,6 @@
 # regexml
 
-This Rust workspace contains three related project
+This Rust workspace contains three related projects:
 
 - [regexml](regexml/README.md) - an XML compliant regex implementation in Rust
 
