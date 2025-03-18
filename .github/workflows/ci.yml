@@ -28,13 +28,9 @@ jobs:
         id: cache-dependencies
         uses: Swatinem/rust-cache@v2
 
-      - name: Initial cargo fetch
-        if: steps.cache-dependencies.outputs.cache-hit != 'true'
-        run: cargo fetch
-
       - name: Build
-        run: cargo build --verbose --frozen
+        run: cargo build --verbose
       
       - name: Test
-        run: cargo test --verbose --frozen
+        run: cargo test --verbose
       
