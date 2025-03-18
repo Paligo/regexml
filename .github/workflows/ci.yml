@@ -1,23 +1,32 @@
+# Following a bunch of recommendations from
+# https://corrode.dev/blog/tips-for-faster-ci-builds/
+
 name: Cargo Build & Test
 
 on:
   push:
+    branches: 
+      - main 
   pull_request:
 
 env: 
   CARGO_TERM_COLOR: always
+  # disable incremental compilation for faster from scratch builds
+  CARGO_INCREMENTAL: 0
+  # disable debug info to increase caching efficiency
+  CARGO_PROFILE_TEST_DEBUG: 0
 
 jobs:
   build_and_test:
     name: Rust project - latest
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        toolchain:
-          - stable
     steps:
       - uses: actions/checkout@v4
-      - run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
-      - run: cargo build --verbose
-      - run: cargo test --verbose
+      - uses: dtolnay/rust-toolchain@stable
+      # caching
+      - uses: Swatinem/rust-cache@v2
+
+      - run: cargo check --locked
+      - run: cargo test --verbose --locked
+      - run: cargo build --verbose --locked
       
