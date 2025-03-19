@@ -5,6 +5,11 @@ edition = "2021"
 authors = ["Regexml contributors"]
 license = "Apache-2.0 OR MPL-2.0"
 description = "Maintain blocks.rs in regexml"
+documentation = "https://docs.rs/regexml-ucd-blocks"
+repository = "https://github.com/Paligo/regexml"
+readme = "README.md"
+keywords = ["regexml"]
+categories = ["development-tools", "command-line-utilities"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
