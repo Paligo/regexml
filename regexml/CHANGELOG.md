@@ -9,9 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.0](https://github.com/Paligo/regexml/compare/regexml-v0.1.1...regexml-v0.2.0) - 2025-03-19
 
-### Other
+- Implement API docs.
 
-- (feat) Implement API docs.
+### Breaking
+
+- The `Language` enum was removed from the public API as it was not in use.
 
 ## [0.1.1](https://github.com/Paligo/regexml/compare/regexml-v0.1.0...regexml-v0.1.1) - 2025-03-19
 
