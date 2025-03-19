@@ -1,3 +1,6 @@
+#![warn(missing_docs)]
+#![doc = include_str!("../README.md")]
+
 mod analyze_string;
 mod block;
 mod category;
@@ -26,5 +29,4 @@ mod regex;
 
 pub use crate::analyze_string::{AnalyzeEntry, MatchEntry};
 pub use crate::re_compiler::Error;
-pub use crate::re_flags::Language;
 pub use crate::regex::Regex;

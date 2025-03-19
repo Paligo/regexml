@@ -1,8 +1,16 @@
 use crate::re_compiler::Error;
 
+/// Regular expressions can be compiled for XSD, or following
+/// the XPath superset.
+///
+/// Only the XPath superset is currently properly tested.
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub enum Language {
+pub(crate) enum Language {
+    /// Follow the XML Schema definition of regular expressions only,
+    /// don't allow XPath extensions
     XSD,
+    /// Follow the XPath 3.1 definition of regular expressions, which
+    /// includes some additional features.
     XPath,
 }
 
