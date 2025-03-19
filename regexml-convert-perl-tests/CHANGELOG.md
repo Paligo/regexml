@@ -9,9 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.2](https://github.com/Paligo/regexml/compare/regexml-convert-perl-tests-v0.1.1...regexml-convert-perl-tests-v0.1.2) - 2025-03-19
 
-### Other
-
-- Improve cargo fields.
+- Improve cargo metadata.
 
 ## [0.1.1](https://github.com/Paligo/regexml/compare/regexml-convert-perl-tests-v0.1.0...regexml-convert-perl-tests-v0.1.1) - 2025-03-19
 
