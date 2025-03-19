@@ -9,9 +9,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.0](https://github.com/Paligo/regexml/releases/tag/regexml-ucd-blocks-v0.1.0) - 2025-03-19
 
-### Other
-
-- Add in authors.
-- Add some compatibility blocks.
-- More tweaking.
-- Add regexml-ucd-blocks.
+Initial public release.
