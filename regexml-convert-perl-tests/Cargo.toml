@@ -5,7 +5,11 @@ edition = "2021"
 authors = ["Regexml contributors"]
 license = "Apache-2.0 OR MPL-2.0"
 description = "Convert Perl tests to Rust tests"
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+documentation = "https://docs.rs/regexml-convert-perl-tests"
+repository = "https://github.com/Paligo/regexml"
+readme = "README.md"
+keywords = ["regexml"]
+categories = ["development-tools", "command-line-utilities"]
 
 [dependencies]
 xot = "0.29.0"
