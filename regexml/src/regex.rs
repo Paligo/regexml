@@ -1,13 +1,13 @@
 #[cfg(test)]
 use crate::operation::Operation;
 use crate::re_compiler::ReCompiler;
+use crate::re_flags::Language;
 use crate::re_flags::ReFlags;
 use crate::re_matcher::ReMatcher;
 use crate::re_program::ReProgram;
 
 pub use crate::analyze_string::AnalyzeIter;
 pub use crate::re_compiler::Error;
-pub use crate::re_flags::Language;
 
 /// A XML-style regular expression.
 #[derive(Debug)]

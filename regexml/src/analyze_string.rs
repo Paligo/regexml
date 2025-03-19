@@ -1,16 +1,30 @@
 use crate::re_matcher::ReMatcher;
+#[cfg(doc)]
+use crate::regex::Regex;
 use ahash::{HashMap, HashMapExt};
 
+/// The [`Regex::analyze`] method returns an iterator over the results of
+/// analyzing a string with a regular expression. It contains these entries.
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum AnalyzeEntry {
+    /// Match entries of a match
     Match(Vec<MatchEntry>),
+    /// A non-match
     NonMatch(String),
 }
 
+/// A match can be a simple match, or a group match.
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum MatchEntry {
+    /// A match with a string
     String(String),
-    Group { nr: usize, value: Vec<MatchEntry> },
+    /// A match with a group. This contains further match entries.
+    Group {
+        /// The group number
+        nr: usize,
+        /// Match entries of the group
+        value: Vec<MatchEntry>,
+    },
 }
 
 #[derive(Debug)]

@@ -52,17 +52,18 @@ pub(crate) struct ReCompiler {
     re_flags: ReFlags,
 }
 
+/// Regular expression error
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Error {
+    /// Internal error
     Internal,
-    // FORX0001
+    /// Invalid flags (FORX0001)
     InvalidFlags(String),
-    // FORX0002
+    /// Syntax error (FORX0002)
     Syntax(String),
-
-    // FORX0003
+    /// Pattern matches an empty string (FORX0003)
     MatchesEmptyString,
-    // FORX0004
+    /// Replacement string is invalid (FORX0004)
     InvalidReplacementString(String),
 }
 
