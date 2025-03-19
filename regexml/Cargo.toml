@@ -1,6 +1,6 @@
 [package]
 name = "regexml"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 authors = ["Regexml contributors"]
 license = "Apache-2.0 OR MPL-2.0"
