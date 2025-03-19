@@ -3,7 +3,7 @@ name = "regexml"
 version = "0.1.0"
 edition = "2021"
 authors = ["Regexml contributors"]
-license = "Apache-2.0"
+license = "Apache-2.0 or MPL-2.0"
 description = "XPath compatible regex engine"
 
 [dependencies]
