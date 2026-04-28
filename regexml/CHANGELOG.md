@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2](https://github.com/Paligo/regexml/compare/regexml-v0.2.1...regexml-v0.2.2) - 2026-04-28
+
+### Fixed
+
+- fix panic in analyze-string
+
 ## [0.2.1](https://github.com/Paligo/regexml/compare/regexml-v0.2.0...regexml-v0.2.1) - 2025-03-19
 
 - Improve cargo metadata.
