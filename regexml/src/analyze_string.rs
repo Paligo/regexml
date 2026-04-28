@@ -117,8 +117,8 @@ impl<'a> AnalyzeIter<'a> {
                             .or_insert_with(|| {
                                 let mut v = Vec::with_capacity(4);
                                 let i: isize = i.try_into().unwrap();
-                                v.push(-i);
                                 v.push(i);
+                                v.push(-i);
                                 v
                             });
                     }

@@ -518,3 +518,27 @@ fn test_analyze_string_903() {
     let result = regex.analyze("abc").unwrap_err();
     assert_eq!(result, Error::MatchesEmptyString);
 }
+
+// analyze-string with optional groups that don't participate in a match.
+// Regression test: optional groups (e.g. `([0-9]{1,2})?`) that don't match
+// produced zero-length group entries where the start/end events were inserted
+// in the wrong order (end before start), causing a panic in on_group_end.
+#[test]
+fn test_analyze_string_optional_groups() {
+    let regex =
+        Regex::xpath(r"([0-9]{1,2})?\s?([A-Z]{1}[a-z]{1,8}\.?)?\s?([0-9]{4})", "").unwrap();
+    let result = regex.analyze("1949").unwrap().collect::<Vec<_>>();
+    assert_eq!(
+        result,
+        vec![AnalyzeEntry::Match(vec![
+            MatchEntry::Group {
+                nr: 1,
+                value: vec![]
+            },
+            MatchEntry::Group {
+                nr: 3,
+                value: vec![MatchEntry::String("1949".to_string())]
+            },
+        ])]
+    );
+}
