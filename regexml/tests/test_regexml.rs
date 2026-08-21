@@ -229,3 +229,37 @@ fn test_matches_31() {
     let regex = Regex::xpath("(?:abra(?:cad)?)*", "").unwrap();
     assert!(regex.is_match("abracadabra"));
 }
+
+#[test]
+fn test_is_full_match_whole_string() {
+    let regex = Regex::xsd("a", "").unwrap();
+    assert!(regex.is_full_match("a"));
+    assert!(!regex.is_full_match("ab"));
+    assert!(!regex.is_full_match("ba"));
+    assert!(regex.is_match("ab"));
+}
+
+#[test]
+fn test_is_full_match_leftmost_alternative_backtracks() {
+    // A leftmost-first engine finds the short branch first; full matching
+    // must still accept through the longer one.
+    let regex = Regex::xsd("a|ab", "").unwrap();
+    assert!(regex.is_full_match("a"));
+    assert!(regex.is_full_match("ab"));
+    assert!(!regex.is_full_match("abc"));
+}
+
+#[test]
+fn test_is_full_match_xpath_anchors_still_work() {
+    let regex = Regex::xpath("^a$", "").unwrap();
+    assert!(regex.is_full_match("a"));
+    assert!(!regex.is_full_match("aa"));
+}
+
+#[test]
+fn test_is_full_match_empty() {
+    let regex = Regex::xsd("a?", "").unwrap();
+    assert!(regex.is_full_match(""));
+    assert!(regex.is_full_match("a"));
+    assert!(!regex.is_full_match("aa"));
+}
