@@ -185,6 +185,13 @@ impl<'a> ReMatcher<'a> {
         self.matches(0)
     }
 
+    pub(crate) fn is_full_match(&mut self) -> bool {
+        // clear the captured group state
+        self.state.borrow_mut().capture_state = CaptureState::new();
+
+        self.match_at(0, true)
+    }
+
     fn check_preconditions(&self, start: usize) -> bool {
         for precondition in &self.program.preconditions {
             if let Some(fixed_position) = precondition.fixed_position {

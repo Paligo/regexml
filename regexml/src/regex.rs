@@ -47,6 +47,18 @@ impl Regex {
         matcher.is_match()
     }
 
+    /// Returns `true` if the whole argument matches this regular expression.
+    ///
+    /// This is the matching operation of XML Schema's `pattern` facet: XSD
+    /// "implicitly anchors all regular expressions at the head and tail", so
+    /// the expression must account for the entire input. [`Regex::is_match`],
+    /// by contrast, searches for a match anywhere inside the haystack, which
+    /// is the XPath `fn:matches` semantics.
+    pub fn is_full_match(&self, haystack: &str) -> bool {
+        let mut matcher = self.matcher(haystack);
+        matcher.is_full_match()
+    }
+
     // returns an error if this regex is known to match an empty string.
     // caches the last result so it doesn't have to do the match again.
     fn check_matches_empty_string(&self) -> Result<(), Error> {
