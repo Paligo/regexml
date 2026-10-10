@@ -1,7 +1,8 @@
 use crate::{
     character_class::CharacterClass,
     operation::{
-        ForceProgressIterator, Operation, OperationControl, RepeatOperation, MATCHES_ZLS_ANYWHERE,
+        captures, groups_of, unbind_groups, ForceProgressIterator, Operation, OperationControl,
+        RepeatOperation, RestoreCaptures, MATCHES_ZLS_ANYWHERE,
     },
     re_flags::ReFlags,
     re_matcher::ReMatcher,
@@ -78,7 +79,30 @@ impl OperationControl for Repeat {
 
     fn matches_iter<'a>(
         &'a self,
-        matcher: &'a ReMatcher,
+        matcher: &'a ReMatcher<'a>,
+        position: usize,
+    ) -> Box<dyn Iterator<Item = usize> + 'a> {
+        if matcher.tracks_captures() && captures(&self.operation) {
+            let mark = matcher.trail_mark();
+            RestoreCaptures::wrap(matcher, mark, self.repeat_iter(matcher, position))
+        } else {
+            self.repeat_iter(matcher, position)
+        }
+    }
+
+    fn children(&self) -> Vec<Operation> {
+        vec![self.operation.as_ref().clone()]
+    }
+
+    fn collect_groups(&self, groups: &mut Vec<usize>) {
+        self.operation.collect_groups(groups);
+    }
+}
+
+impl Repeat {
+    fn repeat_iter<'a>(
+        &'a self,
+        matcher: &'a ReMatcher<'a>,
         position: usize,
     ) -> Box<dyn Iterator<Item = usize> + 'a> {
         let mut iterators: Vec<Box<dyn Iterator<Item = usize>>> = Vec::new();
@@ -94,10 +118,16 @@ impl OperationControl for Repeat {
             // code, i.e. GreedyFixed, ReluctantFixed, UnambiguousRepeat),
             // because each of these subclasses overrides matches_iter anyway,
             // so this code can never be reached.
+            // with zero occurrences allowed, the groups of a capturing
+            // operand are left unmatched when zero occurrences are reported
+            let mut zero_groups = None;
             if self.min == 0 && !matcher.is_duplicate_zero_length_match(self, position) {
                 // add a match at the current position if zero occurrences are allowed
                 iterators.push(Box::new(std::iter::once(position)));
                 positions.push(p);
+                if matcher.tracks_captures() && captures(&self.operation) {
+                    zero_groups = Some(groups_of(&self.operation));
+                }
             }
             for _i in 0..bound {
                 let mut it = self.operation.matches_iter(matcher, p);
@@ -121,6 +151,7 @@ impl OperationControl for Repeat {
                     positions,
                     bound,
                     self.min,
+                    zero_groups,
                 ),
             )))
         } else {
@@ -135,10 +166,6 @@ impl OperationControl for Repeat {
                 ),
             )))
         }
-    }
-
-    fn children(&self) -> Vec<Operation> {
-        vec![self.operation.as_ref().clone()]
     }
 }
 
@@ -168,6 +195,11 @@ struct GreedyRepeatIterator<'a> {
     iterators: Vec<Box<dyn Iterator<Item = usize> + 'a>>,
     positions: Vec<usize>,
     bound: usize,
+    // the groups of a capturing operand when `iterators[0]` is the
+    // zero-occurrence entry, and the capture log's length before they were
+    // left unmatched for reporting zero occurrences
+    zero_groups: Option<Vec<usize>>,
+    unbound: Option<usize>,
 }
 
 impl<'a> GreedyRepeatIterator<'a> {
@@ -178,6 +210,7 @@ impl<'a> GreedyRepeatIterator<'a> {
         positions: Vec<usize>,
         bound: usize,
         min: usize,
+        zero_groups: Option<Vec<usize>>,
     ) -> Self {
         Self {
             primed: true,
@@ -187,6 +220,8 @@ impl<'a> GreedyRepeatIterator<'a> {
             iterators,
             positions,
             bound,
+            zero_groups,
+            unbound: None,
         }
     }
 }
@@ -195,6 +230,9 @@ impl Iterator for GreedyRepeatIterator<'_> {
     type Item = usize;
 
     fn next(&mut self) -> Option<Self::Item> {
+        if let Some(mark) = self.unbound.take() {
+            self.matcher.undo_to(mark);
+        }
         let has_next = if self.primed && self.iterators.len() >= self.min {
             !self.iterators.is_empty()
         } else if self.iterators.is_empty() {
@@ -227,6 +265,11 @@ impl Iterator for GreedyRepeatIterator<'_> {
         };
         if has_next {
             self.primed = false;
+            if self.iterators.len() == 1 {
+                if let Some(groups) = &self.zero_groups {
+                    self.unbound = Some(unbind_groups(self.matcher, groups));
+                }
+            }
             self.positions.last().copied()
         } else {
             None

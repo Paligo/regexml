@@ -523,10 +523,25 @@ fn test_analyze_string_903() {
 // Regression test: optional groups (e.g. `([0-9]{1,2})?`) that don't match
 // produced zero-length group entries where the start/end events were inserted
 // in the wrong order (end before start), causing a panic in on_group_end.
+//
+// `([0-9]{1,2})?` matches nothing here: its attempts ("19", then "1") are
+// backtracked, so group 1 has captured nothing and is not reported (it used to
+// be reported as an empty group, a leftover of those attempts; the group
+// cannot match a zero-length string). A group that does match a zero-length
+// string, `([0-9]{0,2})`, is reported, still in the right order.
 #[test]
 fn test_analyze_string_optional_groups() {
-    let regex =
-        Regex::xpath(r"([0-9]{1,2})?\s?([A-Z]{1}[a-z]{1,8}\.?)?\s?([0-9]{4})", "").unwrap();
+    let regex = Regex::xpath(r"([0-9]{1,2})?\s?([A-Z]{1}[a-z]{1,8}\.?)?\s?([0-9]{4})", "").unwrap();
+    let result = regex.analyze("1949").unwrap().collect::<Vec<_>>();
+    assert_eq!(
+        result,
+        vec![AnalyzeEntry::Match(vec![MatchEntry::Group {
+            nr: 3,
+            value: vec![MatchEntry::String("1949".to_string())]
+        }])]
+    );
+
+    let regex = Regex::xpath(r"([0-9]{0,2})\s?([A-Z]{1}[a-z]{1,8}\.?)?\s?([0-9]{4})", "").unwrap();
     let result = regex.analyze("1949").unwrap().collect::<Vec<_>>();
     assert_eq!(
         result,

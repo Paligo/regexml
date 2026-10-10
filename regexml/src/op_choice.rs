@@ -94,6 +94,12 @@ impl OperationControl for Choice {
     fn children(&self) -> Vec<Operation> {
         self.branches.clone()
     }
+
+    fn collect_groups(&self, groups: &mut Vec<usize>) {
+        for branch in &self.branches {
+            branch.collect_groups(groups);
+        }
+    }
 }
 
 struct ChoiceIterator<'a> {
@@ -117,8 +123,8 @@ impl<'a> ChoiceIterator<'a> {
         // look for the next branch
         let next_op = self.branches_iter.next();
         if let Some(next_op) = next_op {
-            // if there is one, set the current iter to that one
-            self.matcher.clear_captured_groups_beyond(self.position);
+            // if there is one, set the current iter to that one; the branch
+            // before it is exhausted, so it has taken back its captures
             self.current_iter = Some(next_op.matches_iter(self.matcher, self.position));
             true
         } else {

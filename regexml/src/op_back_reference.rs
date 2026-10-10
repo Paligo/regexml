@@ -68,8 +68,12 @@ impl OperationControl for BackReference {
             }
             Box::new(std::iter::once(position + l))
         } else {
-            // We don't know the backref yet
-            Box::new(std::iter::empty())
+            // The group has not captured anything (it did not participate in
+            // the match so far, or the attempts that did were backtracked):
+            // "If no string is matched by the Nth capturing subexpression,
+            // the back-reference is interpreted as matching a zero-length
+            // string" (XPath F&O 1.0 §7.6.1, 3.1 §5.6.1).
+            Box::new(std::iter::once(position))
         }
     }
 }

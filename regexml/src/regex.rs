@@ -23,7 +23,7 @@ impl Regex {
         let re_compiler = ReCompiler::new(pattern, re_flags);
         let re_program = re_compiler.compile()?;
         // we need to check if the regex matches the empty string
-        let mut matcher = ReMatcher::new(&re_program, "");
+        let mut matcher = ReMatcher::new_without_captures(&re_program, "");
         let matches_empty_string = matcher.is_match();
         Ok(Self {
             re_program,
@@ -43,7 +43,7 @@ impl Regex {
 
     /// Returns `true` if the argument matches this regular expression.
     pub fn is_match(&self, haystack: &str) -> bool {
-        let mut matcher = self.matcher(haystack);
+        let mut matcher = ReMatcher::new_without_captures(&self.re_program, haystack);
         matcher.is_match()
     }
 
@@ -74,14 +74,14 @@ impl Regex {
         // if we input the empty string, we should return no tokens
         if haystack.is_empty() {
             return Ok(TokenIter {
-                matcher: self.matcher(haystack),
+                matcher: ReMatcher::new_without_captures(&self.re_program, haystack),
                 prev_end: None,
             });
         }
         self.check_matches_empty_string()?;
 
         Ok(TokenIter {
-            matcher: self.matcher(haystack),
+            matcher: ReMatcher::new_without_captures(&self.re_program, haystack),
             prev_end: Some(0),
         })
     }

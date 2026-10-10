@@ -22,6 +22,10 @@ pub(crate) struct ReMatcher<'a> {
     case_mapper: CaseMapper,
     // parenthesized subexpressions
     state: RefCell<State>,
+    // whether captures must be correct after backtracking (`Undo`): always,
+    // except when only the yes/no answer or the overall match is wanted and
+    // the program has no back-references, so that nothing reads them
+    track_captures: bool,
 }
 
 #[derive(Debug)]
@@ -31,6 +35,9 @@ pub(crate) struct State {
     pub(crate) capture_state: CaptureState,
     pub(crate) anchored_match: bool,
     pub(crate) history: History,
+    // Undo log of the capture writes made during the current match attempt,
+    // most recent last; see `ReMatcher::trail_mark` and `ReMatcher::undo_to`.
+    pub(crate) trail: Vec<Undo>,
 }
 
 impl State {
@@ -41,8 +48,36 @@ impl State {
             capture_state: CaptureState::new(),
             anchored_match: false,
             history: History::new(),
+            trail: Vec::new(),
         }
     }
+}
+
+/// A capture write that backtracking may have to take back: the group and
+/// the offsets it held before the write.
+///
+/// Captures are side effects of the matching iterators, so an attempt that
+/// is abandoned (an alternative, an iteration of a repeat) would otherwise
+/// leave its writes behind, overwriting what the group had captured on the
+/// path that is still being followed. Every write is logged here first, and
+/// an iterator that gives up undoes the log down to the mark it took when it
+/// was created (`CaptureGroupIterator`, `RestoreCaptures`; a fixed-length
+/// repetition also keeps a mark per repetition, to back off one at a time),
+/// which puts back exactly the state its attempt started from.
+#[derive(Debug, Clone, Copy)]
+pub(crate) enum Undo {
+    /// `capture_state.startn` / `endn` of a group.
+    Paren {
+        group_nr: usize,
+        start: Option<usize>,
+        end: Option<usize>,
+    },
+    /// `start_backref` / `end_backref` of a group.
+    Backref {
+        group_nr: usize,
+        start: Option<usize>,
+        end: Option<usize>,
+    },
 }
 
 impl<'a> ReMatcher<'a> {
@@ -53,7 +88,23 @@ impl<'a> ReMatcher<'a> {
             search,
             state: RefCell::new(State::new()),
             case_mapper: CaseMapper::new(),
+            track_captures: true,
         }
+    }
+
+    /// A matcher for a caller that reads no captured group (only whether
+    /// there is a match, and where): without back-references the captures
+    /// cannot change the outcome, so they are not kept correct on
+    /// backtracking, which costs a log entry per capture.
+    pub(crate) fn new_without_captures(program: &'a ReProgram, search: &str) -> Self {
+        let mut matcher = Self::new(program, search);
+        matcher.track_captures = program.optimization_flags & OPT_HASBACKREFS != 0;
+        matcher
+    }
+
+    /// Whether captures are kept correct on backtracking (see `Undo`).
+    pub(crate) fn tracks_captures(&self) -> bool {
+        self.track_captures
     }
 
     pub(crate) fn match_at(&self, i: usize, anchored: bool) -> bool {
@@ -69,12 +120,17 @@ impl<'a> ReMatcher<'a> {
         }
 
         // match against string
+        let mark = self.trail_mark();
         let mut iter = self.program.operation.matches_iter(self, i);
         if let Some(idx) = iter.next() {
             self.set_paren_end(0, idx);
+            // the captures are those of the match: nothing left to undo
+            self.state.borrow_mut().trail.clear();
             true
         } else {
-            // didn't match
+            // didn't match; an exhausted iterator has already taken back its
+            // captures, so this only makes sure of it
+            self.undo_to(mark);
             self.state.borrow_mut().capture_state.paren_count = 0;
             false
         }
@@ -83,6 +139,7 @@ impl<'a> ReMatcher<'a> {
     pub(crate) fn matches(&mut self, i: usize) -> bool {
         // clear the captured group state
         self.state.borrow_mut().capture_state = CaptureState::new();
+        self.state.borrow_mut().trail.clear();
 
         // can we optimize the search by looking for new lines?
         if self.program.optimization_flags & OPT_HASBOL == OPT_HASBOL {
@@ -387,24 +444,12 @@ impl<'a> ReMatcher<'a> {
 
     // state related
 
-    fn start_backref_len(&self) -> usize {
-        self.state.borrow().start_backref.len()
-    }
-
     pub(crate) fn start_backref(&self, i: usize) -> Option<usize> {
         self.state.borrow().start_backref[i]
     }
 
-    pub(crate) fn set_start_backref(&self, i: usize, value: Option<usize>) {
-        self.state.borrow_mut().start_backref[i] = value;
-    }
-
     pub(crate) fn end_backref(&self, i: usize) -> Option<usize> {
         self.state.borrow().end_backref[i]
-    }
-
-    pub(crate) fn set_end_backref(&self, i: usize, value: Option<usize>) {
-        self.state.borrow_mut().end_backref[i] = value;
     }
 
     pub(crate) fn anchored_match(&self) -> bool {
@@ -429,10 +474,6 @@ impl<'a> ReMatcher<'a> {
             }
         }
         None
-    }
-
-    fn startn_len(&self) -> usize {
-        self.state.borrow().capture_state.startn.len()
     }
 
     pub(crate) fn get_paren_start(&self, group_nr: usize) -> Option<usize> {
@@ -465,29 +506,6 @@ impl<'a> ReMatcher<'a> {
             .set_paren_end(group_nr, position)
     }
 
-    pub(crate) fn clear_captured_groups_beyond(&self, pos: usize) {
-        for i in 0..self.startn_len() {
-            let start = self.capture_state_startn(i);
-            if start >= Some(pos) {
-                self.set_capture_state_endn(i, start);
-            }
-        }
-        for i in 0..self.start_backref_len() {
-            let start = self.start_backref(i);
-            if start >= Some(pos) {
-                self.set_end_backref(i, start);
-            }
-        }
-    }
-
-    fn capture_state_startn(&self, i: usize) -> Option<usize> {
-        self.state.borrow().capture_state.startn[i]
-    }
-
-    fn set_capture_state_endn(&self, i: usize, value: Option<usize>) {
-        self.state.borrow_mut().capture_state.endn[i] = value;
-    }
-
     pub(crate) fn paren_count(&self) -> usize {
         self.state.borrow().capture_state.paren_count
     }
@@ -496,16 +514,108 @@ impl<'a> ReMatcher<'a> {
         self.state.borrow_mut().capture_state.paren_count = count;
     }
 
-    pub(crate) fn capture_state(&self) -> CaptureState {
-        self.state.borrow().capture_state.clone()
+    /// Records that group `group_nr` has matched `start..end`, logging what
+    /// it held before (`Undo`) so that backtracking can put that back.
+    pub(crate) fn capture(&self, group_nr: usize, start: usize, end: usize) {
+        let state = &mut *self.state.borrow_mut();
+        let captures = &mut state.capture_state;
+        if self.track_captures {
+            state.trail.push(Undo::Paren {
+                group_nr,
+                start: captures.startn.get(group_nr).copied().flatten(),
+                end: captures.endn.get(group_nr).copied().flatten(),
+            });
+        }
+        captures.set_paren_start(group_nr, start);
+        captures.set_paren_end(group_nr, end);
+        if self.program.optimization_flags & OPT_HASBACKREFS != 0 {
+            state.trail.push(Undo::Backref {
+                group_nr,
+                start: state.start_backref[group_nr],
+                end: state.end_backref[group_nr],
+            });
+            state.start_backref[group_nr] = Some(start);
+            state.end_backref[group_nr] = Some(end);
+        }
     }
 
-    pub(crate) fn reset_state(&self, capture_state: CaptureState) {
-        self.state.borrow_mut().capture_state = capture_state;
+    /// Records the start of an attempt to match group `group_nr` for its
+    /// back-references (only when the program has back-references), logged
+    /// like `capture`.
+    pub(crate) fn open_backref(&self, group_nr: usize, start: usize) {
+        let state = &mut *self.state.borrow_mut();
+        state.trail.push(Undo::Backref {
+            group_nr,
+            start: state.start_backref[group_nr],
+            end: state.end_backref[group_nr],
+        });
+        state.start_backref[group_nr] = Some(start);
+    }
+
+    /// Sets group `group_nr` back to "not matched", logged like `capture`.
+    pub(crate) fn unbind(&self, group_nr: usize) {
+        let state = &mut *self.state.borrow_mut();
+        let captures = &mut state.capture_state;
+        if group_nr < captures.startn.len() && group_nr < captures.endn.len() {
+            let (start, end) = (captures.startn[group_nr], captures.endn[group_nr]);
+            if start.is_some() || end.is_some() {
+                state.trail.push(Undo::Paren {
+                    group_nr,
+                    start,
+                    end,
+                });
+                captures.startn[group_nr] = None;
+                captures.endn[group_nr] = None;
+            }
+        }
+        if self.program.optimization_flags & OPT_HASBACKREFS != 0 {
+            let (start, end) = (state.start_backref[group_nr], state.end_backref[group_nr]);
+            if start.is_some() || end.is_some() {
+                state.trail.push(Undo::Backref {
+                    group_nr,
+                    start,
+                    end,
+                });
+                state.start_backref[group_nr] = None;
+                state.end_backref[group_nr] = None;
+            }
+        }
+    }
+
+    /// The current length of the capture log: an iterator takes it when it is
+    /// created and passes it to `undo_to` when it gives up.
+    pub(crate) fn trail_mark(&self) -> usize {
+        self.state.borrow().trail.len()
+    }
+
+    /// Takes back every capture write logged after `mark`, most recent first,
+    /// restoring the offsets the groups held when the mark was taken.
+    pub(crate) fn undo_to(&self, mark: usize) {
+        let state = &mut *self.state.borrow_mut();
+        while state.trail.len() > mark {
+            match state.trail.pop().unwrap() {
+                Undo::Paren {
+                    group_nr,
+                    start,
+                    end,
+                } => {
+                    state.capture_state.startn[group_nr] = start;
+                    state.capture_state.endn[group_nr] = end;
+                }
+                Undo::Backref {
+                    group_nr,
+                    start,
+                    end,
+                } => {
+                    state.start_backref[group_nr] = start;
+                    state.end_backref[group_nr] = end;
+                }
+            }
+        }
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub(crate) struct CaptureState {
     // Number of subexpressions matched (num open parens + 1)
     pub(crate) paren_count: usize,
