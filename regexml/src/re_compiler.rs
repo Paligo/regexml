@@ -28,6 +28,19 @@ pub(crate) const NODE_NORMAL: u32 = 0;
 // True if top level expr
 pub(crate) const NODE_TOPLEVEL: u32 = 2;
 
+// The deepest nesting of groups and character classes that is compiled.
+//
+// Compiling and matching recurse once per level: a level of groups takes about
+// 1 KB of stack to compile in an optimized build (5.5 KB in a debug build) and
+// up to 0.5 KB (2 KB) to match, and a level of character class subtraction
+// 0.5 KB (2.5 KB) to compile. A deeper expression is a syntax error rather than
+// a stack overflow, which would abort the process. At the limit, compiling
+// takes less than 400 KB of stack in a debug build, under a fifth of the 2 MB
+// a spawned thread has, and matching less than 150 KB. The deepest expressions
+// in the W3C XML Schema test suite, URI and IRI patterns derived from RFC 3986
+// and RFC 3987, nest 15 levels deep.
+const MAX_NESTING_DEPTH: usize = 64;
+
 pub(crate) struct ReCompiler {
     // Input state for compiling regular expression
 
@@ -49,6 +62,9 @@ pub(crate) struct ReCompiler {
     captures: HashSet<usize>,
     has_back_references: bool,
 
+    // current nesting of groups and character classes
+    nesting_depth: usize,
+
     re_flags: ReFlags,
 }
 
@@ -59,7 +75,8 @@ pub enum Error {
     Internal,
     /// Invalid flags (FORX0001)
     InvalidFlags(String),
-    /// Syntax error (FORX0002)
+    /// Syntax error (FORX0002). Also reported for an expression that nests
+    /// groups and character classes more than 64 levels deep.
     Syntax(String),
     /// Pattern matches an empty string (FORX0003)
     MatchesEmptyString,
@@ -96,8 +113,22 @@ impl ReCompiler {
             bracket_max: 0,
             captures: HashSet::new(),
             has_back_references: false,
+            nesting_depth: 0,
             re_flags,
         }
+    }
+
+    // Called when a group or a character class opens; the caller decrements
+    // `nesting_depth` again when it closes.
+    fn enter_nesting(&mut self) -> Result<(), Error> {
+        self.nesting_depth += 1;
+        if self.nesting_depth > MAX_NESTING_DEPTH {
+            return Err(Error::syntax(format!(
+                "Groups and character classes nested more than {} levels deep",
+                MAX_NESTING_DEPTH
+            )));
+        }
+        Ok(())
     }
 
     fn bracket(&mut self) -> Result<(), Error> {
@@ -361,6 +392,8 @@ impl ReCompiler {
             return Err(Error::Internal);
         }
 
+        self.enter_nesting()?;
+
         // check for unterminated or empty class
         self.idx += 1;
         let index = self.idx;
@@ -530,6 +563,7 @@ impl ReCompiler {
         if let Some(subtrahend) = subtrahend {
             result = result.difference(subtrahend);
         }
+        self.nesting_depth -= 1;
         Ok(result)
     }
 
@@ -870,6 +904,7 @@ impl ReCompiler {
                 group = self.capturing_open_paren_count;
                 self.capturing_open_paren_count += 1;
             }
+            self.enter_nesting()?;
         }
         let mut compiler_flags = compiler_flags.to_vec();
         compiler_flags[0] &= !NODE_TOPLEVEL;
@@ -899,6 +934,7 @@ impl ReCompiler {
                 op = Operation::from(Capture::new(group, op));
                 self.captures.insert(close_parens);
             }
+            self.nesting_depth -= 1;
         } else {
             op = Self::make_sequence(op, Operation::from(EndProgram));
         }
