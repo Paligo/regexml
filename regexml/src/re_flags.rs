@@ -121,9 +121,10 @@ impl ReFlags {
     //     self.debug
     // }
 
-    // We haven't implemented this support yet; in the Java original it
-    // gives a warning.
-    // pub(crate) fn is_allow_unknown_block_names(&self) -> bool {
-    //     self.allow_unknown_block_names
-    // }
+    // Whether a block escape with an unrecognized block name denotes the set
+    // of all characters (XSD 1.1 Part 2 §G.4.2.4) instead of being an error;
+    // the Java original also gives a warning, which we cannot do.
+    pub(crate) fn is_allow_unknown_block_names(&self) -> bool {
+        self.allow_unknown_block_names
+    }
 }

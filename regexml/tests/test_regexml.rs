@@ -229,3 +229,61 @@ fn test_matches_31() {
     let regex = Regex::xpath("(?:abra(?:cad)?)*", "").unwrap();
     assert!(regex.is_match("abracadabra"));
 }
+
+#[test]
+fn test_regex_is_send_and_sync() {
+    fn assert_send_sync<T: Send + Sync>() {}
+    assert_send_sync::<Regex>();
+}
+
+#[test]
+fn test_category_escapes_after_their_sets_are_cached() {
+    // the first compilation of each escape builds its set, the later ones
+    // start from the cached set; complementing or subtracting it in one
+    // expression must not affect another
+    for _ in 0..2 {
+        let regex = Regex::xpath(r"^\P{Lu}+$", "").unwrap();
+        assert!(regex.is_match("abc1"));
+        assert!(!regex.is_match("aBc"));
+
+        let regex = Regex::xpath(r"^[\p{L}-[\p{Lu}]]+$", "").unwrap();
+        assert!(regex.is_match("abcé"));
+        assert!(!regex.is_match("abÉ"));
+
+        let regex = Regex::xpath(r"^\p{Lu}+$", "").unwrap();
+        assert!(regex.is_match("ABÉ"));
+        assert!(!regex.is_match("Ab"));
+
+        let regex = Regex::xsd(r"\d{3}-\w+", "").unwrap();
+        assert!(regex.is_match("123-abc"));
+        assert!(regex.is_match("١٢٣-abc"));
+        assert!(!regex.is_match("123-!"));
+
+        let regex = Regex::xpath(r"^[\W\D]+$", "").unwrap();
+        assert!(regex.is_match("a!"));
+
+        let regex = Regex::xpath(r"^\W+$", "").unwrap();
+        assert!(regex.is_match("!? "));
+        assert!(!regex.is_match("!a"));
+    }
+}
+
+#[test]
+fn test_category_escapes_compiled_on_several_threads() {
+    let threads: Vec<_> = (0..8)
+        .map(|i| {
+            std::thread::spawn(move || {
+                let pattern = if i % 2 == 0 {
+                    r"^\p{Lu}\w*\d$"
+                } else {
+                    r"^[\p{L}-[\p{Ll}]]\w*\d$"
+                };
+                let regex = Regex::xpath(pattern, "").unwrap();
+                regex.is_match("Abc1") && !regex.is_match("abc1")
+            })
+        })
+        .collect();
+    for thread in threads {
+        assert!(thread.join().unwrap());
+    }
+}

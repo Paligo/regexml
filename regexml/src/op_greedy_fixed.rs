@@ -1,6 +1,9 @@
 use crate::{
     op_nothing::Nothing,
-    operation::{Operation, OperationControl, RepeatOperation, MATCHES_ZLS_ANYWHERE},
+    operation::{
+        captures, groups_of, unbind_groups, Operation, OperationControl, RepeatOperation,
+        MATCHES_ZLS_ANYWHERE,
+    },
     re_flags::ReFlags,
     re_matcher::ReMatcher,
 };
@@ -70,7 +73,7 @@ impl OperationControl for GreedyFixed {
 
     fn matches_iter<'a>(
         &self,
-        matcher: &'a ReMatcher,
+        matcher: &'a ReMatcher<'a>,
         position: usize,
     ) -> Box<dyn Iterator<Item = usize> + 'a> {
         let mut guard = matcher.search.len();
@@ -79,6 +82,10 @@ impl OperationControl for GreedyFixed {
         }
         if position >= guard && self.min > 0 {
             return Box::new(std::iter::empty());
+        }
+
+        if matcher.tracks_captures() && captures(&self.operation) {
+            return self.capturing_matches_iter(matcher, position, guard);
         }
 
         let mut p = position;
@@ -109,6 +116,56 @@ impl OperationControl for GreedyFixed {
     fn children(&self) -> Vec<Operation> {
         vec![self.operation.as_ref().clone()]
     }
+
+    fn collect_groups(&self, groups: &mut Vec<usize>) {
+        self.operation.collect_groups(groups);
+    }
+}
+
+impl GreedyFixed {
+    // `matches_iter` when the repeated operation captures groups: `marks[k]`
+    // is the capture log's length after `k` iterations, so that backing off to
+    // fewer iterations can take back the captures of the ones dropped.
+    fn capturing_matches_iter<'a>(
+        &self,
+        matcher: &'a ReMatcher<'a>,
+        position: usize,
+        guard: usize,
+    ) -> Box<dyn Iterator<Item = usize> + 'a> {
+        // (one allocation: at most `(guard - position) / len + 1` iterations)
+        let mut marks = Vec::with_capacity(((guard - position) / self.len + 2).min(1024));
+        marks.push(matcher.trail_mark());
+        let mut p = position;
+        let mut matches = 0;
+        while p <= guard {
+            let mut it = self.operation.matches_iter(matcher, p);
+            let matched = it.next().is_some();
+            if matched {
+                matches += 1;
+                p += self.len;
+                marks.push(matcher.trail_mark());
+                if matches == self.max {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+        if matches < self.min {
+            matcher.undo_to(marks[0]);
+            return Box::new(std::iter::empty());
+        }
+        Box::new(CapturingStepIterator {
+            matcher,
+            marks,
+            groups: groups_of(&self.operation),
+            position,
+            len: self.len,
+            min: self.min,
+            count: matches,
+            started: false,
+        })
+    }
 }
 
 impl RepeatOperation for GreedyFixed {
@@ -126,6 +183,43 @@ impl RepeatOperation for GreedyFixed {
 
     fn greedy(&self) -> bool {
         true
+    }
+}
+
+// `IntStepIterator` for a repeated operation that captures groups: reports
+// `count` iterations, then one fewer each time it is asked again, down to
+// `min`, taking back the captures of each iteration it drops — the captures
+// are always those of the iterations it reports; zero iterations leave the
+// operand's groups unmatched (`unbind_groups`). When it gives up, it takes
+// back the captures of all of them.
+struct CapturingStepIterator<'a> {
+    matcher: &'a ReMatcher<'a>,
+    marks: Vec<usize>,
+    groups: Vec<usize>,
+    position: usize,
+    len: usize,
+    min: usize,
+    count: usize,
+    started: bool,
+}
+
+impl Iterator for CapturingStepIterator<'_> {
+    type Item = usize;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if !self.started {
+            self.started = true;
+        } else if self.count > self.min {
+            self.count -= 1;
+            self.matcher.undo_to(self.marks[self.count]);
+        } else {
+            self.matcher.undo_to(self.marks[0]);
+            return None;
+        }
+        if self.count == 0 {
+            unbind_groups(self.matcher, &self.groups);
+        }
+        Some(self.position + self.len * self.count)
     }
 }
 

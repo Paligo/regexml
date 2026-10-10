@@ -95,6 +95,10 @@ pub(crate) trait OperationControl {
         false
     }
 
+    /// Append the numbers of the capturing groups in this expression,
+    /// including this one if it is a capturing group itself.
+    fn collect_groups(&self, _groups: &mut Vec<usize>) {}
+
     /// Access child information so we can structurally dive into
     /// a regex, mostly for testing purposes.
     /// allow unused code to exist as we do use it in the tests
@@ -140,6 +144,84 @@ impl Operation {
             _ => None,
         }
     }
+}
+
+/// Wraps the iterator of a repetition whose repeated operation captures
+/// groups: when it gives up, every capture written since it was created is
+/// taken back (`ReMatcher::undo_to`).
+///
+/// A capturing group restores its own captures when it is exhausted
+/// (`CaptureGroupIterator`), and a sequence or a choice only moves on from a
+/// sub-iterator once it is exhausted, so neither needs this. A repetition
+/// does: it keeps the captures of iterations whose iterators it has dropped
+/// (they are on the path it reports), and it may stop before those are
+/// exhausted (`ForceProgressIterator`), so when it fails, it must undo them
+/// itself.
+pub(crate) struct RestoreCaptures<'a> {
+    matcher: &'a ReMatcher<'a>,
+    mark: usize,
+    base: Box<dyn Iterator<Item = usize> + 'a>,
+}
+
+impl<'a> RestoreCaptures<'a> {
+    /// `mark` is `matcher.trail_mark()` taken before the repetition did any
+    /// matching (it primes its iterators when it is created).
+    pub(crate) fn wrap(
+        matcher: &'a ReMatcher<'a>,
+        mark: usize,
+        base: Box<dyn Iterator<Item = usize> + 'a>,
+    ) -> Box<dyn Iterator<Item = usize> + 'a> {
+        Box::new(Self {
+            matcher,
+            mark,
+            base,
+        })
+    }
+}
+
+impl Iterator for RestoreCaptures<'_> {
+    type Item = usize;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let next = self.base.next();
+        if next.is_none() {
+            self.matcher.undo_to(self.mark);
+        }
+        next
+    }
+}
+
+/// Whether `operation` is a capturing group or contains one: only then can
+/// matching it write captures.
+pub(crate) fn captures(operation: &Operation) -> bool {
+    matches!(operation, Operation::Capture(_)) || operation.contains_capturing_expressions()
+}
+
+/// The numbers of the capturing groups in `operation`.
+pub(crate) fn groups_of(operation: &Operation) -> Vec<usize> {
+    let mut groups = Vec::new();
+    operation.collect_groups(&mut groups);
+    groups
+}
+
+/// Called when a repetition reports that it has matched its operand zero
+/// times: the groups inside the operand did not match in it, so the ones
+/// still holding a capture from an earlier iteration of an enclosing
+/// repetition are set back to "not matched" (logged, so backtracking past
+/// the zero-occurrence choice restores them). Returns the capture log's
+/// length before, for `ReMatcher::undo_to`.
+///
+/// This is how the W3C XQuery/XPath 3 test suite reads captures in nested
+/// repetitions (fn-matches-50, `^((.)?a\2)+$` matches "babadad": in the second
+/// iteration `(.)?` matches nothing, so `\2` matches the zero-length string;
+/// W3C bug 29253); F&O 3.1 §5.6.1 leaves the substring captured in nested
+/// repeating constructs implementation-dependent.
+pub(crate) fn unbind_groups(matcher: &ReMatcher, groups: &[usize]) -> usize {
+    let mark = matcher.trail_mark();
+    for &group_nr in groups {
+        matcher.unbind(group_nr);
+    }
+    mark
 }
 
 // The ForceProgressIterator is used to protect against non-termination;

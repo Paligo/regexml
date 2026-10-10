@@ -23,7 +23,7 @@ impl Regex {
         let re_compiler = ReCompiler::new(pattern, re_flags);
         let re_program = re_compiler.compile()?;
         // we need to check if the regex matches the empty string
-        let mut matcher = ReMatcher::new(&re_program, "");
+        let mut matcher = ReMatcher::new_without_captures(&re_program, "");
         let matches_empty_string = matcher.is_match();
         Ok(Self {
             re_program,
@@ -32,18 +32,41 @@ impl Regex {
     }
 
     /// Create a regular expression from a string, using XPath 3.1 rules.
+    ///
+    /// A block escape with a block name that is not recognized, such as
+    /// `\p{IsUnknown}`, is a syntax error, as F&O 3.1 §5.6.1.5 requires; the
+    /// `;k` flag described at [`Regex::xsd`] makes it denote all characters
+    /// here too. F&O 3.1 §5.6.2 makes a `;` in the flags an error (FORX0001),
+    /// so a caller that passes on flags given by a user should not pass on
+    /// `;k`.
     pub fn xpath(re: &str, flags: &str) -> Result<Self, Error> {
         Self::new(re, flags, Language::XPath)
     }
 
     /// Create a regular expression from a string, using XML Schema 1.1 rules.
+    ///
+    /// A block escape with a block name that is not recognized, such as
+    /// `\p{IsUnknown}`, is a syntax error by default. XSD 1.1 Part 2 §G.4.2.4
+    /// lets it denote the set of all characters instead, for `\p{IsX}` and
+    /// `\P{IsX}` alike; ask for that by ending the flags with `;k`, as in
+    /// Saxon:
+    ///
+    /// ```
+    /// use regexml::Regex;
+    ///
+    /// assert!(Regex::xsd(r"\p{IsUnknown}", "").is_err());
+    /// let regex = Regex::xsd(r"\p{IsUnknown}", ";k").unwrap();
+    /// assert!(regex.is_match("a"));
+    /// // the other flags go before the `;`
+    /// assert!(Regex::xsd(r"\P{IsUnknown}", "i;k").unwrap().is_match("a"));
+    /// ```
     pub fn xsd(re: &str, flags: &str) -> Result<Self, Error> {
         Self::new(re, flags, Language::XSD)
     }
 
     /// Returns `true` if the argument matches this regular expression.
     pub fn is_match(&self, haystack: &str) -> bool {
-        let mut matcher = self.matcher(haystack);
+        let mut matcher = ReMatcher::new_without_captures(&self.re_program, haystack);
         matcher.is_match()
     }
 
@@ -74,19 +97,19 @@ impl Regex {
         // if we input the empty string, we should return no tokens
         if haystack.is_empty() {
             return Ok(TokenIter {
-                matcher: self.matcher(haystack),
+                matcher: ReMatcher::new_without_captures(&self.re_program, haystack),
                 prev_end: None,
             });
         }
         self.check_matches_empty_string()?;
 
         Ok(TokenIter {
-            matcher: self.matcher(haystack),
+            matcher: ReMatcher::new_without_captures(&self.re_program, haystack),
             prev_end: Some(0),
         })
     }
 
-    pub(crate) fn matcher(&self, search: &str) -> ReMatcher {
+    pub(crate) fn matcher(&self, search: &str) -> ReMatcher<'_> {
         ReMatcher::new(&self.re_program, search)
     }
 

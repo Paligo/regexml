@@ -95,6 +95,10 @@ impl OperationControl for UnambiguousRepeat {
     fn children(&self) -> Vec<Operation> {
         vec![self.operation.as_ref().clone()]
     }
+
+    fn collect_groups(&self, groups: &mut Vec<usize>) {
+        self.operation.collect_groups(groups);
+    }
 }
 
 impl RepeatOperation for UnambiguousRepeat {
