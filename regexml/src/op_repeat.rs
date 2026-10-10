@@ -155,7 +155,12 @@ impl Repeat {
                 ),
             )))
         } else {
-            // reluctant (non-greedy) repeat.
+            // reluctant (non-greedy) repeat; as in the greedy case, the groups
+            // of a capturing operand are left unmatched when zero occurrences
+            // are reported
+            let zero_groups =
+                (self.min == 0 && matcher.tracks_captures() && captures(&self.operation))
+                    .then(|| groups_of(&self.operation));
             Box::new(ForceProgressIterator::new(Box::new(
                 ReluctantRepeatIterator::new(
                     matcher,
@@ -163,6 +168,7 @@ impl Repeat {
                     position,
                     self.min,
                     self.max,
+                    zero_groups,
                 ),
             )))
         }
@@ -284,6 +290,11 @@ struct ReluctantRepeatIterator<'a> {
     max: usize,
     counter: usize,
     position: Option<usize>,
+    // the groups of a capturing operand when zero occurrences are allowed,
+    // and the capture log's length before they were left unmatched for
+    // reporting zero occurrences
+    zero_groups: Option<Vec<usize>>,
+    unbound: Option<usize>,
 }
 
 impl<'a> ReluctantRepeatIterator<'a> {
@@ -293,6 +304,7 @@ impl<'a> ReluctantRepeatIterator<'a> {
         position: usize,
         min: usize,
         max: usize,
+        zero_groups: Option<Vec<usize>>,
     ) -> Self {
         Self {
             matcher,
@@ -301,6 +313,8 @@ impl<'a> ReluctantRepeatIterator<'a> {
             max,
             counter: 0,
             position: Some(position),
+            zero_groups,
+            unbound: None,
         }
     }
 }
@@ -309,6 +323,9 @@ impl Iterator for ReluctantRepeatIterator<'_> {
     type Item = usize;
 
     fn next(&mut self) -> Option<Self::Item> {
+        if let Some(mark) = self.unbound.take() {
+            self.matcher.undo_to(mark);
+        }
         loop {
             if let Some(position) = self.position {
                 let mut it = self.operation.matches_iter(self.matcher, position);
@@ -322,6 +339,9 @@ impl Iterator for ReluctantRepeatIterator<'_> {
                 } else if self.min == 0 && self.counter == 0 {
                     // the operand does not match: zero repetitions
                     self.counter += 1;
+                    if let Some(groups) = &self.zero_groups {
+                        self.unbound = Some(unbind_groups(self.matcher, groups));
+                    }
                 } else {
                     // the operand does not match: no further repetition, and
                     // no match at all if there are fewer than `min`

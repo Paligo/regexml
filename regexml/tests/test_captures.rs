@@ -195,6 +195,35 @@ fn zero_repetitions_leave_the_groups_of_the_operand_unmatched() {
     assert_eq!(first_match("(a)?b", "b"), Some(((0, 1), vec![])));
 }
 
+#[test]
+fn zero_repetitions_of_a_variable_length_reluctant_operand_leave_its_groups_unmatched() {
+    // As with the greedy `?` above: in the second repetition `(a|bc)` matches
+    // nothing, so `\2` matches the zero-length string — for every reluctant
+    // form of a variable-length operand, not only for `(.)??`.
+    for pattern in [
+        r"^((a|bc)?x\2)+$",
+        r"^((a|bc)??x\2)+$",
+        r"^((a|bc){0,1}?x\2)+$",
+        r"^((a|bc)*?x\2)+$",
+    ] {
+        assert!(
+            Regex::xpath(pattern, "").unwrap().is_match("bcxbcx"),
+            "{pattern}"
+        );
+    }
+    assert_eq!(
+        first_match(r"^((a|bc)??x\2)+$", "bcxbcx"),
+        Some(((0, 6), vec![(1, 5, 6)]))
+    );
+    // Backtracking past the zero repetitions restores the capture of the
+    // earlier repetition: the second repetition of the outer group is given
+    // up, so `\2` is the "bc" of the first one again.
+    assert_eq!(
+        first_match(r"^((a|bc)??x)+x\2$", "bcxxbc"),
+        Some(((0, 6), vec![(1, 0, 3), (2, 0, 2)]))
+    );
+}
+
 // Captures of a failed match attempt at an earlier start position are gone
 // when a later one succeeds.
 #[test]
