@@ -319,11 +319,14 @@ impl Iterator for ReluctantRepeatIterator<'_> {
                     } else {
                         self.position = Some(position);
                     }
+                } else if self.min == 0 && self.counter == 0 {
+                    // the operand does not match: zero repetitions
+                    self.counter += 1;
+                } else {
+                    // the operand does not match: no further repetition, and
+                    // no match at all if there are fewer than `min`
+                    self.position = None;
                 }
-            } else if self.min == 0 && self.counter == 0 {
-                self.counter += 1;
-            } else {
-                self.position = None;
             }
             if self.counter >= self.min || self.position.is_none() {
                 break;
