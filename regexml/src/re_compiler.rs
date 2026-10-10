@@ -314,12 +314,29 @@ impl ReCompiler {
                     }
                 } else if block.starts_with(&['I', 's']) {
                     let name = block[2..].iter().collect::<String>();
-                    // TODO: obey isAllowUnknownBlockNames to follow XSD spec
-                    // (which doesn't make this an error; original source code
-                    // issues a warning)
-                    let cc = CharacterClassBuilder::CodePointInversionListBuilder(category::block(
-                        &name,
-                    )?);
+                    let builder = match category::block(&name) {
+                        Ok(builder) => builder,
+                        // XSD 1.1 Part 2 §G.4.2.4: "If a string "IsX" matches
+                        // the non-terminal IsBlock but X is not a recognized
+                        // block name, then the expressions "\p{IsX}" and
+                        // "\P{IsX}" each denote the set of all characters."
+                        // IsBlock is 'Is' [a-zA-Z0-9#x2D]+
+                        Err(_)
+                            if self.re_flags.is_allow_unknown_block_names()
+                                && block[2..]
+                                    .iter()
+                                    .all(|c| c.is_ascii_alphanumeric() || *c == '-') =>
+                        {
+                            self.idx = close + 1;
+                            let mut all = CodePointInversionListBuilder::new();
+                            all.add_range32(&(0x0000..=0x10FFFF));
+                            return Ok(
+                                CharacterClassBuilder::CodePointInversionListBuilder(all).into()
+                            );
+                        }
+                        Err(e) => return Err(e),
+                    };
+                    let cc = CharacterClassBuilder::CodePointInversionListBuilder(builder);
                     self.idx = close + 1;
                     if escape_char == 'p' {
                         Ok(cc.into())

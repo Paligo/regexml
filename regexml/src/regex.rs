@@ -32,11 +32,34 @@ impl Regex {
     }
 
     /// Create a regular expression from a string, using XPath 3.1 rules.
+    ///
+    /// A block escape with a block name that is not recognized, such as
+    /// `\p{IsUnknown}`, is a syntax error, as F&O 3.1 §5.6.1.5 requires; the
+    /// `;k` flag described at [`Regex::xsd`] makes it denote all characters
+    /// here too. F&O 3.1 §5.6.2 makes a `;` in the flags an error (FORX0001),
+    /// so a caller that passes on flags given by a user should not pass on
+    /// `;k`.
     pub fn xpath(re: &str, flags: &str) -> Result<Self, Error> {
         Self::new(re, flags, Language::XPath)
     }
 
     /// Create a regular expression from a string, using XML Schema 1.1 rules.
+    ///
+    /// A block escape with a block name that is not recognized, such as
+    /// `\p{IsUnknown}`, is a syntax error by default. XSD 1.1 Part 2 §G.4.2.4
+    /// lets it denote the set of all characters instead, for `\p{IsX}` and
+    /// `\P{IsX}` alike; ask for that by ending the flags with `;k`, as in
+    /// Saxon:
+    ///
+    /// ```
+    /// use regexml::Regex;
+    ///
+    /// assert!(Regex::xsd(r"\p{IsUnknown}", "").is_err());
+    /// let regex = Regex::xsd(r"\p{IsUnknown}", ";k").unwrap();
+    /// assert!(regex.is_match("a"));
+    /// // the other flags go before the `;`
+    /// assert!(Regex::xsd(r"\P{IsUnknown}", "i;k").unwrap().is_match("a"));
+    /// ```
     pub fn xsd(re: &str, flags: &str) -> Result<Self, Error> {
         Self::new(re, flags, Language::XSD)
     }
