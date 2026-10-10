@@ -86,7 +86,7 @@ impl Regex {
         })
     }
 
-    pub(crate) fn matcher(&self, search: &str) -> ReMatcher {
+    pub(crate) fn matcher(&self, search: &str) -> ReMatcher<'_> {
         ReMatcher::new(&self.re_program, search)
     }
 
